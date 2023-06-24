@@ -1,0 +1,62 @@
+# Gradle 빌드 결과물과 캐시 디렉토리
+.gradle/
+build/
+out/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle Wrapper 파일 (gradle-wrapper.jar은 제외)
+gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Spring Tool Suite (STS) 관련 파일
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# IntelliJ IDEA 관련 파일
+.idea/
+*.iws
+*.iml
+*.ipr
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Kotlin 컴파일 관련 파일
+*.class
+*.kotlin_metadata
+*.kotlin_module
+
+# 로그 파일
+*.log
+
+# 운영체제(OS) 관련 파일
+.DS_Store
+
+# NetBeans 관련 파일
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Visual Studio Code 관련 파일
+.vscode/
+
+# 기타 임시 파일
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+*.old
+
+# 빌드와 관련 없는 개인 파일
+output.txt
