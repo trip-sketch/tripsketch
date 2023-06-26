@@ -23,9 +23,6 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("org.jetbrains.exposed:exposed-core:0.35.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.35.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.35.1")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
