@@ -1,4 +1,4 @@
-package com.example.demo.utils
+package kr.kro.tripsketch.utils
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

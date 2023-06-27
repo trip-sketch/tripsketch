@@ -1,6 +1,6 @@
-package com.example.demo.repositories
+package kr.kro.tripsketch.repositories
 
-import com.example.demo.domain.Comment
+import kr.kro.tripsketch.domain.Comment
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import java.time.LocalDateTime
