@@ -1,7 +1,7 @@
-package com.example.demo.controller
+package kr.kro.tripsketch.controllers
 
-import com.example.demo.dto.CommentDto
-import com.example.demo.service.CommentService
+import kr.kro.tripsketch.dto.CommentDto
+import kr.kro.tripsketch.services.CommentService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

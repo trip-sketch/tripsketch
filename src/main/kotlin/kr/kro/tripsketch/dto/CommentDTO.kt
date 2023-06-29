@@ -1,4 +1,4 @@
-package com.example.demo.dto
+package kr.kro.tripsketch.dto
 
 import java.time.LocalDateTime
 

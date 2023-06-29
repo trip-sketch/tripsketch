@@ -1,4 +1,4 @@
-package com.example.demo.domain
+package kr.kro.tripsketch.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

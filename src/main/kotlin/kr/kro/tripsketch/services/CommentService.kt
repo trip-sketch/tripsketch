@@ -1,8 +1,8 @@
-package com.example.demo.service
+package kr.kro.tripsketch.services
 
-import com.example.demo.domain.Comment
-import com.example.demo.dto.CommentDto
-import com.example.demo.repositories.CommentRepository
+import kr.kro.tripsketch.domain.Comment
+import kr.kro.tripsketch.dto.CommentDto
+import kr.kro.tripsketch.repositories.CommentRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 

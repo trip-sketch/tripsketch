@@ -1,4 +1,4 @@
-package com.example
+package kr.kro
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
