@@ -1,64 +1,55 @@
 package kr.kro.tripsketch.services
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import kr.kro.tripsketch.dto.UserDto
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
+import kr.kro.tripsketch.config.KakaoOAuthConfig
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 @Service
-class KakaoOAuthService {
+class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
-    @Value("\${kakao.client-id}")
-    private lateinit var kakaoClientId: String
-
-    @Value("\${kakao.redirect-uri}")
-    private lateinit var kakaoRedirectUri: String
-
-    fun getKakaoUserInfo(code: String): UserDto {
+    fun getKakaoAccessToken(code: String): String? {
         val restTemplate = RestTemplate()
 
-        // Access Token Request
-        val headers = HttpHeaders()
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-        val body = "grant_type=authorization_code&client_id=$kakaoClientId&redirect_uri=$kakaoRedirectUri&code=$code"
-        val request = HttpEntity(body, headers)
+        val url = "https://kauth.kakao.com/oauth/token" // Kakao 토큰 발급 엔드포인트
 
-        val responseEntity = restTemplate.exchange("https://kauth.kakao.com/oauth/token", HttpMethod.POST, request, String::class.java)
+        // 파라미터 설정
+        val params = mutableMapOf<String, String>()
+        params["grant_type"] = "authorization_code"
+        params["client_id"] = kakaoConfig.clientId
+        params["redirect_uri"] = kakaoConfig.redirectUri
+        params["code"] = code
 
-        // parse the JSON response
-        val mapper = jacksonObjectMapper()
-        val parsedResponse: Map<String, Any> = mapper.readValue(responseEntity.body.toString())
+        return try {
+            val response = restTemplate.postForEntity(url, params, Map::class.java)
+            response.body?.get("access_token") as String?
+        } catch (e: HttpClientErrorException) {
+            if (e.statusCode == HttpStatus.BAD_REQUEST) {
+                // 오류 처리 (예: 잘못된 인증 코드)
+            }
+            null
+        }
+    }
 
-        val accessToken = parsedResponse["access_token"] as String
-        val tokenType = parsedResponse["token_type"] as String
+    fun getUserInfo(accessToken: String?): Map<String, Any>? {
+        if (accessToken == null) return null
 
-        // User Info Request
-        val userHeaders = HttpHeaders()
-        userHeaders.add("Authorization", "$tokenType $accessToken")
-        userHeaders.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-        val userRequest = HttpEntity("parameters", userHeaders)
+        val restTemplate = RestTemplate()
 
-        val userResponseEntity = restTemplate.exchange("https://kapi.kakao.com/v2/user/me", HttpMethod.POST, userRequest, String::class.java)
+        val url = "https://kapi.kakao.com/v2/user/me" // Kakao 사용자 정보 엔드포인트
 
-        // parse the user JSON response
-        val parsedUserResponse: Map<String, Any> = mapper.readValue(userResponseEntity.body.toString())
+        val headers = mutableMapOf<String, String>()
+        headers["Authorization"] = "Bearer $accessToken"
 
-        val email = parsedUserResponse["email"] as String
-        val nickname = parsedUserResponse["nickname"] as String
-        val introduction = parsedUserResponse["introduction"] as String
-        val profileImageUrl = parsedUserResponse["profile_image_url"] as String
-
-        return UserDto(
-            id = "",
-            email = email,
-            nickname = nickname,
-            introduction = introduction,
-            profileImageUrl = profileImageUrl
-        )
+        return try {
+            val response = restTemplate.postForEntity(url, headers, Map::class.java)
+            response.body as Map<String, Any>?
+        } catch (e: HttpClientErrorException) {
+            if (e.statusCode == HttpStatus.BAD_REQUEST) {
+                // 오류 처리 (예: 잘못된 액세스 토큰)
+            }
+            null
+        }
     }
 }
