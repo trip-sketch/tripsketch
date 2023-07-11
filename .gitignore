@@ -60,3 +60,7 @@ bin/
 
 # 빌드와 관련 없는 개인 파일
 output.txt
+
+# 환경변수
+.env
+/src/main/resources/application.properties
