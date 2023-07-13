@@ -70,6 +70,8 @@ dependencies {
 
     // Java에서 .env 파일을 관리하는 라이브러리
     implementation("io.github.cdimascio:java-dotenv:5.2.2")
+
+
 }
 
 

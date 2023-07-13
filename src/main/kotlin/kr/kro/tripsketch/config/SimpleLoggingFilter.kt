@@ -1,31 +1,28 @@
-package kr.kro.tripsketch.config
+package kr.kro.refbook.config
 
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Component
-import java.io.IOException
-import javax.servlet.Filter
-import javax.servlet.FilterChain
-import javax.servlet.FilterConfig
-import javax.servlet.ServletException
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.*
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 @Component
 class SimpleLoggingFilter : Filter {
 
-    private val logger = LoggerFactory.getLogger(SimpleLoggingFilter::class.java)
+    private val logger = LogManager.getLogger(SimpleLoggingFilter::class.java)
 
-    @Throws(IOException::class, ServletException::class)
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
 
         val httpRequest = request as HttpServletRequest
         val httpResponse = response as HttpServletResponse
 
-        // 요청 정보를 로그로 남깁니다.
-        chain.doFilter(request, response)
-        logger.info("[${httpResponse.status}] ${httpRequest.method} ${httpRequest.requestURI}")
+        try {
+            chain.doFilter(request, response)
+        } catch (e: Exception) {
+            logger.error("Error occurred while filtering the request/response", e)
+        } finally {
+            logger.info("[${httpResponse.status}] ${httpRequest.method} ${httpRequest.requestURI}")
+        }
     }
 
     override fun init(filterConfig: FilterConfig) {}

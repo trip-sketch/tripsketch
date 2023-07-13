@@ -7,7 +7,7 @@ import kotlin.random.Random
 class NickNameService {
     private val actions = listOf("먹는", "마시는", "기다리는", "상상하는", "훔치는", "사고싶은", "먹고싶은", "싫은", "생각하는", "꿈꾸는")
     private val objects = listOf("과자", "음료수", "과일", "우유", "사탕", "초콜릿", "아이스크림", "커피", "라면", "빵")
-    private val animals = listOf("곰돌이", "나비", "고양이", "강아지", "토끼", "사자", "호랑이", "코끼리", "원숭이", "앵무새", "개")
+    private val animals = listOf("곰돌이", "나비", "야옹이", "멍멍이", "토끼", "사자", "호랑이", "코끼리", "원숭이", "앵무새", "사슴")
 
     fun generateRandomNickname(): String {
         val randomAction = actions.random()
