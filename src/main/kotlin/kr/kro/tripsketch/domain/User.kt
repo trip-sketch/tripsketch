@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 data class User(
     @Id val id: String? = null,
     val email: String,
-    val nickname: String?,
-    val introduction: String?,
-    val profileImageUrl: String?,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    var nickname: String?,
+    var introduction: String?,
+    var profileImageUrl: String?,
+    var createdAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 )

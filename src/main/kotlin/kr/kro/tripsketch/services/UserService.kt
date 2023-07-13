@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.dto.UserLoginDto
+import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.repositories.UserRepository
@@ -30,5 +31,24 @@ class UserService(private val userRepository: UserRepository) {
 
     fun loginUser(userLoginDto: UserLoginDto): User? {
         return userRepository.findByEmail(userLoginDto.email)
+    }
+
+    fun getAllUsers(): List<User> {
+        return userRepository.findAll()
+    }
+
+    // 사용자 업데이트
+    fun updateUser(email: String, userUpdateDto: UserUpdateDto): User {
+        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+        if (userUpdateDto.nickname != null) {
+            user.nickname = userUpdateDto.nickname
+        }
+        if (userUpdateDto.profileImageUrl != null) {
+            user.profileImageUrl = userUpdateDto.profileImageUrl
+        }
+        if (userUpdateDto.introduction != null) {
+            user.introduction = userUpdateDto.introduction
+        }
+        return userRepository.save(user)
     }
 }

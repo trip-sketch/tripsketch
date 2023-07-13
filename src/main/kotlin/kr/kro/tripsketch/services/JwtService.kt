@@ -1,16 +1,16 @@
 package kr.kro.tripsketch.services
 
-import org.springframework.stereotype.Service
-import kr.kro.tripsketch.domain.User
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import java.util.Date
+import kr.kro.tripsketch.domain.User
+import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class JwtService {
     private val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-    private val tokenValidityInMilliseconds: Long = 3600000  // 1 hour for example
+    private val tokenValidityInMilliseconds: Long = 3600000  // 1 hour
 
     fun createToken(user: User): String {
         val claims = Jwts.claims().setSubject(user.email)
@@ -25,5 +25,23 @@ class JwtService {
             .setExpiration(validity)
             .signWith(secretKey)
             .compact()
+    }
+
+    fun validateToken(token: String): Boolean {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
+            return true
+        } catch (e: Exception) {
+            // 토큰 파싱에 실패하면 false를 반환합니다.
+            return false
+        }
+    }
+
+    fun getEmailFromToken(token: String): String {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
+    }
+
+    fun getNicknameFromToken(token: String): String {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body["nickname"].toString()
     }
 }

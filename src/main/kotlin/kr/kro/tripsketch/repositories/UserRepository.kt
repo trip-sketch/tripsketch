@@ -7,5 +7,4 @@ interface UserRepository : MongoRepository<User, String> {
 
     fun findByEmail(email: String): User?
 
-
 }
