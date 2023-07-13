@@ -1,15 +1,16 @@
 package kr.kro.tripsketch.services
 
-import org.springframework.stereotype.Service
 import kr.kro.tripsketch.config.KakaoOAuthConfig
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.stereotype.Service
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
+
+inline fun <reified T: Any> typeRef(): ParameterizedTypeReference<T> = object: ParameterizedTypeReference<T>(){}
 
 @Service
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
@@ -31,8 +32,9 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val request = HttpEntity(params, headers)
 
         return try {
-            val response = restTemplate.postForEntity(url, request, Map::class.java)
-            response.body?.get("access_token") as String?
+            val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
+            val body = response.body
+            body?.get("access_token") as? String
         } catch (e: RestClientException) {
             println("Error while requesting access token: ${e.message}")
             null
@@ -53,8 +55,8 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val request = HttpEntity<String>("", headers)
 
         return try {
-            val response = restTemplate.exchange(url, HttpMethod.POST, request, Map::class.java)
-            response.body as? Map<String, Any>
+            val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
+            response.body
         } catch (e: RestClientException) {
             // 오류 처리
             null
