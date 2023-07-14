@@ -2,15 +2,15 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.config.KakaoOAuthConfig
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 
-inline fun <reified T: Any> typeRef(): ParameterizedTypeReference<T> = object: ParameterizedTypeReference<T>(){}
+inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object : ParameterizedTypeReference<T>() {}
 
 @Service
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {

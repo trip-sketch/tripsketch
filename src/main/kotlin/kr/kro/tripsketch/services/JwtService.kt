@@ -10,7 +10,7 @@ import java.util.*
 @Service
 class JwtService {
     private val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-    private val tokenValidityInMilliseconds: Long = 3600000  // 1 hour
+    private val tokenValidityInMilliseconds: Long = 3600000 // 1 hour
 
     fun createToken(user: User): String {
         val claims = Jwts.claims().setSubject(user.email)

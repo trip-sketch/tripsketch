@@ -1,10 +1,10 @@
 package kr.kro.refbook.config
 
-import org.apache.logging.log4j.LogManager
-import org.springframework.stereotype.Component
 import jakarta.servlet.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.apache.logging.log4j.LogManager
+import org.springframework.stereotype.Component
 
 @Component
 class SimpleLoggingFilter : Filter {
@@ -12,7 +12,6 @@ class SimpleLoggingFilter : Filter {
     private val logger = LogManager.getLogger(SimpleLoggingFilter::class.java)
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-
         val httpRequest = request as HttpServletRequest
         val httpResponse = response as HttpServletResponse
 

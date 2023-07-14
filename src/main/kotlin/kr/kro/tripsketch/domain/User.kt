@@ -12,5 +12,5 @@ data class User(
     var introduction: String?,
     var profileImageUrl: String?,
     var createdAt: LocalDateTime = LocalDateTime.now(),
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 )
