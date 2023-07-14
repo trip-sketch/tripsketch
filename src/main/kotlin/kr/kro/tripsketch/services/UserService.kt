@@ -1,9 +1,9 @@
 package kr.kro.tripsketch.services
 
-import kr.kro.tripsketch.dto.UserLoginDto
-import kr.kro.tripsketch.dto.UserUpdateDto
-import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.dto.UserLoginDto
+import kr.kro.tripsketch.dto.UserRegistrationDto
+import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
 
@@ -20,7 +20,7 @@ class UserService(private val userRepository: UserRepository) {
             email = email,
             nickname = nickname,
             profileImageUrl = userRegistrationDto.profileImageUrl,
-            introduction = userRegistrationDto.introduction
+            introduction = userRegistrationDto.introduction,
         )
         return userRepository.save(user)
     }

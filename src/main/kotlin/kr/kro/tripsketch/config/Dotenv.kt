@@ -1,8 +1,6 @@
 package kr.kro.tripsketch.config
 
 import io.github.cdimascio.dotenv.Dotenv
-import io.github.cdimascio.dotenv.DotenvBuilder
-import java.io.File
 
 object EnvLoader {
     private val dotenv: Dotenv by lazy {

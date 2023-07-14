@@ -1,15 +1,13 @@
 package kr.kro.tripsketch.controllers
 
+import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.AdditionalUserInfo
-import kr.kro.tripsketch.dto.UserLoginDto
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.dto.UserUpdateDto
-import kr.kro.tripsketch.services.KakaoOAuthService
-import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.services.JwtService
+import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.NickNameService
-import kr.kro.tripsketch.domain.User
-
+import kr.kro.tripsketch.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -22,8 +20,7 @@ class UserController(
     private val nicknameService: NickNameService,
 ) {
 
-
-    //카카오 Oauth2.0을 이용한 사용자 로그인/회원가입 콜백함수
+    // 카카오 Oauth2.0을 이용한 사용자 로그인/회원가입 콜백함수
     @GetMapping("/kakao/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
         val accessToken = kakaoOAuthService.getKakaoAccessToken(code)
@@ -44,14 +41,14 @@ class UserController(
             // 회원 가입을 위한 추가 정보가 없는 경우, 임의의 값을 설정합니다.
             val additionalUserInfo = AdditionalUserInfo(
                 nickname = nicknameService.generateRandomNickname(), // 임의의 닉네임
-                profileImageUrl = "https://example.com/default-profile-image.png", // 기본 프로필 이미지 URL
-                introduction = "Nice to meet you!" // 기본 소개 문구
+                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", // 기본 프로필 이미지 URL
+                introduction = "안녕하세요! 만나서 반갑습니다!", // 기본 소개 문구
             )
             val userRegistrationDto = UserRegistrationDto(
                 email,
                 additionalUserInfo.nickname,
                 additionalUserInfo.profileImageUrl,
-                additionalUserInfo.introduction
+                additionalUserInfo.introduction,
             )
             user = userService.registerUser(userRegistrationDto)
         }
@@ -101,6 +98,4 @@ class UserController(
         val users = userService.getAllUsers()
         return ResponseEntity.ok(users)
     }
-
-
 }

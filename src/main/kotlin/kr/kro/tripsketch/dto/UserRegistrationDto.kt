@@ -4,5 +4,5 @@ data class UserRegistrationDto(
     val email: String,
     val nickname: String,
     val profileImageUrl: String?,
-    val introduction: String?
+    val introduction: String?,
 )

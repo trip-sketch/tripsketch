@@ -14,5 +14,7 @@ data class Comment(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val likes: Int = 0,
-    val likedBy: List<String> = listOf()
+    val likedBy: List<String> = listOf(),
+    val replyTo: String? = null,
+    val children: List<Comment> = emptyList(),
 )
