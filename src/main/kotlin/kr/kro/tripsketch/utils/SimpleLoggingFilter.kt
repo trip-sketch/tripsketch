@@ -1,4 +1,4 @@
-package kr.kro.refbook.config
+package kr.kro.tripsketch.utils
 
 import jakarta.servlet.*
 import jakarta.servlet.http.HttpServletRequest

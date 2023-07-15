@@ -8,7 +8,10 @@ import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
 
 @Service
-class UserService(private val userRepository: UserRepository) {
+class UserService(
+    private val userRepository: UserRepository,
+    private val jwtService: JwtService,
+) {
 
     fun registerUser(userRegistrationDto: UserRegistrationDto): User {
         if (userRepository.findByEmail(userRegistrationDto.email) != null) {
@@ -38,7 +41,8 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     // 사용자 업데이트
-    fun updateUser(email: String, userUpdateDto: UserUpdateDto): User {
+    fun updateUser(token: String, userUpdateDto: UserUpdateDto): User {
+        val email = jwtService.getEmailFromToken(token)
         val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
         if (userUpdateDto.nickname != null) {
             user.nickname = userUpdateDto.nickname

@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys
 import kr.kro.tripsketch.domain.User
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 @Service
 class JwtService {
@@ -43,5 +44,14 @@ class JwtService {
 
     fun getNicknameFromToken(token: String): String {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body["nickname"].toString()
+    }
+
+    fun resolveToken(req: HttpServletRequest): String? {
+        val bearerToken = req.getHeader("Authorization")
+        return if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            bearerToken.substring(7, bearerToken.length)
+        } else {
+            null
+        }
     }
 }
