@@ -6,8 +6,8 @@ out/
 !**/src/test/**/build/
 
 # Gradle Wrapper 파일 (gradle-wrapper.jar은 제외)
-gradle/
-!gradle/wrapper/gradle-wrapper.jar
+# gradle/
+# !gradle/wrapper/gradle-wrapper.jar
 
 # Spring Tool Suite (STS) 관련 파일
 .apt_generated/
