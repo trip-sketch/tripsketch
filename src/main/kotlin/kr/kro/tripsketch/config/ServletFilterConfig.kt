@@ -1,6 +1,7 @@
-package kr.kro.refbook.config
+package kr.kro.tripsketch.config
 
 import jakarta.servlet.Filter
+import kr.kro.tripsketch.utils.SimpleLoggingFilter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

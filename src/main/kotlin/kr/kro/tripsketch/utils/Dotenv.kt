@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.config
+package kr.kro.tripsketch.utils
 
 import io.github.cdimascio.dotenv.Dotenv
 
