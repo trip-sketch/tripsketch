@@ -1,11 +1,10 @@
 package kr.kro.tripsketch.dto
 
-import kr.kro.tripsketch.domain.User
 import java.time.LocalDateTime
 
 data class TripDto(
     val id: String? = null,
-    val userId: User, // 외래키-User객체자체를 참조  // val userId: String,
+    val userId: String, // 외래키-User객체자체를 참조  // val userId: String,
     val scheduleId: String,
     var title: String,
     var content: String,
