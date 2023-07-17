@@ -8,6 +8,7 @@ import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.NickNameService
 import kr.kro.tripsketch.services.UserService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -54,26 +55,21 @@ class UserController(
         }
 
         val jwt = jwtService.createToken(user)
-        val response = mapOf("token" to jwt)
-        return ResponseEntity.ok(response)
+        val headers = HttpHeaders()
+        headers.add("Authorization", "Bearer $jwt")
+        return ResponseEntity.ok().headers(headers).build()
     }
 
     // 토큰값으로 사용자를 조회하는 메소드
     @GetMapping("/user")
     fun getUser(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
-        println("Received token: $token") // 토큰 출력
-
         val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
-        println("Actual token: $actualToken") // 실제 토큰 출력
 
         if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
         }
         val email = jwtService.getEmailFromToken(actualToken) // 토큰에서 이메일 추출
-        println("Email from token: $email") // 이메일 출력
-
         val user = userService.findUserByEmail(email) ?: return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.")
-        println("User found: $user") // 찾은 사용자 출력
 
         return ResponseEntity.ok(user)
     }
@@ -84,7 +80,6 @@ class UserController(
         println("Received token: $token") // 토큰 출력
 
         val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
-        println("Actual token: $actualToken") // 실제 토큰 출력
 
         if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")

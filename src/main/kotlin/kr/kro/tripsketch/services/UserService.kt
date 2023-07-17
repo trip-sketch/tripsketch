@@ -1,7 +1,6 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.User
-import kr.kro.tripsketch.dto.UserLoginDto
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.repositories.UserRepository
@@ -30,10 +29,6 @@ class UserService(
 
     fun findUserByEmail(email: String): User? {
         return userRepository.findByEmail(email)
-    }
-
-    fun loginUser(userLoginDto: UserLoginDto): User? {
-        return userRepository.findByEmail(userLoginDto.email)
     }
 
     fun getAllUsers(): List<User> {
