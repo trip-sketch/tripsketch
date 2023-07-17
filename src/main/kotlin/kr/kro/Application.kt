@@ -1,8 +1,8 @@
 package kr.kro
 
+import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import kr.kro.tripsketch.utils.EnvLoader
 
 @SpringBootApplication
 class Application
