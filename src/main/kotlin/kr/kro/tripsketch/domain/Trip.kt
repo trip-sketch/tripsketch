@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Document(collection = "trips")
 data class Trip(
     @Id val id: String? = null,
-    val userId: User, // 외래키-User객체자체를 참조  // val userId: String,
+    val userId: User,                       // 외래키-User객체자체를 참조  // val userId: String,
     val scheduleId: String,
     var title: String,
     var content: String,
@@ -22,5 +22,5 @@ data class Trip(
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
     var likeFlag: Int = 0,
-    val tripViews: Set<String> = setOf(), // tripviews 배열로 set 형태로 받겠다?   - 원하면 redis 로도 해줘도 됌!
+    val tripViews: Set<String> = setOf(),   // tripviews 배열로 set 형태로 받겠다?   - 원하면 redis 로도 해줘도 됌!
 )
