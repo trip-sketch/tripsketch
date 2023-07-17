@@ -2,16 +2,18 @@ package kr.kro.tripsketch.services
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.security.Keys
 import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
 
 @Service
 class JwtService {
-    private val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-    private val tokenValidityInMilliseconds: Long = 3600000 // 1 hour
+    private val secretKeyString = EnvLoader.getProperty("SECRET_KEY") ?: ""
+    private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
+    private val tokenValidityInMilliseconds: Long = EnvLoader.getProperty("TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1 hour
 
     fun createToken(user: User): String {
         val claims = Jwts.claims().setSubject(user.email)
