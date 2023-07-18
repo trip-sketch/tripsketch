@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CommentRepository : MongoRepository<Comment, String> {
-    override fun findById(id: String): Optional<Comment>
-
 }

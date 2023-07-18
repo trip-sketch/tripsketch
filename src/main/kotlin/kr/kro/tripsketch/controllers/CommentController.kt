@@ -17,15 +17,13 @@ class CommentController(private val commentService: CommentService) {
     // Other endpoints go here
     @PostMapping
     fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
-        return commentService.createComment(commentDto)
+        val comment = commentService.createComment(commentDto)
+        return CommentDto.fromComment(comment)
     }
 
     @PatchMapping("/{id}")
     fun updateCommentById(@PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
-        val patchedComment = updatedComment.copy(id = id)
-        return commentService.updateComment(id, patchedComment)
+        return commentService.updateComment(id, updatedComment)
     }
-
-
 
 }
