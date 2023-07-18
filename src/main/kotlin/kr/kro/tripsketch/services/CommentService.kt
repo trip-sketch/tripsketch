@@ -13,11 +13,6 @@ class CommentService(private val commentRepository: CommentRepository) {
         return commentRepository.findAll().map { CommentDto(it.id, it.userId, it.tripId, it.parentId, it.content, it.createdAt, it.updatedAt, it.likes, it.likedBy, it.replyTo) }
     }
 
-    fun getCommentById(id: String): CommentDto? {
-        val comment = commentRepository.findById(id)
-        return comment?.let { CommentDto(it.id, it.userId, it.tripId, it.parentId, it.content, it.createdAt, it.updatedAt, it.likes, it.likedBy, it.replyTo) }
-    }
-
     // Other CRUD operations go here
     fun createComment(dto: CommentDto): Comment {
         val comment = Comment(
@@ -28,48 +23,20 @@ class CommentService(private val commentRepository: CommentRepository) {
             replyTo = dto.replyTo,
         )
 
-        val savedComment = commentRepository.save(comment)
-
-        return CommentDto(
-            id = savedComment.id,
-            userId = savedComment.userId,
-            tripId = savedComment.tripId,
-            parentId = savedComment.parentId,
-            content = savedComment.content,
-            createdAt = savedComment.createdAt,
-            updatedAt = savedComment.updatedAt,
-            likes = savedComment.likes,
-            likedBy = savedComment.likedBy,
-            replyTo = savedComment.replyTo,
-        )
+        return commentRepository.save(comment)
     }
 
-    fun updateComment(id: String, commentUpdateDto: CommentDto): CommentDto {
-    val comment = commentRepository.findById(id).orElse(null as Comment?) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-    val updatedComment = comment.copy(
+    fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+        val comment = commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+
+        val updatedComment = comment.copy(
         content = commentUpdateDto.content ?: comment.content,
         updatedAt = commentUpdateDto.updatedAt
     )
+
     val savedComment = commentRepository.save(updatedComment)
-    return CommentDto(
-        id = savedComment.id,
-        userId = savedComment.userId,
-        tripId = savedComment.tripId,
-        parentId = savedComment.parentId,
-        content = savedComment.content ?: "",
-        createdAt = savedComment.createdAt,
-        updatedAt = savedComment.updatedAt,
-        likes = savedComment.likes,
-        likedBy = savedComment.likedBy,
-        replyTo = savedComment.replyTo
-    )
-}
 
-
-
-
-
-
-
+    return CommentDto.fromComment(savedComment)
+    }
 
 }
