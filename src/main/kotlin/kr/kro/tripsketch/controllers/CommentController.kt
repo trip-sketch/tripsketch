@@ -15,6 +15,11 @@ class CommentController(private val commentService: CommentService) {
         return commentService.getAllComments()
     }
 
+    @GetMapping("/{tripId}")
+    fun getCommentByTripId(@PathVariable tripId: String): List<CommentDto> {
+        return commentService.getCommentByTripId(tripId)
+    }
+
     // Other endpoints go here
     @PostMapping("")
     fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
