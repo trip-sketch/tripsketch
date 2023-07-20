@@ -7,16 +7,16 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/trips")
+@RequestMapping
 class TripController(private val tripService: TripService) {
 
-    @GetMapping("/trips")
+    @GetMapping("/trip")
     fun getAllTrips(): ResponseEntity<List<Trip>> {
         val trips = tripService.getAllTrips()
         return ResponseEntity.ok(trips)
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/trip/{id}")
     fun getTripById(@PathVariable id: String): TripDto? {
         val trip = tripService.findById(id)
         return trip?.let { mapToTripDto(it) }
@@ -44,13 +44,21 @@ class TripController(private val tripService: TripService) {
             tripViews = trip.tripViews,
         )
     }
+
+    @PostMapping("/trip")
+    fun createTrip(@RequestBody tripDto: TripDto): TripDto {
+        val trip = tripService.createTrip(tripDto)
+        return mapToTripDto(trip)
+    }
+
     // @PostMapping
     // fun createOrUpdateTrip(@RequestBody tripDto: TripDto): TripDto {
     //     return tripService.createOrUpdateTrip(tripDto)
     // }
 
-    // @DeleteMapping("/{id}")
+    // @DeleteMapping("/trip/{id}")
     // fun deleteTripById(@PathVariable id: String) {
     //     return tripService.deleteTripById(id)
     // }
+
 }

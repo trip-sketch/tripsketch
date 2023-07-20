@@ -13,7 +13,7 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     // 삭제(soft delete)
     // fun deleteTripById(id: String): Trip? {
-    //     val trip = findByTripId(id)
+    //     val trip = findById(id)
     //     if (trip != null) {
     //         trip.deletedAt = LocalDateTime.now()
     //         trip.hidden = 1         // 값은 체크 다시하기
