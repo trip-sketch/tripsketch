@@ -39,21 +39,18 @@ class CommentService(private val commentRepository: CommentRepository) {
         return CommentDto.fromComment(savedComment)
     }
 
-
     fun deleteComment(id: String) {
-    val comment = commentRepository.findById(id).orElse(null)
-        ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+        val comment = commentRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
 
-    if (comment.parentId != null) {
-        // 부모 댓글의 children 목록에서 삭제합니다.
-        val parentComment = commentRepository.findById(comment.parentId).orElse(null)
-            ?: throw IllegalArgumentException("댓글의 부모 댓글이 존재하지 않습니다.")
-        parentComment.children.removeIf { it.id == id }
-        commentRepository.save(parentComment)
+        if (comment.parentId != null) {
+            // 부모 댓글의 children 목록에서 삭제합니다.
+            val parentComment = commentRepository.findById(comment.parentId).orElse(null)
+                ?: throw IllegalArgumentException("댓글의 부모 댓글이 존재하지 않습니다.")
+            parentComment.children.removeIf { it.id == id }
+            commentRepository.save(parentComment)
+        }
+
+        commentRepository.deleteById(id)
     }
-
-    commentRepository.deleteById(id)
-}
-  
-
 }
