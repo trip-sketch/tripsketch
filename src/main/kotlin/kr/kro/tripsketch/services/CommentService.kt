@@ -13,6 +13,11 @@ class CommentService(private val commentRepository: CommentRepository) {
         return commentRepository.findAll().map { CommentDto(it.id, it.userId, it.tripId, it.parentId, it.content, it.createdAt, it.updatedAt, it.likes, it.likedBy, it.replyTo) }
     }
 
+    fun getCommentByTripId(tripId: String): List<CommentDto> {
+        val comments = commentRepository.findAllByTripId(tripId)
+        return comments.map { CommentDto.fromComment(it) }
+    }
+
     // Other CRUD operations go here
     fun createComment(dto: CommentDto): Comment {
         val comment = Comment(
