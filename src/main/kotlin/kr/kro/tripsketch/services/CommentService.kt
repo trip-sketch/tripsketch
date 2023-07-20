@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.CommentDto
+import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.repositories.CommentRepository
 import org.springframework.stereotype.Service
 
@@ -13,7 +14,7 @@ class CommentService(private val commentRepository: CommentRepository) {
     }
 
     // Other CRUD operations go here
-    fun createComment(dto: CommentDto): CommentDto {
+    fun createComment(dto: CommentDto): Comment {
         val comment = Comment(
             userId = dto.userId,
             tripId = dto.tripId,
@@ -22,19 +23,19 @@ class CommentService(private val commentRepository: CommentRepository) {
             replyTo = dto.replyTo,
         )
 
-        val savedComment = commentRepository.save(comment)
+        return commentRepository.save(comment)
+    }
 
-        return CommentDto(
-            id = savedComment.id,
-            userId = savedComment.userId,
-            tripId = savedComment.tripId,
-            parentId = savedComment.parentId,
-            content = savedComment.content,
-            createdAt = savedComment.createdAt,
-            updatedAt = savedComment.updatedAt,
-            likes = savedComment.likes,
-            likedBy = savedComment.likedBy,
-            replyTo = savedComment.replyTo,
+    fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+        val comment = commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+
+        val updatedComment = comment.copy(
+            content = commentUpdateDto.content ?: comment.content,
+            updatedAt = commentUpdateDto.updatedAt,
         )
+
+        val savedComment = commentRepository.save(updatedComment)
+
+        return CommentDto.fromComment(savedComment)
     }
 }
