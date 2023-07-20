@@ -13,6 +13,11 @@ class CommentService(private val commentRepository: CommentRepository) {
         return commentRepository.findAll().map { CommentDto(it.id, it.userId, it.tripId, it.parentId, it.content, it.createdAt, it.updatedAt, it.likes, it.likedBy, it.replyTo) }
     }
 
+    fun getCommentByTripId(tripId: String): List<CommentDto> {
+        val comments = commentRepository.findAllByTripId(tripId)
+        return comments.map { CommentDto.fromComment(it) }
+    }
+
     // Other CRUD operations go here
     fun createComment(dto: CommentDto): Comment {
         val comment = Comment(
@@ -37,5 +42,20 @@ class CommentService(private val commentRepository: CommentRepository) {
         val savedComment = commentRepository.save(updatedComment)
 
         return CommentDto.fromComment(savedComment)
+    }
+
+    fun deleteComment(id: String) {
+        val comment = commentRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+
+        if (comment.parentId != null) {
+            // 부모 댓글의 children 목록에서 삭제합니다.
+            val parentComment = commentRepository.findById(comment.parentId).orElse(null)
+                ?: throw IllegalArgumentException("댓글의 부모 댓글이 존재하지 않습니다.")
+            parentComment.children.removeIf { it.id == id }
+            commentRepository.save(parentComment)
+        }
+
+        commentRepository.delete(comment)
     }
 }

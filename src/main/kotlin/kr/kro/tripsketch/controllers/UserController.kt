@@ -55,9 +55,7 @@ class UserController(
         }
 
         val jwt = jwtService.createToken(user)
-        val headers = HttpHeaders()
-        headers.add("Authorization", "Bearer $jwt")
-        return ResponseEntity.ok().headers(headers).build()
+        return ResponseEntity.ok().body(mapOf("Authorization" to "Bearer $jwt"))
     }
 
     // 토큰값으로 사용자를 조회하는 메소드
