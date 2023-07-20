@@ -26,4 +26,9 @@ class CommentController(private val commentService: CommentService) {
         return commentService.updateComment(id, updatedComment)
     }
 
+    @DeleteMapping("/{id}")
+    fun deleteComment(@PathVariable id: String) {
+        commentService.deleteComment(id)
+    }
+
 }
