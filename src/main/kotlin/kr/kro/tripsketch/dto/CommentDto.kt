@@ -27,7 +27,7 @@ data class CommentDto(
                 updatedAt = comment.updatedAt,
                 likes = comment.likes,
                 likedBy = comment.likedBy,
-                replyTo = comment.replyTo
+                replyTo = comment.replyTo,
             )
         }
     }
