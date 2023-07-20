@@ -16,5 +16,5 @@ data class Comment(
     val likes: Int = 0,
     val likedBy: List<String> = listOf(),
     val replyTo: String? = null,
-    val children: List<Comment> = emptyList(),
+    val children: MutableList<Comment> = mutableListOf(),
 )
