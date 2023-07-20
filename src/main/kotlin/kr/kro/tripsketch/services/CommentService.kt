@@ -30,13 +30,13 @@ class CommentService(private val commentRepository: CommentRepository) {
         val comment = commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
 
         val updatedComment = comment.copy(
-        content = commentUpdateDto.content ?: comment.content,
-        updatedAt = commentUpdateDto.updatedAt
-    )
+            content = commentUpdateDto.content ?: comment.content,
+            updatedAt = commentUpdateDto.updatedAt,
+        )
 
-    val savedComment = commentRepository.save(updatedComment)
+        val savedComment = commentRepository.save(updatedComment)
 
-    return CommentDto.fromComment(savedComment)
+        return CommentDto.fromComment(savedComment)
     }
 
 

@@ -1,7 +1,7 @@
 package kr.kro.tripsketch.controllers
 
-import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.dto.CommentDto
+import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.services.CommentService
 import org.springframework.web.bind.annotation.*
 
