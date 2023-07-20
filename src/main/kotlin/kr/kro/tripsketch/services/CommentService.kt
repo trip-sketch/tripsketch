@@ -56,6 +56,6 @@ class CommentService(private val commentRepository: CommentRepository) {
             commentRepository.save(parentComment)
         }
 
-        commentRepository.deleteById(id)
+        commentRepository.delete(comment)
     }
 }
