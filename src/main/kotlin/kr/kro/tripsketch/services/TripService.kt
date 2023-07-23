@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.TripDto
+import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -19,8 +20,8 @@ class TripService(private val tripRepository: TripRepository) {
         return tripRepository.findById(id).orElseThrow { NoSuchElementException("Trip not found") }
     }
 
-    // Trip 생성
-    fun createTrip(tripDto: TripDto): Trip {
+    // Trip 생성 및 수정
+    fun createOrUpdateTrip(tripDto: TripDto): Trip {
         val trip = Trip(
             id = tripDto.id,
             userId = tripDto.userId,
@@ -58,12 +59,16 @@ class TripService(private val tripRepository: TripRepository) {
     // // 삭제(soft delete)
     // fun deleteTripById(id: String) {
     //     val trip = findById(id)
-    //     if (trip != null) {
-    //         trip.deletedAt = LocalDateTime.now()
-    //         trip.hidden = 1 // 값은 체크 다시하기
-    //         tripRepository.save(trip)
-    //     } else {
-    //         throw NoSuchElementException("Trip not found")
-    //     }
-    // }
+    fun deleteTripById(id: ObjectId) { // ObjectId 타입으로 변경
+        val trip = findById(id.toString()) // ObjectId를 String으로 변환하여 findById 메서드에 전달
+        if (trip != null) {
+            trip.deletedAt = LocalDateTime.now()
+            trip.hidden = 1 // 값은 체크 다시하기
+            tripRepository.save(trip)
+        } else {
+            throw NoSuchElementException("Trip not found")
+        }
+    }
+
+
 }
