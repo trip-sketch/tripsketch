@@ -1,11 +1,15 @@
 package kr.kro.tripsketch.dto
 
+import org.bson.types.ObjectId  // ObjectId import
 import java.time.LocalDateTime
 
 data class TripDto(
     val id: String? = null,
     val userId: String, // 외래키-User객체자체를 참조  // val userId: String,
     val scheduleId: String,
+    // val id: ObjectId,         // ObjectId로 타입 변경
+    // val userId: ObjectId,     // ObjectId로 타입 변경
+    // val scheduleId: ObjectId, // ObjectId로 타입 변경
     var title: String,
     var content: String,
     var likes: Int,
