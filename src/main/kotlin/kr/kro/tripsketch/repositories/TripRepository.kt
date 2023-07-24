@@ -6,22 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
-
-    // 신규 Trip 생성 및 수정 메서드
-    // fun save(trip: Trip): Trip?
-    // saveTrip -> Save로 변경
-
-    // 삭제(soft delete)
-    // fun deleteTripById(id: String): Trip? {
-    //     val trip = findById(id)
-    //     if (trip != null) {
-    //         trip.deletedAt = LocalDateTime.now()
-    //         trip.hidden = 1         // 값은 체크 다시하기
-    //         return save(trip)
-    //     }
-    //     return null
-    // }
-
-    // 삭제(hard delete)
-    // fun deleteHardTripById(id: String)
+    // 별도의 쿼리 메서드가 필요하면 여기에 추가 가능
 }
