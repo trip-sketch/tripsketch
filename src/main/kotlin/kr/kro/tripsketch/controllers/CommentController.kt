@@ -20,7 +20,6 @@ class CommentController(private val commentService: CommentService) {
         return commentService.getCommentByTripId(tripId)
     }
 
-    // Other endpoints go here
     @PostMapping("")
     fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
         val comment = commentService.createComment(commentDto)
