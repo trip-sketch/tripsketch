@@ -20,6 +20,10 @@ class CommentService(private val commentRepository: CommentRepository) {
 
     // Other CRUD operations go here
     fun createComment(dto: CommentDto): Comment {
+        val parentComment: Comment? = dto.parentId?.let {
+            commentRepository.findById(it).orElse(null)
+        }
+
         val comment = Comment(
             userId = dto.userId,
             tripId = dto.tripId,
@@ -28,7 +32,15 @@ class CommentService(private val commentRepository: CommentRepository) {
             replyTo = dto.replyTo,
         )
 
-        return commentRepository.save(comment)
+        val savedComment = commentRepository.save(comment)
+
+        // If the parentComment exists, add the new comment as a child to the parent
+        parentComment?.let {
+            it.children.add(savedComment)
+            commentRepository.save(it)
+        }
+
+        return savedComment
     }
 
     fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
