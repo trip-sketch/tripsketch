@@ -7,7 +7,6 @@ import kr.kro.tripsketch.services.TripService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-
 @RestController
 @RequestMapping("/trips")
 class TripController(private val tripService: TripService) {
@@ -32,19 +31,8 @@ class TripController(private val tripService: TripService) {
     fun createTrip(@RequestBody trip: Trip): ResponseEntity<Trip> {
         val createdTrip = tripService.createOrUpdateTrip(trip)
         return ResponseEntity.ok(createdTrip)
-    }   
-
-    // @PutMapping("/{id}")
-    // fun updateTrip(@PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
-    //     val existingTrip = tripService.getTripById(id)
-    //     if (existingTrip != null) {
-    //         trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
-    //         val updatedTrip = tripService.createOrUpdateTrip(trip)
-    //         return ResponseEntity.ok(updatedTrip)
-    //     }
-    //     return ResponseEntity.notFound().build()
-    // }
-
+    }
+    
     @PutMapping("/{id}")
     fun updateTrip(@PathVariable id: ObjectId, @RequestBody trip: Trip): ResponseEntity<Trip> {
         val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
@@ -55,6 +43,16 @@ class TripController(private val tripService: TripService) {
         }
         return ResponseEntity.notFound().build()
     }
+
+    // @DeleteMapping("/{id}")
+    // fun deleteHardTrip(@PathVariable id: String): ResponseEntity<Unit> {
+    //     val existingTrip = tripService.getTripById(id)
+    //     if (existingTrip != null) {
+    //         tripService.deleteHardTripById(id)
+    //         return ResponseEntity.noContent().build()
+    //     }
+    //     return ResponseEntity.notFound().build()
+    // }
 
     @DeleteMapping("/{id}")
     fun deleteTrip(@PathVariable id: String): ResponseEntity<Unit> {

@@ -25,9 +25,21 @@ class TripService(private val tripRepository: TripRepository) {
         return tripRepository.save(trip)
     }
 
-    /** Trip 삭제(hard delete) */
+    // /** Trip 삭제(hard delete) */
+    // fun deleteHardTripById(id: String) {
+    //     tripRepository.deleteById(id)
+    // }
+
+    /** Trip 삭제(soft delete) */
     fun deleteTripById(id: String) {
-        tripRepository.deleteById(id)
+        val trip = tripRepository.findById(id).orElse(null)
+        if (trip != null) {
+            trip.deletedAt = LocalDateTime.now()
+            trip.hidden = true // 혹은 1에 해당하는 값으로 설정
+            tripRepository.save(trip)
+        } else {
+            throw NoSuchElementException("Trip not found")
+        }
     }
 }
 
