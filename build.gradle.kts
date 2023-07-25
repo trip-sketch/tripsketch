@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.1.1"
+    id("org.springframework.boot") version "3.1.2"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.8.22"
     kotlin("plugin.spring") version "1.8.22"
@@ -74,6 +74,9 @@ dependencies {
     // logger dependencies
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
+
+    // 오라클 SDK
+    implementation("com.oracle.oci.sdk:oci-java-sdk-bom:2.7.1")
 }
 
 tasks.withType<KotlinCompile> {
