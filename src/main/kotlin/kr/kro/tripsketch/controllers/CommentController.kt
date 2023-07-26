@@ -31,6 +31,11 @@ class CommentController(private val commentService: CommentService) {
         return commentService.updateComment(id, updatedComment)
     }
 
+    @PatchMapping("/{parentId}/{id}")
+    fun updateChildrenCommentById(@PathVariable parentId: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+        return commentService.updateChildrenComment(parentId, id, updatedComment)
+    }
+
     @DeleteMapping("/{id}")
     fun deleteComment(@PathVariable id: String): ResponseEntity<Any> {
         commentService.deleteComment(id)

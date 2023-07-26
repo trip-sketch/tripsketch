@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CommentRepository : MongoRepository<Comment, String> {
     fun findAllByTripId(tripId: String): List<Comment>
-
-    
 }
