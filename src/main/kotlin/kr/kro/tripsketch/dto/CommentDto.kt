@@ -29,7 +29,7 @@ data class CommentDto(
                 likes = comment.likes,
                 likedBy = comment.likedBy,
                 replyTo = comment.replyTo,
-                children = comment.children.map { fromComment(it) }.toMutableList() // MutableList로 변환
+                children = comment.children.map { fromComment(it) }.toMutableList(), // MutableList로 변환
 
             )
         }
