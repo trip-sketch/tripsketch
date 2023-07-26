@@ -15,6 +15,7 @@ inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object :
 @Service
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
+
     fun getKakaoAccessToken(code: String): String? {
         val restTemplate = RestTemplate()
 
