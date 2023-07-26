@@ -21,6 +21,11 @@ class UserController(
     private val nicknameService: NickNameService,
 ) {
 
+    @GetMapping("/kakao/code")
+    fun kakaoCode(@RequestParam code: String): ResponseEntity<Any> {
+        return ResponseEntity.ok().body(mapOf("code" to code))
+    }
+
     // 카카오 Oauth2.0을 이용한 사용자 로그인/회원가입 콜백함수
     @GetMapping("/kakao/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
@@ -55,9 +60,7 @@ class UserController(
         }
 
         val jwt = jwtService.createToken(user)
-        val headers = HttpHeaders()
-        headers.add("Authorization", "Bearer $jwt")
-        return ResponseEntity.ok().headers(headers).build()
+        return ResponseEntity.ok().body(mapOf("Authorization" to "Bearer $jwt"))
     }
 
     // 토큰값으로 사용자를 조회하는 메소드
@@ -92,6 +95,7 @@ class UserController(
             return ResponseEntity.status(400).body(e.message)
         }
     }
+
 
     // 전체 사용자를 조회하는 메소드
     @GetMapping("/users")
