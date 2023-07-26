@@ -20,7 +20,6 @@ class CommentController(private val commentService: CommentService) {
         return commentService.getCommentByTripId(tripId)
     }
 
-    // Other endpoints go here
     @PostMapping("")
     fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
         val comment = commentService.createComment(commentDto)
@@ -30,6 +29,11 @@ class CommentController(private val commentService: CommentService) {
     @PatchMapping("/{id}")
     fun updateCommentById(@PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
         return commentService.updateComment(id, updatedComment)
+    }
+
+    @PatchMapping("/{parentId}/{id}")
+    fun updateChildrenCommentById(@PathVariable parentId: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+        return commentService.updateChildrenComment(parentId, id, updatedComment)
     }
 
     @DeleteMapping("/{id}")
