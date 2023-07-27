@@ -19,4 +19,5 @@ data class Comment(
     val likedBy: List<String> = listOf(),
     val replyTo: String? = null,
     val children: MutableList<Comment> = mutableListOf(),
+    val isDeleted: Boolean = false,
 )
