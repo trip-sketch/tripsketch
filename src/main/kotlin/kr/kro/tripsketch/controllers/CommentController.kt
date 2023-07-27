@@ -41,4 +41,10 @@ class CommentController(private val commentService: CommentService) {
         commentService.deleteComment(id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
+
+    @DeleteMapping("/{parentId}/{id}")
+    fun deleteChildrenComment(@PathVariable parentId: String,@PathVariable id: String): ResponseEntity<Any> {
+        commentService.deleteChildrenComment(parentId,id)
+        return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
+    }
 }
