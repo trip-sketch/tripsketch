@@ -30,6 +30,8 @@ class CommentService(private val commentRepository: CommentRepository) {
             parentId = dto.parentId,
             content = dto.content,
             replyTo = dto.replyTo,
+            userNickName = dto.userNickName,    
+            userProfileUrl = dto.userProfileUrl,  
         )
 
         if (parentComment == null) {
@@ -48,7 +50,8 @@ class CommentService(private val commentRepository: CommentRepository) {
                 updatedAt = comment.updatedAt,
                 likes = comment.likes,
                 likedBy = comment.likedBy,
-                // 여기서 children 추가하지 않습니다.
+                userNickName = comment.userNickName,           
+                userProfileUrl = comment.userProfileUrl, 
             )
             parentComment.children.add(childComment)
             commentRepository.save(parentComment)
@@ -83,24 +86,33 @@ class CommentService(private val commentRepository: CommentRepository) {
             updatedAt = commentUpdateDto.updatedAt,
         )
 
-        parentComment.children[childCommentIndex] = updatedChildComment
-        val savedParentComment = commentRepository.save(parentComment)
-        println("부모 댓글 업데이트 후: $savedParentComment")
-        return CommentDto.fromComment(savedParentComment)
+            parentComment.children[childCommentIndex] = updatedChildComment
+            val savedParentComment = commentRepository.save(parentComment)
+
+            return CommentDto.fromComment(savedParentComment)
     }
 
     fun deleteComment(id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
 
-        if (comment.parentId != null) {
-            // 부모 댓글의 children 목록에서 삭제합니다.
-            val parentComment = commentRepository.findById(comment.parentId).orElse(null)
-                ?: throw IllegalArgumentException("댓글의 부모 댓글이 존재하지 않습니다.")
-            parentComment.children.removeIf { it.id == id }
-            commentRepository.save(parentComment)
+        // Soft delete 처리
+        val deletedComment = comment.copy(isDeleted = true)
+        commentRepository.save(deletedComment)
+    }
+
+    fun deleteChildrenComment(parentId: String, id: String) {
+        val parentComment = commentRepository.findById(parentId).orElse(null)
+            ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
+
+        val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
+        if (childCommentIndex == -1) {
+            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
         }
 
-        commentRepository.delete(comment)
+        // Soft delete 처리
+        val deletedChildComment = parentComment.children[childCommentIndex].copy(isDeleted = true)
+        parentComment.children[childCommentIndex] = deletedChildComment
+        commentRepository.save(parentComment)
     }
 }

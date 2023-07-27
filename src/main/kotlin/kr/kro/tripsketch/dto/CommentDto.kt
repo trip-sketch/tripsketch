@@ -6,6 +6,8 @@ import java.time.LocalDateTime
 data class CommentDto(
     val id: String? = null,
     val userId: String,
+    val userNickName: String,          
+    val userProfileUrl: String, 
     val tripId: String,
     val parentId: String? = null,
     val content: String? = null,
@@ -14,6 +16,7 @@ data class CommentDto(
     val likes: Int = 0,
     val likedBy: List<String> = listOf(),
     val replyTo: String? = null,
+    val isDeleted: Boolean = false,
     val children: MutableList<CommentDto> = mutableListOf(),
 ) {
     companion object {
@@ -21,6 +24,8 @@ data class CommentDto(
             return CommentDto(
                 id = comment.id,
                 userId = comment.userId,
+                userNickName = comment.userNickName,        
+                userProfileUrl = comment.userProfileUrl,  
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
@@ -29,8 +34,8 @@ data class CommentDto(
                 likes = comment.likes,
                 likedBy = comment.likedBy,
                 replyTo = comment.replyTo,
+                isDeleted = comment.isDeleted,
                 children = comment.children.map { fromComment(it) }.toMutableList(), // MutableList로 변환
-
             )
         }
     }
