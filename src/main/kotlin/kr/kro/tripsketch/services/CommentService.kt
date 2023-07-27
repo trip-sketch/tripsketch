@@ -48,7 +48,7 @@ class CommentService(private val commentRepository: CommentRepository) {
                 updatedAt = comment.updatedAt,
                 likes = comment.likes,
                 likedBy = comment.likedBy,
-                // 여기서 children은 추가하지 않습니다.
+                // 여기서 children 추가하지 않습니다.
             )
             parentComment.children.add(childComment)
             commentRepository.save(parentComment)
@@ -75,7 +75,7 @@ class CommentService(private val commentRepository: CommentRepository) {
 
         val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
         if (childCommentIndex == -1) {
-            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
 
         val updatedChildComment = parentComment.children[childCommentIndex].copy(
