@@ -1,8 +1,6 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -42,7 +40,6 @@ class TripService(private val tripRepository: TripRepository) {
         }
     }
 }
-
 
 // @Service
 // class TripService(private val tripRepository: TripRepository) {
@@ -106,6 +103,5 @@ class TripService(private val tripRepository: TripRepository) {
 //             throw NoSuchElementException("Trip not found")
 //         }
 //     }
-
 
 // }
