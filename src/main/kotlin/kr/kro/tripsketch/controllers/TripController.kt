@@ -29,16 +29,24 @@ class TripController(private val tripService: TripService) {
 
     @PostMapping
     fun createTrip(@RequestBody trip: Trip): ResponseEntity<Trip> {
-        val createdTrip = tripService.createOrUpdateTrip(trip)
+        val createdTrip = tripService.createTrip(trip)
         return ResponseEntity.ok(createdTrip)
     }
-    
-    @PutMapping("/{id}")
+
+    @PutMapping("/{id}")            // 패치!!!
     fun updateTrip(@PathVariable id: ObjectId, @RequestBody trip: Trip): ResponseEntity<Trip> {
-        val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
+        // val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
+        // if (existingTrip != null) {
+        //     trip.id = id // 업데이트하려는 객체의 ID를 URL에서 받은 ID로 설정
+        //     val updatedTrip = tripService.updateTrip(trip)
+        //     return ResponseEntity.ok(updatedTrip)
+        // }
+        // return ResponseEntity.notFound().build()
+        
+        val existingTrip = tripService.getTripById(id)
         if (existingTrip != null) {
-            trip.id = id // 업데이트하려는 객체의 ID를 URL에서 받은 ID로 설정
-            val updatedTrip = tripService.createOrUpdateTrip(trip)
+            trip.id = existingTrip.id // 업데이트하려는 객체의 ID를 기존 Trip 객체의 ID로 설정
+            val updatedTrip = tripService.updateTrip(trip)
             return ResponseEntity.ok(updatedTrip)
         }
         return ResponseEntity.notFound().build()
