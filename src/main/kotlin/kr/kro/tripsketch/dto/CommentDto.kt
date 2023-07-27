@@ -17,6 +17,7 @@ data class CommentDto(
     val likedBy: List<String> = listOf(),
     val replyTo: String? = null,
     val children: MutableList<CommentDto> = mutableListOf(),
+    val isDeleted: Boolean = false,
 ) {
     companion object {
         fun fromComment(comment: Comment): CommentDto {
@@ -34,7 +35,7 @@ data class CommentDto(
                 likedBy = comment.likedBy,
                 replyTo = comment.replyTo,
                 children = comment.children.map { fromComment(it) }.toMutableList(), // MutableList로 변환
-
+                isDeleted = comment.isDeleted ,
             )
         }
     }
