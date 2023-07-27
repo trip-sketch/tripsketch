@@ -1,8 +1,8 @@
 package kr.kro.tripsketch.domain
 
+import org.bson.types.ObjectId // ObjectId import
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import org.bson.types.ObjectId  // ObjectId import
 import java.time.LocalDateTime
 import kr.kro.tripsketch.dto.TripDto
 
@@ -12,7 +12,7 @@ data class Trip(
     @Id var id: ObjectId = ObjectId.get(),
     // var userId: ObjectId,            // 자동생성되니까.. 일단 String으로 구현!
     // var scheduleId: ObjectId,        // 자동생성되니까.. 일단 String으로 구현!
-    var userId: String,   
+    var userId: String,
     var scheduleId: String,
     var title: String,
     var content: String,

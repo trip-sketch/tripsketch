@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.dto
 
-import org.bson.types.ObjectId  // ObjectId import
 import java.time.LocalDateTime
 
 data class TripDto(

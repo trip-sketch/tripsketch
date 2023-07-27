@@ -1,9 +1,8 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.repositories.TripRepository
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -25,14 +24,52 @@ class TripService(private val tripRepository: TripRepository) {
         return tripRepository.save(trip)
     }
 
-    /** Trip 수정 */
-    fun updateTrip(trip: Trip): Trip {
-        val existingTrip = getTripById(trip.id.toHexString())
+    /** Trip 수정 */    // update 틀만 잡기
+    // fun updateTrip(id: String, trip: Trip): Trip {
+    //     val existingTrip = getTripById(id)
+    //     if (existingTrip != null) {
+    //         trip.id = ObjectId(id) // String 타입의 id를 ObjectId로 변환하여 trip 객체에 설정
+    //         existingTrip.update(trip) // 변경된 필드만 업데이트
+    //         return tripRepository.save(existingTrip)
+    //     }
+    //     throw NoSuchElementException("Trip not found")
+    // }
+
+    /** Trip 수정 */    // test 성공
+    fun updateTrip(id: String, trip: Trip): Trip {
+        val existingTrip = getTripById(id)
         if (existingTrip != null) {
-            existingTrip.update(trip) // 변경된 필드만 업데이트
+            if (trip.title != existingTrip.title) {
+                existingTrip.title = trip.title
+            }
+            if (trip.content != existingTrip.content) {
+                existingTrip.content = trip.content
+            }
+            if (trip.likes != existingTrip.likes) {
+                existingTrip.likes = trip.likes
+            }
+            if (trip.views != existingTrip.views) {
+                existingTrip.views = trip.views
+            }
+            if (trip.location != existingTrip.location) {
+                existingTrip.location = trip.location
+            }
+            if (trip.startedAt != existingTrip.startedAt) {
+                existingTrip.startedAt = trip.startedAt
+            }
+            if (trip.endAt != existingTrip.endAt) {
+                existingTrip.endAt = trip.endAt
+            }
+            if (trip.likeFlag != existingTrip.likeFlag) {
+                existingTrip.likeFlag = trip.likeFlag
+            }
+
+            existingTrip.updatedAt = LocalDateTime.now()
+
             return tripRepository.save(existingTrip)
+        } else {
+            throw NoSuchElementException("Trip not found")
         }
-        throw NoSuchElementException("Trip not found")
     }
 
     // /** Trip 삭제(hard delete) */
