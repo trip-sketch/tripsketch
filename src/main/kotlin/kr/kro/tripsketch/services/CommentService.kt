@@ -69,24 +69,24 @@ class CommentService(private val commentRepository: CommentRepository) {
         return CommentDto.fromComment(savedComment)
     }
 
-    fun updateChildrenComment(parentId:String, id: String,  commentUpdateDto: CommentUpdateDto): CommentDto {
+    fun updateChildrenComment(parentId: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
-            val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
-            if (childCommentIndex == -1) {
-                throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
-            }
+        val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
+        if (childCommentIndex == -1) {
+            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+        }
 
-            val updatedChildComment = parentComment.children[childCommentIndex].copy(
-                content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
-                updatedAt = commentUpdateDto.updatedAt,
-            )
+        val updatedChildComment = parentComment.children[childCommentIndex].copy(
+            content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
+            updatedAt = commentUpdateDto.updatedAt,
+        )
 
-            parentComment.children[childCommentIndex] = updatedChildComment
-            val savedParentComment = commentRepository.save(parentComment)
-            println("부모 댓글 업데이트 후: $savedParentComment")
-            return CommentDto.fromComment(savedParentComment)
+        parentComment.children[childCommentIndex] = updatedChildComment
+        val savedParentComment = commentRepository.save(parentComment)
+        println("부모 댓글 업데이트 후: $savedParentComment")
+        return CommentDto.fromComment(savedParentComment)
     }
 
     fun deleteComment(id: String) {

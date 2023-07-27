@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.dto
 
-import org.bson.types.ObjectId  // ObjectId import
 import java.time.LocalDateTime
 
 data class TripDto(
@@ -20,5 +19,5 @@ data class TripDto(
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
     var likeFlg: Int = 0,
-    var tripViews: Set<String> = setOf()    
+    var tripViews: Set<String> = setOf(),
 )
