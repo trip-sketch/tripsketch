@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 data class Comment(
     @Id val id: String? = null,
     val userId: String,
+    val userNickName: String,
+    val userProfileUrl: String,
     val tripId: String,
     val parentId: String? = null,
     val content: String? = null,

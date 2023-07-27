@@ -30,6 +30,8 @@ class CommentService(private val commentRepository: CommentRepository) {
             parentId = dto.parentId,
             content = dto.content,
             replyTo = dto.replyTo,
+            userNickName = dto.userNickName,    
+            userProfileUrl = dto.userProfileUrl,  
         )
 
         if (parentComment == null) {
@@ -48,7 +50,8 @@ class CommentService(private val commentRepository: CommentRepository) {
                 updatedAt = comment.updatedAt,
                 likes = comment.likes,
                 likedBy = comment.likedBy,
-                // 여기서 children은 추가하지 않습니다.
+                userNickName = comment.userNickName,           
+                userProfileUrl = comment.userProfileUrl, 
             )
             parentComment.children.add(childComment)
             commentRepository.save(parentComment)
