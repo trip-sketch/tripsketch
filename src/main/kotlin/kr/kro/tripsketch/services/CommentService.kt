@@ -101,5 +101,18 @@ class CommentService(private val commentRepository: CommentRepository) {
         commentRepository.save(deletedComment)
     }
 
-    // fun deleteChildrenComment(parentId:String, id: String) {}
+    fun deleteChildrenComment(parentId: String, id: String) {
+        val parentComment = commentRepository.findById(parentId).orElse(null)
+            ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
+
+        val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
+        if (childCommentIndex == -1) {
+            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+        }
+
+        // Soft delete 처리
+        val deletedChildComment = parentComment.children[childCommentIndex].copy(isDeleted = true)
+        parentComment.children[childCommentIndex] = deletedChildComment
+        commentRepository.save(parentComment)
+    }
 }
