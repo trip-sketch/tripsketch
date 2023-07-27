@@ -13,7 +13,7 @@ class ServletFilterConfig {
     fun loggingFilter(simpleLoggingFilter: SimpleLoggingFilter): FilterRegistrationBean<*> {
         val registrationBean = FilterRegistrationBean<Filter>()
 
-        registrationBean.setFilter(simpleLoggingFilter)
+        registrationBean.filter = simpleLoggingFilter
         registrationBean.addUrlPatterns("/*")
 
         return registrationBean

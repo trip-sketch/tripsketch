@@ -1,9 +1,8 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.services.TripService
+import org.bson.types.ObjectId // ObjectId import
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -32,24 +31,11 @@ class TripController(private val tripService: TripService) {
         val createdTrip = tripService.createTrip(trip)
         return ResponseEntity.ok(createdTrip)
     }
-
-    @PutMapping("/{id}")            // 패치!!!
-    fun updateTrip(@PathVariable id: ObjectId, @RequestBody trip: Trip): ResponseEntity<Trip> {
-        // val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
-        // if (existingTrip != null) {
-        //     trip.id = id // 업데이트하려는 객체의 ID를 URL에서 받은 ID로 설정
-        //     val updatedTrip = tripService.updateTrip(trip)
-        //     return ResponseEntity.ok(updatedTrip)
-        // }
-        // return ResponseEntity.notFound().build()
-        
-        val existingTrip = tripService.getTripById(id)
-        if (existingTrip != null) {
-            trip.id = existingTrip.id // 업데이트하려는 객체의 ID를 기존 Trip 객체의 ID로 설정
-            val updatedTrip = tripService.updateTrip(trip)
-            return ResponseEntity.ok(updatedTrip)
-        }
-        return ResponseEntity.notFound().build()
+    
+    @PatchMapping("/{id}")            
+    fun updateTrip(@PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
+        val updatedTrip = tripService.updateTrip(id, trip) // id를 String 타입으로 전달
+        return ResponseEntity.ok(updatedTrip)
     }
 
     // @DeleteMapping("/{id}")
