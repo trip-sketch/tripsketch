@@ -30,17 +30,10 @@ class UserController(
     @GetMapping("/kakao/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
         val accessToken = kakaoOAuthService.getKakaoAccessToken(code)
-        val userInfo = kakaoOAuthService.getUserInfo(accessToken)
-
-        if (userInfo == null) {
-            return ResponseEntity.status(400).body("유효하지 않은 요청입니다.")
-        }
+        val userInfo = kakaoOAuthService.getUserInfo(accessToken) ?: return ResponseEntity.status(400).body("유효하지 않은 요청입니다.")
 
         val kakaoAccountInfo = userInfo["kakao_account"] as? Map<*, *>
-        val email = kakaoAccountInfo?.get("email")?.toString()
-        if (email == null) {
-            return ResponseEntity.status(400).body("이메일 정보가 없습니다.")
-        }
+        val email = kakaoAccountInfo?.get("email")?.toString() ?: return ResponseEntity.status(400).body("이메일 정보가 없습니다.")
 
         var user = userService.findUserByEmail(email)
         if (user == null) {
@@ -60,7 +53,9 @@ class UserController(
         }
 
         val jwt = jwtService.createToken(user)
-        return ResponseEntity.ok().body(mapOf("Authorization" to "Bearer $jwt"))
+        val headers = HttpHeaders()
+        headers.add("Authorization", "Bearer $jwt")
+        return ResponseEntity.ok().headers(headers).body(mapOf("message" to "Success"))
     }
 
     // 토큰값으로 사용자를 조회하는 메소드
@@ -88,14 +83,13 @@ class UserController(
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
         }
 
-        try {
+        return try {
             val updatedUser = userService.updateUser(actualToken, userUpdateDto)
-            return ResponseEntity.ok(updatedUser)
+            ResponseEntity.ok(updatedUser)
         } catch (e: IllegalArgumentException) {
-            return ResponseEntity.status(400).body(e.message)
+            ResponseEntity.status(400).body(e.message)
         }
     }
-
 
     // 전체 사용자를 조회하는 메소드
     @GetMapping("/users")

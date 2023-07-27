@@ -1,9 +1,8 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.services.TripService
+import org.bson.types.ObjectId // ObjectId import
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -32,7 +31,7 @@ class TripController(private val tripService: TripService) {
         val createdTrip = tripService.createOrUpdateTrip(trip)
         return ResponseEntity.ok(createdTrip)
     }
-    
+
     @PutMapping("/{id}")
     fun updateTrip(@PathVariable id: ObjectId, @RequestBody trip: Trip): ResponseEntity<Trip> {
         val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
