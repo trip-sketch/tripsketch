@@ -48,7 +48,6 @@ class CommentService(private val commentRepository: CommentRepository) {
                 replyTo = comment.replyTo,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
-                likes = comment.likes,
                 likedBy = comment.likedBy,
                 userNickName = comment.userNickName,           
                 userProfileUrl = comment.userProfileUrl, 
