@@ -13,7 +13,7 @@ data class CommentDto(
     val content: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-    val likedBy: List<String> = listOf(),
+    val likedBy: MutableSet<String> = mutableSetOf(),
     val replyTo: String? = null,
     val isDeleted: Boolean = false,
     val children: MutableList<CommentDto> = mutableListOf(),
@@ -30,7 +30,7 @@ data class CommentDto(
                 content = comment.content,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
-                likedBy = comment.likedBy,
+                likedBy = comment.likedBy.toMutableSet(),
                 replyTo = comment.replyTo,
                 isDeleted = comment.isDeleted,
                 children = comment.children.map { fromComment(it) }.toMutableList(), // MutableList로 변환
