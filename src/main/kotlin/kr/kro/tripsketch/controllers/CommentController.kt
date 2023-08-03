@@ -47,4 +47,15 @@ class CommentController(private val commentService: CommentService) {
         commentService.deleteChildrenComment(parentId,id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
+
+    // (이메일 바디에 넣음) 로그인 상태면 알아서 들어가도록 바꿔야함
+    @PatchMapping("/{id}/like")
+    fun toggleLikeComment(@PathVariable id: String, @RequestParam userEmail: String): CommentDto {
+        return commentService.toggleLikeComment(id, userEmail)
+    }
+
+    @PatchMapping("/{parentId}/{id}/like")
+    fun toggleLikeChildrenComment(@PathVariable parentId: String, @PathVariable id: String, @RequestParam userEmail: String): CommentDto {
+        return commentService.toggleLikeChildrenComment(parentId, id, userEmail)
+    }
 }
