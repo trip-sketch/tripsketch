@@ -48,7 +48,6 @@ class CommentService(private val commentRepository: CommentRepository) {
                 replyTo = comment.replyTo,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
-                likes = comment.likes,
                 likedBy = comment.likedBy,
                 userNickName = comment.userNickName,           
                 userProfileUrl = comment.userProfileUrl, 
@@ -114,5 +113,39 @@ class CommentService(private val commentRepository: CommentRepository) {
         val deletedChildComment = parentComment.children[childCommentIndex].copy(isDeleted = true)
         parentComment.children[childCommentIndex] = deletedChildComment
         commentRepository.save(parentComment)
+    }
+
+    fun toggleLikeComment(id: String, userEmail: String): CommentDto {
+        val comment = commentRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+
+        if (comment.likedBy.contains(userEmail)) {
+            comment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+        } else {
+            comment.likedBy.add(userEmail) // 좋아요 추가
+        }
+
+        val savedComment = commentRepository.save(comment)
+        return CommentDto.fromComment(savedComment)
+    }
+
+    fun toggleLikeChildrenComment(parentId: String, id: String, userEmail: String): CommentDto {
+        val parentComment = commentRepository.findById(parentId).orElse(null)
+            ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
+
+        val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
+        if (childCommentIndex == -1) {
+            throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+        }
+
+        val childComment = parentComment.children[childCommentIndex]
+        if (childComment.likedBy.contains(userEmail)) {
+            childComment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+        } else {
+            childComment.likedBy.add(userEmail) // 좋아요 추가
+        }
+
+        val savedParentComment = commentRepository.save(parentComment)
+        return CommentDto.fromComment(savedParentComment)
     }
 }
