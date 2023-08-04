@@ -1,16 +1,11 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.User
-import kr.kro.tripsketch.dto.AdditionalUserInfo
-import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.services.JwtService
-import kr.kro.tripsketch.services.KakaoOAuthService
-import kr.kro.tripsketch.services.NickNameService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
