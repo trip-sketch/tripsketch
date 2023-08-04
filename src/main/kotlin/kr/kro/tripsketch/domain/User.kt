@@ -13,7 +13,7 @@ data class User(
     val email: String,
 
     @Indexed(unique = true)
-    var nickname: String?,
+    var nickname: String,
 
     var introduction: String?,
     var profileImageUrl: String?,
