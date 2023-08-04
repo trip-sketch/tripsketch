@@ -8,10 +8,20 @@ import org.springframework.web.servlet.HandlerInterceptor
 
 class JwtTokenInterceptor(private val jwtService: JwtService) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val handlerMethod = handler as? HandlerMethod ?: return true
-        val authorization = request.getHeader("Authorization") ?: return false
-        val token = authorization.removePrefix("Bearer ").trim()
+        // GET 메소드는 인증을 체크하지 않고 통과
+        if (request.method.equals("GET", ignoreCase = true)) return true
 
-        return jwtService.validateToken(token)
+        val authorization = request.getHeader("Authorization") ?: run {
+            response.status = HttpServletResponse.SC_UNAUTHORIZED
+            return false
+        }
+
+        val token = authorization.removePrefix("Bearer ").trim()
+        if (!jwtService.validateToken(token)) {
+            response.status = HttpServletResponse.SC_UNAUTHORIZED
+            return false
+        }
+
+        return true
     }
 }
