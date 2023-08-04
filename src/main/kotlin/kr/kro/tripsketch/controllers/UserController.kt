@@ -75,8 +75,6 @@ class UserController(
     // 토큰값으로 사용자 정보를 업데이트하는 메소드
     @PatchMapping("/user")
     fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody userUpdateDto: UserUpdateDto): ResponseEntity<Any> {
-        println("Received token: $token") // 토큰 출력
-
         val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
 
         if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
