@@ -13,8 +13,9 @@ class UserService(
 ) {
 
     fun registerUser(userRegistrationDto: UserRegistrationDto): User {
-        if (userRepository.findByEmail(userRegistrationDto.email) != null) {
-            throw IllegalArgumentException("이미 존재하는 이메일입니다.")
+        if (userRepository.findByEmail(userRegistrationDto.email) != null || userRepository.findByNickName(userRegistrationDto.nickname) != null)
+        {
+            throw IllegalArgumentException("이미 사용중인 닉네임입니다.")
         }
         val email = userRegistrationDto.email
         val nickname = userRegistrationDto.nickname
