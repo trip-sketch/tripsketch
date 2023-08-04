@@ -36,11 +36,15 @@ class OauthController(
 
         var user = userService.findUserByEmail(email)
         if (user == null) {
-            // 회원 가입을 위한 추가 정보가 없는 경우, 임의의 값을 설정합니다.
+            var nickname: String
+            do {
+                nickname = nicknameService.generateRandomNickname()
+            } while (userService.isNicknameExist(nickname)) // 닉네임 중복 체크
+
             val additionalUserInfo = AdditionalUserInfo(
-                nickname = nicknameService.generateRandomNickname(), // 임의의 닉네임
-                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", // 기본 프로필 이미지 URL
-                introduction = "안녕하세요! 만나서 반갑습니다!", // 기본 소개 문구
+                nickname = nickname,
+                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                introduction = "안녕하세요! 만나서 반갑습니다!",
             )
             val userRegistrationDto = UserRegistrationDto(
                 email,
