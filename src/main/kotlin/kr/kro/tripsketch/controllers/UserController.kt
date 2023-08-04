@@ -8,6 +8,8 @@ import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.NickNameService
 import kr.kro.tripsketch.services.UserService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -46,8 +48,8 @@ class UserController(
     }
 
     @GetMapping("/users")
-    fun getAllUsers(): ResponseEntity<List<User>> {
-        val users = userService.getAllUsers()
+    fun getAllUsers(pageable: Pageable): ResponseEntity<Page<User>> {
+        val users = userService.getAllUsers(pageable)
         return ResponseEntity.ok(users)
     }
 }

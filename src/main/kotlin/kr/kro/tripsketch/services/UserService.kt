@@ -4,6 +4,8 @@ import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.repositories.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,8 +38,8 @@ class UserService(
         return userRepository.findByEmail(nickname)
     }
 
-    fun getAllUsers(): List<User> {
-        return userRepository.findAll()
+    fun getAllUsers(pageable: Pageable): Page<User> {
+        return userRepository.findAll(pageable)
     }
 
     // 사용자 업데이트
