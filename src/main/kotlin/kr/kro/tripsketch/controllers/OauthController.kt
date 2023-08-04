@@ -25,7 +25,7 @@ class OauthController(
         return ResponseEntity.ok().body(mapOf("code" to code))
     }
 
-    // 카카오 Oauth2.0을 이용한 사용자 로그인/회원가입 콜백함수
+    // 카카오 Oauth2.0을 이용한 사용자 로그인/회원가입 기능
     @GetMapping("/kakao/login")
     fun kakaoLogin(@RequestParam code: String): ResponseEntity<Any> {
         val accessToken = kakaoOAuthService.getKakaoAccessToken(code)
