@@ -20,8 +20,8 @@ class UserController(
 ) {
 
     @GetMapping
-    fun getUser(@PathVariable email: String): ResponseEntity<User> {
-        val user = userService.findUserByEmail(email)
+    fun getUser(@RequestParam nickname: String): ResponseEntity<User> {
+        val user = userService.findUserByNickname(nickname)
         return if (user != null) {
             ResponseEntity.ok(user)
         } else {
