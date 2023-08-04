@@ -35,7 +35,7 @@ class UserService(
     }
 
     fun findUserByNickname(nickname: String): User? {
-        return userRepository.findByEmail(nickname)
+        return userRepository.findByNickname(nickname)
     }
 
     fun getAllUsers(pageable: Pageable): Page<User> {
