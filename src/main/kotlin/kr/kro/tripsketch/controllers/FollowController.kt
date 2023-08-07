@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 @Validated
 @RestController
-@RequestMapping("api/follows")
+@RequestMapping("api/follow")
 class FollowController(private val followService: FollowService) {
 
     @PostMapping
