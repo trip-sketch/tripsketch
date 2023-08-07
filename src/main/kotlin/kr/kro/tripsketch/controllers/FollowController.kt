@@ -1,11 +1,15 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.validation.Valid
-import kr.kro.tripsketch.domain.Follow
+import jakarta.validation.constraints.Email
 import kr.kro.tripsketch.dto.FollowDto
+import kr.kro.tripsketch.dto.UserProfileDto
 import kr.kro.tripsketch.services.FollowService
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
+
+@Validated
 @RestController
 @RequestMapping("api/follows")
 class FollowController(private val followService: FollowService) {
@@ -29,12 +33,12 @@ class FollowController(private val followService: FollowService) {
     }
 
     @GetMapping("/followings")
-    fun getFollowings(@RequestParam follower: String): List<Follow> {
+    fun getFollowings(@Email @RequestParam follower: String): List<UserProfileDto> {
         return followService.getFollowings(follower)
     }
 
     @GetMapping("/followers")
-    fun getFollowers(@RequestParam following: String): List<Follow> {
+    fun getFollowers(@Email @RequestParam following: String): List<UserProfileDto> {
         return followService.getFollowers(following)
     }
 }
