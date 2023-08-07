@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("api/comment")
 class CommentController(private val commentService: CommentService) {
 
     @GetMapping("/comments")
