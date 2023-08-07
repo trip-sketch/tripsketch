@@ -33,19 +33,40 @@ class FollowService(
         followRepository.deleteByFollowerAndFollowing(follower, following)
     }
 
-    fun getFollowings(follower: String): List<UserProfileDto> {
-        return followRepository.findByFollower(follower).map { follow ->
-            val user = userRepository.findByNickname(follow.following)
+    fun getFollowings(followerEmail: String): List<UserProfileDto> {
+        val follower = userRepository.findByEmail(followerEmail)
+        val followerProfile = follower?.let {
+            UserProfileDto(
+                nickname = it.nickname,
+                introduction = it.introduction,
+                profileImageUrl = it.profileImageUrl
+            )
+        }
+
+        val followings = followRepository.findByFollower(followerEmail).map { follow ->
+            val user = userRepository.findByEmail(follow.following)
             UserProfileDto(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
                 profileImageUrl = user?.profileImageUrl
             )
         }
+
+        return listOfNotNull(followerProfile) + followings
     }
 
-    fun getFollowers(following: String): List<UserProfileDto> {
-        return followRepository.findByFollowing(following).map { follow ->
+
+    fun getFollowers(followingEmail: String): List<UserProfileDto> {
+        val following = userRepository.findByEmail(followingEmail)
+        val followingProfile = following?.let {
+            UserProfileDto(
+                nickname = it.nickname,
+                introduction = it.introduction,
+                profileImageUrl = it.profileImageUrl
+            )
+        }
+
+        val followers = followRepository.findByFollowing(followingEmail).map { follow ->
             val user = userRepository.findByEmail(follow.follower)
             UserProfileDto(
                 nickname = user?.nickname,
@@ -53,5 +74,7 @@ class FollowService(
                 profileImageUrl = user?.profileImageUrl
             )
         }
+
+        return listOfNotNull(followingProfile) + followers
     }
 }
