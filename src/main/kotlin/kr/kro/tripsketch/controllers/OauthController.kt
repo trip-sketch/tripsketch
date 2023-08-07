@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("api/oauth")
 class OauthController(
     private val kakaoOAuthService: KakaoOAuthService,
     private val userService: UserService,
