@@ -22,10 +22,12 @@ class CommentController(private val commentService: CommentService, private val 
     }
 
     @PostMapping("")
-    fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
-        val comment = commentService.createComment(commentDto)
+    fun createComment(
+        @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
+        val comment = commentService.createComment(token, commentDto)
         return CommentDto.fromComment(comment)
     }
+
 
     @PatchMapping("/{id}")
     fun updateCommentById(@PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {

@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 
 data class CommentDto(
     val id: String? = null,
-    val userId: String,
-    val userNickName: String,          
+    val userEmail: String,
+    val userNickName: String,
     val userProfileUrl: String, 
     val tripId: String,
     val parentId: String? = null,
@@ -22,7 +22,7 @@ data class CommentDto(
         fun fromComment(comment: Comment): CommentDto {
             return CommentDto(
                 id = comment.id,
-                userId = comment.userId,
+                userEmail = comment.userEmail,
                 userNickName = comment.userNickName,        
                 userProfileUrl = comment.userProfileUrl,  
                 tripId = comment.tripId,
