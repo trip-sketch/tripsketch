@@ -4,11 +4,12 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.services.CommentService
 import org.springframework.http.ResponseEntity
+import kr.kro.tripsketch.services.JwtService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/comment")
-class CommentController(private val commentService: CommentService) {
+@RequestMapping("api/comment")
+class CommentController(private val commentService: CommentService, private val jwtService: JwtService) {
 
     @GetMapping("/comments")
     fun getAllComments(): List<CommentDto> {
@@ -21,10 +22,12 @@ class CommentController(private val commentService: CommentService) {
     }
 
     @PostMapping("")
-    fun createComment(@RequestBody commentDto: CommentDto): CommentDto {
-        val comment = commentService.createComment(commentDto)
+    fun createComment(
+        @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
+        val comment = commentService.createComment(token, commentDto)
         return CommentDto.fromComment(comment)
     }
+
 
     @PatchMapping("/{id}")
     fun updateCommentById(@PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
@@ -50,12 +53,34 @@ class CommentController(private val commentService: CommentService) {
 
     // (이메일 바디에 넣음) 로그인 상태면 알아서 들어가도록 바꿔야함
     @PatchMapping("/{id}/like")
-    fun toggleLikeComment(@PathVariable id: String, @RequestParam userEmail: String): CommentDto {
-        return commentService.toggleLikeComment(id, userEmail)
+    fun toggleLikeComment(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Any>  {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
+            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
+        }
+
+        return try {
+            val updatedComment = commentService.toggleLikeComment(actualToken, id)
+            ResponseEntity.ok(updatedComment)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(400).body(e.message)
+        }
     }
 
     @PatchMapping("/{parentId}/{id}/like")
-    fun toggleLikeChildrenComment(@PathVariable parentId: String, @PathVariable id: String, @RequestParam userEmail: String): CommentDto {
-        return commentService.toggleLikeChildrenComment(parentId, id, userEmail)
+    fun toggleLikeChildrenComment(@RequestHeader("Authorization") token: String, @PathVariable parentId: String, @PathVariable id: String): ResponseEntity<Any>  {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
+            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
+        }
+
+        return try {
+            val updatedChildrenComment = commentService.toggleLikeChildrenComment(actualToken, parentId, id)
+            ResponseEntity.ok(updatedChildrenComment)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(400).body(e.message)
+        }
     }
 }

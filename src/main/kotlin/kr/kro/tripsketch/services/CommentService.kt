@@ -8,7 +8,7 @@ import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
 import org.springframework.stereotype.Service
 
 @Service
-class CommentService(private val commentRepository: CommentRepository) {
+class CommentService(private val commentRepository: CommentRepository, private val jwtService: JwtService,) {
 
     fun getAllComments(): List<CommentDto> {
         return commentRepository.findAll().map { CommentDto.fromComment(it) }
@@ -19,13 +19,19 @@ class CommentService(private val commentRepository: CommentRepository) {
         return comments.map { CommentDto.fromComment(it) }
     }
 
-    fun createComment(dto: CommentDto): Comment {
+    fun createComment(token: String, dto: CommentDto): Comment {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
+        val userEmail = jwtService.getEmailFromToken(token)
         val parentComment: Comment? = dto.parentId?.let {
             commentRepository.findById(it).orElse(null)
         }
 
         val comment = Comment(
-            userId = dto.userId,
+            userEmail = userEmail,
             tripId = dto.tripId,
             parentId = dto.parentId,
             content = dto.content,
@@ -41,7 +47,7 @@ class CommentService(private val commentRepository: CommentRepository) {
             // parentId가 있는 경우: 새로운 댓글을 부모의 children 리스트에 추가하고 부모 댓글을 저장
             val childComment = Comment(
                 id = ObjectId().toString(), // 새로운 ObjectId 생성
-                userId = comment.userId,
+                userEmail = userEmail,
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
@@ -115,10 +121,10 @@ class CommentService(private val commentRepository: CommentRepository) {
         commentRepository.save(parentComment)
     }
 
-    fun toggleLikeComment(id: String, userEmail: String): CommentDto {
+    fun toggleLikeComment(token:String, id: String): CommentDto {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-
+        val userEmail = jwtService.getEmailFromToken(token)
         if (comment.likedBy.contains(userEmail)) {
             comment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
         } else {
@@ -129,7 +135,7 @@ class CommentService(private val commentRepository: CommentRepository) {
         return CommentDto.fromComment(savedComment)
     }
 
-    fun toggleLikeChildrenComment(parentId: String, id: String, userEmail: String): CommentDto {
+    fun toggleLikeChildrenComment(token:String, parentId: String, id: String): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -139,6 +145,7 @@ class CommentService(private val commentRepository: CommentRepository) {
         }
 
         val childComment = parentComment.children[childCommentIndex]
+        val userEmail = jwtService.getEmailFromToken(token)
         if (childComment.likedBy.contains(userEmail)) {
             childComment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
         } else {
