@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Document(collection = "comments")
 data class Comment(
     @Id val id: String? = null,
-    val userId: String,
+    val userEmail: String,
     val userNickName: String,
     val userProfileUrl: String,
     val tripId: String,
