@@ -25,8 +25,15 @@ class CommentController(private val commentService: CommentService, private val 
     @PostMapping("")
     fun createComment(
         @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
-        return commentService.createComment(token, commentDto)
+
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
+        return commentService.createComment(actualToken, commentDto)
     }
+
 
 
     @PatchMapping("/{id}")
