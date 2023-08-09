@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.controllers
 
+import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.services.CommentService
@@ -24,8 +25,7 @@ class CommentController(private val commentService: CommentService, private val 
     @PostMapping("")
     fun createComment(
         @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
-        val comment = commentService.createComment(token, commentDto)
-        return CommentDto.fromComment(comment) //test
+        return commentService.createComment(token, commentDto)
     }
 
 
@@ -51,7 +51,6 @@ class CommentController(private val commentService: CommentService, private val 
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
 
-    // (이메일 바디에 넣음) 로그인 상태면 알아서 들어가도록 바꿔야함
     @PatchMapping("/{id}/like")
     fun toggleLikeComment(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Any>  {
         val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
