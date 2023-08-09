@@ -19,13 +19,14 @@ class CommentService(private val commentRepository: CommentRepository, private v
         return comments.map { CommentDto.fromComment(it) }
     }
 
-    fun createComment(token: String, dto: CommentDto): Comment {
+    fun createComment(token: String, dto: CommentDto): CommentDto {
         val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
 
         if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
             throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
         }
         val userEmail = jwtService.getEmailFromToken(token)
+
         val parentComment: Comment? = dto.parentId?.let {
             commentRepository.findById(it).orElse(null)
         }
@@ -42,7 +43,8 @@ class CommentService(private val commentRepository: CommentRepository, private v
 
         if (parentComment == null) {
             // parentId가 없는 경우: 새로운 댓글을 저장하고 반환
-            return commentRepository.save(comment)
+            commentRepository.save(comment)
+            return CommentDto.fromComment(comment)
         } else {
             // parentId가 있는 경우: 새로운 댓글을 부모의 children 리스트에 추가하고 부모 댓글을 저장
             val childComment = Comment(
@@ -60,8 +62,9 @@ class CommentService(private val commentRepository: CommentRepository, private v
             )
             parentComment.children.add(childComment)
             commentRepository.save(parentComment)
+            return CommentDto.fromComment(parentComment)
         }
-        return commentRepository.save(parentComment)
+
     }
 
     fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
