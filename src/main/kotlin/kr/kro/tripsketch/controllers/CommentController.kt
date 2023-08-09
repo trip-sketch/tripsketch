@@ -25,7 +25,7 @@ class CommentController(private val commentService: CommentService, private val 
     fun createComment(
         @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
         val comment = commentService.createComment(token, commentDto)
-        return CommentDto.fromComment(comment)
+        return CommentDto.fromComment(comment) //test
     }
 
 
