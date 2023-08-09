@@ -64,6 +64,12 @@ class UserService(
         return userRepository.save(user)
     }
 
+    fun updateRefreshToken(email: String, refreshToken: String): User {
+        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+        user.refreshToken = refreshToken
+        return userRepository.save(user)
+    }
+
     fun isNicknameExist(nickname: String): Boolean {
         return userRepository.existsByNickname(nickname)
     }
