@@ -20,8 +20,11 @@ class TripService(private val tripRepository: TripRepository) {
     }
 
     /** Trip 생성 */
-    fun createTrip(trip: Trip): Trip {
-        return tripRepository.save(trip)
+    fun createTrip(actualToken: String, trip: Trip): Trip {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+        if (userEmail) {
+            return tripRepository.save(trip)
+        }
     }
 
     /** Trip 수정 */    // update 틀만 잡기
@@ -78,7 +81,10 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 삭제(soft delete) */
-    fun deleteTripById(id: String) {
+    fun deleteTripById(actualToken: String, id: String) {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+
+        // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!
         val trip = tripRepository.findById(id).orElse(null)
         if (trip != null) {
             trip.deletedAt = LocalDateTime.now()

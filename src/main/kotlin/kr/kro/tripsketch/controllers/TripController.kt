@@ -5,6 +5,8 @@ import kr.kro.tripsketch.services.TripService
 import org.bson.types.ObjectId // ObjectId import
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import kr.kro.tripsketch.utils.TokenUtils
+import kr.kro.tripsketch.services.JwtService
 
 @RestController
 @RequestMapping("api/trips")
@@ -27,9 +29,11 @@ class TripController(private val tripService: TripService) {
     }
 
     @PostMapping
-    fun createTrip(@RequestBody trip: Trip): ResponseEntity<Trip> {
+    fun createTrip(@RequestHeader("Autorization") token: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
         val createdTrip = tripService.createTrip(trip)
-        return ResponseEntity.ok(createdTrip)
+//        return ResponseEntity.ok(createdTrip)
+        return TripService.createTrip(actualToken,createdTrip)
     }
     
     @PatchMapping("/{id}")            
@@ -49,8 +53,9 @@ class TripController(private val tripService: TripService) {
     // }
 
     @DeleteMapping("/{id}")
-    fun deleteTrip(@PathVariable id: String): ResponseEntity<Unit> {
-        val existingTrip = tripService.getTripById(id)
+    fun deleteTrip(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Unit> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        val existingTrip = tripService.getTripById(actualToken, id)
         if (existingTrip != null) {
             tripService.deleteTripById(id)
             return ResponseEntity.noContent().build()
