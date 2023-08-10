@@ -13,30 +13,44 @@ import javax.servlet.http.HttpServletRequest
 class JwtService {
     private val secretKeyString = EnvLoader.getProperty("SECRET_KEY") ?: ""
     private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
-    private val tokenValidityInMilliseconds: Long = EnvLoader.getProperty("TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1 hour
+    private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1 hour
+    private val refreshTokenValidityInMilliseconds: Long = EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
 
-    fun createToken(user: User): String {
-        val claims = Jwts.claims().setSubject(user.email)
-        claims["nickname"] = user.nickname
+    data class TokenResponse(val accessToken: String, val refreshToken: String, val accessTokenExpiryDate: Long, val refreshTokenExpiryDate: Long)
 
+    fun createTokens(user: User): TokenResponse {
         val now = Date()
-        val validity = Date(now.time + tokenValidityInMilliseconds)
 
-        return Jwts.builder()
-            .setClaims(claims)
+        // Access Token 생성
+        val accessTokenValidity = Date(now.time + accessTokenValidityInMilliseconds)
+        val accessToken = Jwts.builder()
+            .setSubject(user.email)
+            .claim("nickname", user.nickname)
             .setIssuedAt(now)
-            .setExpiration(validity)
+            .setExpiration(accessTokenValidity)
             .signWith(secretKey)
             .compact()
+
+        // Refresh Token 생성
+        val refreshTokenValidity = Date(now.time + refreshTokenValidityInMilliseconds)
+        val refreshToken = Jwts.builder()
+            .setSubject(user.email)
+            .setId(UUID.randomUUID().toString())
+            .setIssuedAt(now)
+            .setExpiration(refreshTokenValidity)
+            .signWith(secretKey)
+            .compact()
+
+        return TokenResponse(accessToken, refreshToken, accessTokenValidity.time, refreshTokenValidity.time)
     }
 
     fun validateToken(token: String): Boolean {
-        try {
+        return try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
-            return true
+            true
         } catch (e: Exception) {
             // 토큰 파싱에 실패하면 false를 반환합니다.
-            return false
+            false
         }
     }
 
@@ -44,9 +58,6 @@ class JwtService {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
     }
 
-    fun getNicknameFromToken(token: String): String {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body["nickname"].toString()
-    }
 
     fun resolveToken(req: HttpServletRequest): String? {
         val bearerToken = req.getHeader("Authorization")
