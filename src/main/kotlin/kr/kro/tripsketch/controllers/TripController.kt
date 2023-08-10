@@ -37,9 +37,10 @@ class TripController(private val tripService: TripService) {
     }
     
     @PatchMapping("/{id}")            
-    fun updateTrip(@PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
-        val updatedTrip = tripService.updateTrip(id, trip) // id를 String 타입으로 전달
-        return ResponseEntity.ok(updatedTrip)
+    fun updateTripById(@RequestHeader("Autorization") token: String, @PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        val updatedTrip = tripService.updateTripById(id, trip) // id를 String 타입으로 전달
+        return ResponseEntity.ok(actualToken, updatedTrip)
     }
 
     // @DeleteMapping("/{id}")
@@ -53,7 +54,7 @@ class TripController(private val tripService: TripService) {
     // }
 
     @DeleteMapping("/{id}")
-    fun deleteTrip(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Unit> {
+    fun deleteTripById(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Unit> {
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
         val existingTrip = tripService.getTripById(actualToken, id)
         if (existingTrip != null) {

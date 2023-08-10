@@ -39,9 +39,11 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 수정 */    // test 성공
-    fun updateTrip(id: String, trip: Trip): Trip {
+    fun updateTripById(actualToken: String, id: String, trip: Trip): Trip {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
         val existingTrip = getTripById(id)
-        if (existingTrip != null) {
+
+        if (existingTrip != null && existingTrip.userEmail == trip.userEmail){
             if (trip.title != existingTrip.title) {
                 existingTrip.title = trip.title
             }
@@ -81,14 +83,14 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 삭제(soft delete) */
+    // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!
     fun deleteTripById(actualToken: String, id: String) {
         val userEmail = jwtService.getEmailFromToken(actualToken)
+        val existingTrip = tripRepository.findById(id).orElse(null)
 
-        // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!
-        val trip = tripRepository.findById(id).orElse(null)
-        if (trip != null) {
+        if (existingTrip != null && existingTrip.userEmail == trip.userEmail) {
             trip.deletedAt = LocalDateTime.now()
-            trip.hidden = true // 혹은 1에 해당하는 값으로 설정
+            trip.hidden = true
             tripRepository.save(trip)
         } else {
             throw NoSuchElementException("Trip not found")
