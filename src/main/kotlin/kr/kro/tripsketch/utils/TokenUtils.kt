@@ -5,6 +5,10 @@ import kr.kro.tripsketch.services.JwtService
 object TokenUtils { // Create a singleton object for utility functions
     lateinit var jwtService: JwtService
 
+    fun initialize(jwtService: JwtService) {
+        this.jwtService = jwtService
+    }
+
     fun validateAndExtractToken(token: String): String {
         val actualToken = token.removePrefix("Bearer ").trim()
         if (!jwtService.validateToken(actualToken)) {
