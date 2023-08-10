@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.controllers
 
-import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.domain.toDto
+import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.UserService
@@ -17,10 +18,10 @@ class UserController(
 ) {
 
     @GetMapping
-    fun getUser(@RequestParam nickname: String): ResponseEntity<User> {
+    fun getUser(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
-            ResponseEntity.ok(user)
+            ResponseEntity.ok(toDto(user))
         } else {
             ResponseEntity.notFound().build()
         }
@@ -28,23 +29,23 @@ class UserController(
 
     @PatchMapping
     fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody userUpdateDto: UserUpdateDto): ResponseEntity<Any> {
-        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+        val actualToken = token.removePrefix("Bearer ").trim()
 
-        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증
+        if (!jwtService.validateToken(actualToken)) {
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
         }
 
         return try {
             val updatedUser = userService.updateUser(actualToken, userUpdateDto)
-            ResponseEntity.ok(updatedUser)
+            ResponseEntity.ok(toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(400).body(e.message)
         }
     }
 
     @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): ResponseEntity<Page<User>> {
+    fun getAllUsers(pageable: Pageable): ResponseEntity<Page<UserDto>> {
         val users = userService.getAllUsers(pageable)
-        return ResponseEntity.ok(users)
+        return ResponseEntity.ok(users.map { toDto(it) })
     }
 }
