@@ -15,7 +15,7 @@ inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object :
 @Service
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
-    fun getKakaoAccessToken(code: String): String? {
+    fun getKakaoAccessToken(code: String): Pair<String?, String?> {
         val restTemplate = RestTemplate()
 
         val url = "https://kauth.kakao.com/oauth/token"
@@ -34,9 +34,36 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         return try {
             val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
             val body = response.body
+            val accessToken = body?.get("access_token") as? String
+            val refreshToken = body?.get("refresh_token") as? String
+            Pair(accessToken, refreshToken)
+        } catch (e: RestClientException) {
+            println("Error while requesting tokens: ${e.message}")
+            Pair(null, null)
+        }
+    }
+
+    fun refreshAccessToken(refreshToken: String): String? {
+        val restTemplate = RestTemplate()
+
+        val url = "https://kauth.kakao.com/oauth/token"
+
+        val params = LinkedMultiValueMap<String, String>()
+        params.add("grant_type", "refresh_token")
+        params.add("client_id", kakaoConfig.clientId)
+        params.add("refresh_token", refreshToken)
+
+        val headers = HttpHeaders()
+        headers.add("Content-Type", "application/x-www-form-urlencoded")
+
+        val request = HttpEntity(params, headers)
+
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
+            val body = response.body
             body?.get("access_token") as? String
         } catch (e: RestClientException) {
-            println("Error while requesting access token: ${e.message}")
+            println("Error while refreshing access token: ${e.message}")
             null
         }
     }
