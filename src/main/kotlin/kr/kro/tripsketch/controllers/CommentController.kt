@@ -37,23 +37,43 @@ class CommentController(private val commentService: CommentService, private val 
 
 
     @PatchMapping("/{id}")
-    fun updateCommentById(@PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+    fun updateCommentById(@RequestHeader("Authorization") token: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
         return commentService.updateComment(id, updatedComment)
     }
 
     @PatchMapping("/{parentId}/{id}")
-    fun updateChildrenCommentById(@PathVariable parentId: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+    fun updateChildrenCommentById(@RequestHeader("Authorization") token: String, @PathVariable parentId: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
         return commentService.updateChildrenComment(parentId, id, updatedComment)
     }
 
     @DeleteMapping("/{id}")
-    fun deleteComment(@PathVariable id: String): ResponseEntity<Any> {
+    fun deleteComment(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Any> {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
         commentService.deleteComment(id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
 
     @DeleteMapping("/{parentId}/{id}")
-    fun deleteChildrenComment(@PathVariable parentId: String,@PathVariable id: String): ResponseEntity<Any> {
+    fun deleteChildrenComment(@RequestHeader("Authorization") token: String, @PathVariable parentId: String,@PathVariable id: String): ResponseEntity<Any> {
+        val actualToken = token.removePrefix("Bearer ").trim() // "Bearer " 제거
+
+        if (!jwtService.validateToken(actualToken)) { // 토큰 유효성 검증구
+            throw IllegalArgumentException("토큰이 유효 하지 않습니다.")
+        }
         commentService.deleteChildrenComment(parentId,id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
