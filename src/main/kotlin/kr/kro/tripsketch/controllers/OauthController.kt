@@ -83,6 +83,7 @@ class OauthController(
     @PostMapping("/kakao/refresh")
     fun refreshKakaoToken(@RequestBody ourRefreshToken: String): ResponseEntity<Any> {
         // ourRefreshToken을 사용하여 사용자 찾기
+        println(ourRefreshToken)
         val user = userService.findByOurRefreshToken(ourRefreshToken) ?: return ResponseEntity.status(400)
             .body("Invalid refreshToken")
 

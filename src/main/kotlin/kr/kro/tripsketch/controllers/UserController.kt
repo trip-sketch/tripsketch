@@ -41,6 +41,16 @@ class UserController(
         }
     }
 
+    @GetMapping("/email")
+    fun getUserByEmail(@RequestParam email: String): ResponseEntity<UserDto> {
+        val user = userService.findUserByEmail(email)
+        return if (user != null) {
+            ResponseEntity.ok(toDto(user))
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
     @PatchMapping
     fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody userUpdateDto: UserUpdateDto): ResponseEntity<Any> {
         val actualToken = token.removePrefix("Bearer ").trim()
