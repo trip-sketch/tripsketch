@@ -5,6 +5,7 @@ import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.UserService
+import kr.kro.tripsketch.utils.TokenUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
@@ -18,7 +19,20 @@ class UserController(
 ) {
 
     @GetMapping
-    fun getUser(@RequestParam nickname: String): ResponseEntity<UserDto> {
+    fun getUser(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        val email = jwtService.getEmailFromToken(actualToken)
+        val user = userService.findUserByEmail(email)
+        return if (user != null) {
+            ResponseEntity.ok(toDto(user))
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+
+    @GetMapping("/nickname")
+    fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
             ResponseEntity.ok(toDto(user))
