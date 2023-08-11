@@ -1,6 +1,8 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.dto.AdditionalUserInfo
+import kr.kro.tripsketch.dto.KakaoRefreshRequest
+import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.KakaoOAuthService
@@ -69,22 +71,21 @@ class OauthController(
         val headers = HttpHeaders()
         headers.add("Authorization", "Bearer ${tokenResponse.accessToken}")
 
-        val responseBody = mapOf(
-            "accessToken" to tokenResponse.accessToken,
-            "refreshToken" to tokenResponse.refreshToken,
-            "accessTokenExpiryDate" to tokenResponse.accessTokenExpiryDate,
-            "refreshTokenExpiryDate" to tokenResponse.refreshTokenExpiryDate,
-            "message" to "Success"
+        val response = TokenResponse(
+            accessToken = tokenResponse.accessToken,
+            refreshToken = tokenResponse.refreshToken,
+            refreshTokenExpiryDate = tokenResponse.refreshTokenExpiryDate,
+            message = "Success"
         )
 
-        return ResponseEntity.ok().headers(headers).body(responseBody)
+        return ResponseEntity.ok().headers(headers).body(response)
     }
 
     @PostMapping("/kakao/refresh")
-    fun refreshKakaoToken(@RequestBody ourRefreshToken: String): ResponseEntity<Any> {
+    fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
         // ourRefreshToken을 사용하여 사용자 찾기
-        println(ourRefreshToken)
-        val user = userService.findByOurRefreshToken(ourRefreshToken) ?: return ResponseEntity.status(400)
+        println(request.ourRefreshToken)
+        val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return ResponseEntity.status(400)
             .body("Invalid refreshToken")
 
         // 사용자 정보에서 카카오의 refreshToken 가져와서 카카오 API 호출
@@ -97,15 +98,14 @@ class OauthController(
         val headers = HttpHeaders()
         headers.add("Authorization", "Bearer ${tokenResponse.accessToken}")
 
-        val responseBody = mapOf(
-            "accessToken" to tokenResponse.accessToken,
-            "refreshToken" to tokenResponse.refreshToken,
-            "accessTokenExpiryDate" to tokenResponse.accessTokenExpiryDate,
-            "refreshTokenExpiryDate" to tokenResponse.refreshTokenExpiryDate,
-            "message" to "Success"
+        val response = TokenResponse(
+            accessToken = tokenResponse.accessToken,
+            refreshToken = tokenResponse.refreshToken,
+            refreshTokenExpiryDate = tokenResponse.refreshTokenExpiryDate,
+            message = "Success"
         )
 
-        return ResponseEntity.ok().headers(headers).body(responseBody)
+        return ResponseEntity.ok().headers(headers).body(response)
     }
 }
 
