@@ -9,6 +9,7 @@ import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class CommentService(
@@ -55,8 +56,6 @@ class CommentService(
                 parentId = commentCreateDto.parentId,
                 content = commentCreateDto.content,
                 replyTo = commentCreateDto.replyTo,
-                createdAt = commentCreateDto.createdAt,
-                updatedAt = commentCreateDto.updatedAt,
             )
             parentComment.children.add(childComment)
             val createdComment = commentRepository.save(parentComment)
@@ -68,10 +67,10 @@ class CommentService(
     fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-
+        val updatedTime = LocalDateTime.now()
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
-            updatedAt = commentUpdateDto.updatedAt,
+            updatedAt = updatedTime
         )
 
         val savedComment = commentRepository.save(updatedComment)
@@ -87,10 +86,10 @@ class CommentService(
         if (childCommentIndex == -1) {
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
-
+        val updatedTime = LocalDateTime.now()
         val updatedChildComment = parentComment.children[childCommentIndex].copy(
             content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
-            updatedAt = commentUpdateDto.updatedAt,
+            updatedAt = updatedTime
         )
 
         parentComment.children[childCommentIndex] = updatedChildComment
