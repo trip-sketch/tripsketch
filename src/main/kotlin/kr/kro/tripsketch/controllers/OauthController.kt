@@ -64,6 +64,8 @@ class OauthController(
 
         val tokenResponse = jwtService.createTokens(user)
 
+        userService.updateUserRefreshToken(email, tokenResponse.refreshToken)
+
         val headers = HttpHeaders()
         headers.add("Authorization", "Bearer ${tokenResponse.accessToken}")
 

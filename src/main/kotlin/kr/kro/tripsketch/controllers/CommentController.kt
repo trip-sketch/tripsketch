@@ -2,6 +2,7 @@ package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
+import kr.kro.tripsketch.dto.CommentCreateDto
 import kr.kro.tripsketch.services.CommentService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -24,10 +25,10 @@ class CommentController(private val commentService: CommentService, private val 
 
     @PostMapping("")
     fun createComment(
-        @RequestHeader("Authorization") token: String, @RequestBody commentDto: CommentDto): CommentDto {
+        @RequestHeader("Authorization") token: String, @RequestBody commentCreateDto: CommentCreateDto): CommentDto {
 
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
-        return commentService.createComment(actualToken, commentDto)
+        return commentService.createComment(actualToken, commentCreateDto)
     }
 
 
