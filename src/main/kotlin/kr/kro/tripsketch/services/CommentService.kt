@@ -4,21 +4,26 @@ import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.dto.CommentCreateDto
+import kr.kro.tripsketch.dto.UserProfileDto
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
 import org.springframework.stereotype.Service
 
 @Service
-class CommentService(private val commentRepository: CommentRepository, private val jwtService: JwtService, private val userRepository: UserRepository) {
+class CommentService(
+    private val commentRepository: CommentRepository,
+    private val jwtService: JwtService,
+    private val userRepository: UserRepository
+) {
 
     fun getAllComments(): List<CommentDto> {
-        return commentRepository.findAll().map { CommentDto.fromComment(it, userRepository) }
+        return commentRepository.findAll().map { fromComment(it, userRepository) }
     }
 
     fun getCommentByTripId(tripId: String): List<CommentDto> {
         val comments = commentRepository.findAllByTripId(tripId)
-        return comments.map { CommentDto.fromComment(it, userRepository) }
+        return comments.map { fromComment(it, userRepository) }
     }
 
     fun createComment(actualToken: String, commentCreateDto: CommentCreateDto): CommentDto {
@@ -40,7 +45,7 @@ class CommentService(private val commentRepository: CommentRepository, private v
         if (parentComment == null) {
             // parentId가 없는 경우: 새로운 댓글을 저장하고 반환
             val createdComment = commentRepository.save(comment)
-            return CommentDto.fromComment(createdComment, userRepository)
+            return fromComment(createdComment, userRepository)
         } else {
             // parentId가 있는 경우: 새로운 댓글을 부모의 children 리스트에 추가하고 부모 댓글을 저장
             val childComment = Comment(
@@ -55,13 +60,14 @@ class CommentService(private val commentRepository: CommentRepository, private v
             )
             parentComment.children.add(childComment)
             val createdComment = commentRepository.save(parentComment)
-            return CommentDto.fromComment(createdComment, userRepository)
+            return fromComment(createdComment, userRepository)
         }
 
     }
 
     fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
-        val comment = commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+        val comment =
+            commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
 
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
@@ -70,7 +76,7 @@ class CommentService(private val commentRepository: CommentRepository, private v
 
         val savedComment = commentRepository.save(updatedComment)
 
-        return CommentDto.fromComment(savedComment, userRepository)
+        return fromComment(savedComment, userRepository)
     }
 
     fun updateChildrenComment(parentId: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
@@ -87,10 +93,10 @@ class CommentService(private val commentRepository: CommentRepository, private v
             updatedAt = commentUpdateDto.updatedAt,
         )
 
-            parentComment.children[childCommentIndex] = updatedChildComment
-            val savedParentComment = commentRepository.save(parentComment)
+        parentComment.children[childCommentIndex] = updatedChildComment
+        val savedParentComment = commentRepository.save(parentComment)
 
-            return CommentDto.fromComment(savedParentComment, userRepository)
+        return fromComment(savedParentComment, userRepository)
     }
 
     fun deleteComment(id: String) {
@@ -117,7 +123,7 @@ class CommentService(private val commentRepository: CommentRepository, private v
         commentRepository.save(parentComment)
     }
 
-    fun toggleLikeComment(token:String, id: String): CommentDto {
+    fun toggleLikeComment(token: String, id: String): CommentDto {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         val userEmail = jwtService.getEmailFromToken(token)
@@ -128,10 +134,10 @@ class CommentService(private val commentRepository: CommentRepository, private v
         }
 
         val savedComment = commentRepository.save(comment)
-        return CommentDto.fromComment(savedComment, userRepository)
+        return fromComment(savedComment, userRepository)
     }
 
-    fun toggleLikeChildrenComment(token:String, parentId: String, id: String): CommentDto {
+    fun toggleLikeChildrenComment(token: String, parentId: String, id: String): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -149,6 +155,36 @@ class CommentService(private val commentRepository: CommentRepository, private v
         }
 
         val savedParentComment = commentRepository.save(parentComment)
-        return CommentDto.fromComment(savedParentComment, userRepository)
+        return fromComment(savedParentComment, userRepository)
+    }
+
+    companion object {
+        fun fromComment(comment: Comment, userRepository: UserRepository): CommentDto {
+            val commenter = userRepository.findByEmail(comment.userEmail)
+            val commenterProfile = commenter?.let {
+                UserProfileDto(
+                    email = it.email,
+                    nickname = it.nickname,
+                    introduction = it.introduction,
+                    profileImageUrl = it.profileImageUrl
+                )
+            }
+
+            return CommentDto(
+                id = comment.id,
+                userEmail = comment.userEmail,
+                userNickName = commenterProfile?.nickname ?: "", // 사용자가 없을 경우 대비
+                userProfileUrl = commenterProfile?.profileImageUrl ?: "", // 사용자가 없을 경우 대비
+                tripId = comment.tripId,
+                parentId = comment.parentId,
+                content = comment.content,
+                createdAt = comment.createdAt,
+                updatedAt = comment.updatedAt,
+                likedBy = comment.likedBy.toMutableSet(),
+                replyTo = comment.replyTo,
+                isDeleted = comment.isDeleted,
+                children = comment.children.map { fromComment(it, userRepository) }.toMutableList(),
+            )
+        }
     }
 }
