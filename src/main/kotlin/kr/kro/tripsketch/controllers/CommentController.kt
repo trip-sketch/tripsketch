@@ -25,22 +25,31 @@ class CommentController(private val commentService: CommentService, private val 
 
     @PostMapping("")
     fun createComment(
-        @RequestHeader("Authorization") token: String, @RequestBody commentCreateDto: CommentCreateDto): CommentDto {
+        @RequestHeader("Authorization") token: String, @RequestBody commentCreateDto: CommentCreateDto
+    ): CommentDto {
 
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
         return commentService.createComment(actualToken, commentCreateDto)
     }
 
 
-
     @PatchMapping("/{id}")
-    fun updateCommentById(@RequestHeader("Authorization") token: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+    fun updateCommentById(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable id: String,
+        @RequestBody updatedComment: CommentUpdateDto
+    ): CommentDto {
         TokenUtils.validateAndExtractToken(jwtService, token)
         return commentService.updateComment(id, updatedComment)
     }
 
     @PatchMapping("/{parentId}/{id}")
-    fun updateChildrenCommentById(@RequestHeader("Authorization") token: String, @PathVariable parentId: String, @PathVariable id: String, @RequestBody updatedComment: CommentUpdateDto): CommentDto {
+    fun updateChildrenCommentById(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable parentId: String,
+        @PathVariable id: String,
+        @RequestBody updatedComment: CommentUpdateDto
+    ): CommentDto {
         TokenUtils.validateAndExtractToken(jwtService, token)
         return commentService.updateChildrenComment(parentId, id, updatedComment)
     }
@@ -53,14 +62,21 @@ class CommentController(private val commentService: CommentService, private val 
     }
 
     @DeleteMapping("/{parentId}/{id}")
-    fun deleteChildrenComment(@RequestHeader("Authorization") token: String, @PathVariable parentId: String,@PathVariable id: String): ResponseEntity<Any> {
+    fun deleteChildrenComment(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable parentId: String,
+        @PathVariable id: String
+    ): ResponseEntity<Any> {
         TokenUtils.validateAndExtractToken(jwtService, token)
-        commentService.deleteChildrenComment(parentId,id)
+        commentService.deleteChildrenComment(parentId, id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
 
     @PatchMapping("/{id}/like")
-    fun toggleLikeComment(@RequestHeader("Authorization") token: String, @PathVariable id: String): ResponseEntity<Any>  {
+    fun toggleLikeComment(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable id: String
+    ): ResponseEntity<Any> {
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
 
         return try {
@@ -72,7 +88,11 @@ class CommentController(private val commentService: CommentService, private val 
     }
 
     @PatchMapping("/{parentId}/{id}/like")
-    fun toggleLikeChildrenComment(@RequestHeader("Authorization") token: String, @PathVariable parentId: String, @PathVariable id: String): ResponseEntity<Any>  {
+    fun toggleLikeChildrenComment(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable parentId: String,
+        @PathVariable id: String
+    ): ResponseEntity<Any> {
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
 
         return try {
