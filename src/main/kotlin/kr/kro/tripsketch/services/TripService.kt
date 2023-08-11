@@ -5,6 +5,8 @@ import kr.kro.tripsketch.repositories.TripRepository
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kr.kro.tripsketch.utils.TokenUtils
+import kr.kro.tripsketch.services.JwtService
 
 @Service
 class TripService(private val tripRepository: TripRepository) {
@@ -22,7 +24,7 @@ class TripService(private val tripRepository: TripRepository) {
     /** Trip 생성 */
     fun createTrip(actualToken: String, trip: Trip): Trip {
         val userEmail = jwtService.getEmailFromToken(actualToken)
-        if (userEmail) {
+        if (userEmail != null) {
             return tripRepository.save(trip)
         }
     }
@@ -41,7 +43,7 @@ class TripService(private val tripRepository: TripRepository) {
     /** Trip 수정 */    // test 성공
     fun updateTripById(actualToken: String, id: String, trip: Trip): Trip {
         val userEmail = jwtService.getEmailFromToken(actualToken)
-        val existingTrip = getTripById(id)
+        val existingTrip = tripRepository.getTripById(id)
 
         if (existingTrip != null && existingTrip.userEmail == trip.userEmail){
             if (trip.title != existingTrip.title) {
@@ -83,8 +85,8 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 삭제(soft delete) */
-    // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!
-    fun deleteTripById(actualToken: String, id: String) {
+    // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!, patch로 바꾸기
+    fun deleteTripById(actualToken: String, id: String, trip: Trip) {
         val userEmail = jwtService.getEmailFromToken(actualToken)
         val existingTrip = tripRepository.findById(id).orElse(null)
 
