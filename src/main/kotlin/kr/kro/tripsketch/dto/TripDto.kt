@@ -4,7 +4,8 @@ import java.time.LocalDateTime
 
 data class TripDto(
     var id: String? = null,
-    var userId: String,
+//    var userId: String,
+    var userEmail: String,
     var scheduleId: String,
     var title: String,
     var content: String,
