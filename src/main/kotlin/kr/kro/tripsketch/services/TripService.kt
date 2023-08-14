@@ -5,6 +5,8 @@ import kr.kro.tripsketch.repositories.TripRepository
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kr.kro.tripsketch.utils.TokenUtils
+import kr.kro.tripsketch.services.JwtService
 
 @Service
 class TripService(private val tripRepository: TripRepository) {
@@ -20,8 +22,11 @@ class TripService(private val tripRepository: TripRepository) {
     }
 
     /** Trip 생성 */
-    fun createTrip(trip: Trip): Trip {
-        return tripRepository.save(trip)
+    fun createTrip(actualToken: String, trip: Trip): Trip {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+        if (userEmail != null) {
+            return tripRepository.save(trip)
+        }
     }
 
     /** Trip 수정 */    // update 틀만 잡기
@@ -36,9 +41,11 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 수정 */    // test 성공
-    fun updateTrip(id: String, trip: Trip): Trip {
-        val existingTrip = getTripById(id)
-        if (existingTrip != null) {
+    fun updateTripById(actualToken: String, id: String, trip: Trip): Trip {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+        val existingTrip = tripRepository.getTripById(id)
+
+        if (existingTrip != null && existingTrip.userEmail == trip.userEmail){
             if (trip.title != existingTrip.title) {
                 existingTrip.title = trip.title
             }
@@ -78,11 +85,14 @@ class TripService(private val tripRepository: TripRepository) {
     // }
 
     /** Trip 삭제(soft delete) */
-    fun deleteTripById(id: String) {
-        val trip = tripRepository.findById(id).orElse(null)
-        if (trip != null) {
+    // to-do: id 또는 Email 과 작성한 trip 게시글의 사용자가 일치해야 함!, patch로 바꾸기
+    fun deleteTripById(actualToken: String, id: String) {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+        val existingTrip = tripRepository.findById(id).orElse(null)
+
+        if (existingTrip != null && existingTrip.userEmail == trip.userEmail) {
             trip.deletedAt = LocalDateTime.now()
-            trip.hidden = true // 혹은 1에 해당하는 값으로 설정
+            trip.hidden = true
             tripRepository.save(trip)
         } else {
             throw NoSuchElementException("Trip not found")
