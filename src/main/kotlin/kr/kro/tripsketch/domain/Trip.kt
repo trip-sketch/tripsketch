@@ -47,7 +47,7 @@ data class Trip(
             userEmail = this.userEmail,
             scheduleId = this.scheduleId,
             title = this.title,
-            content = this.content,정
+            content = this.content,
             likes = this.likes,
             views = this.views,
             location = this.location,
