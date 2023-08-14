@@ -12,7 +12,8 @@ data class Trip(
     @Id var id: ObjectId = ObjectId.get(),
     // var userId: ObjectId,            // 자동생성되니까.. 일단 String으로 구현!
     // var scheduleId: ObjectId,        // 자동생성되니까.. 일단 String으로 구현!
-    var userId: String,
+//    var userId: String,
+    var userEmail: String,
     var scheduleId: String,
     var title: String,
     var content: String,
@@ -26,7 +27,7 @@ data class Trip(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var likeFlag: Int = 0,
+//    var likeFlag: Int = 0,
     var tripViews: Set<String> = setOf()
 ) {
     fun update(updatedTrip: Trip) {
@@ -41,7 +42,8 @@ data class Trip(
 
     fun TripDto.toTrip(): Trip {
         return Trip(
-            userId = this.userId,
+//            userId = this.userId,
+            id = this.userId,
             scheduleId = this.scheduleId,
             title = this.title,
             content = this.content,
@@ -55,7 +57,7 @@ data class Trip(
             createdAt = this.createdAt,
             updatedAt = this.updatedAt,
             deletedAt = this.deletedAt,
-            likeFlag = this.likeFlag,
+//            likeFlag = this.likeFlag,
             tripViews = this.tripViews
         )
     }
