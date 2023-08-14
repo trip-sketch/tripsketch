@@ -22,6 +22,9 @@ dependencies {
     // 스프링 기반 애플리케이션을 위한 스프링 부트 스타터
     implementation("org.springframework.boot:spring-boot-starter")
 
+    // 코틀린 validation 을 위한 스타터
+    implementation ('org.springframework.boot:spring-boot-starter-validation')
+
     // 코틀린 리플렉션 기능
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
