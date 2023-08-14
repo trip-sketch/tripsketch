@@ -43,7 +43,8 @@ data class Trip(
     fun TripDto.toTrip(): Trip {
         return Trip(
 //            userId = this.userId,
-            id = this.userId,
+//            id = this.userId,
+            userEmail = this.userEmail,
             scheduleId = this.scheduleId,
             title = this.title,
             content = this.content,
