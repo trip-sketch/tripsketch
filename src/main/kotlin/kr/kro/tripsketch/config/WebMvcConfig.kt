@@ -41,7 +41,7 @@ class WebMvcConfig(private val jwtService: JwtService) : WebMvcConfigurer {
         registry.addInterceptor(JwtTokenInterceptor(jwtService))
             .addPathPatterns("/**")
             .excludePathPatterns(
-                "api/kakao/refreshToken",
+                "api/oauth/kakao/refreshToken",
                 "api/user/nickname",
                 "api/follow/followings",
                 "api/follow/followers") // Exclude the refresh token endpoint
