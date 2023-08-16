@@ -42,7 +42,9 @@ data class Trip(
 
     fun TripDto.toTrip(): Trip {
         return Trip(
-            userId = this.userId,
+//            userId = this.userId,
+//            id = this.userId,
+            userEmail = this.userEmail,
             scheduleId = this.scheduleId,
             title = this.title,
             content = this.content,
@@ -56,7 +58,7 @@ data class Trip(
             createdAt = this.createdAt,
             updatedAt = this.updatedAt,
             deletedAt = this.deletedAt,
-            likeFlag = this.likeFlag,
+//            likeFlag = this.likeFlag,
             tripViews = this.tripViews
         )
     }

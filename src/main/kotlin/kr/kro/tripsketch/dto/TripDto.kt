@@ -19,6 +19,6 @@ data class TripDto(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var likeFlag: Int = 0,
+//    var likeFlag: Int = 0,
     var tripViews: Set<String> = setOf()    
 )
