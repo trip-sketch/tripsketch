@@ -17,21 +17,25 @@ class UserService(
     private val nicknameService: NickNameService,
 ) {
 
-    fun registerUser(userRegistrationDto: UserRegistrationDto): User {
-        if (userRepository.findByEmail(userRegistrationDto.email) != null)
-        {
-            throw IllegalArgumentException("이미 사용중인 아이디입니다.")
+    fun registerOrUpdateUser(email: String): User {
+        var user = userRepository.findByEmail(email)
+        if (user == null) {
+            var nickname: String
+            do {
+                nickname = nicknameService.generateRandomNickname()
+            } while (isNicknameExist(nickname))
+
+            user = User(
+                email = email,
+                nickname = nickname,
+                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                introduction = "안녕하세요! 만나서 반갑습니다!"
+            )
+            user = userRepository.save(user)
         }
-        val email = userRegistrationDto.email
-        val nickname = userRegistrationDto.nickname
-        val user = User(
-            email = email,
-            nickname = nickname,
-            profileImageUrl = userRegistrationDto.profileImageUrl,
-            introduction = userRegistrationDto.introduction,
-        )
-        return userRepository.save(user)
+        return user
     }
+
 
     fun findUserByEmail(email: String): User? {
         return userRepository.findByEmail(email)
@@ -85,36 +89,6 @@ class UserService(
         val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
         user.kakaoRefreshToken = kakaoRefreshToken
         return userRepository.save(user)
-    }
-
-    fun handleUser(email: String): User {
-        var user = findUserByEmail(email)
-        if (user == null) {
-            var nickname: String
-            do {
-                nickname = nicknameService.generateRandomNickname()
-            } while (isNicknameExist(nickname))
-
-            val additionalUserInfo = AdditionalUserInfo(
-                nickname = nickname,
-                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-                introduction = "안녕하세요! 만나서 반갑습니다!",
-            )
-            val userRegistrationDto = UserRegistrationDto(
-                email,
-                additionalUserInfo.nickname,
-                additionalUserInfo.profileImageUrl,
-                additionalUserInfo.introduction,
-            )
-            user = registerUser(userRegistrationDto)
-        }
-        return user
-    }
-
-    fun handleAndRefreshUserTokens(email: String, kakaoRefreshToken: String, userToken: TokenResponse) {
-        handleUser(email)
-        updateKakaoRefreshToken(email, kakaoRefreshToken)
-        updateUserRefreshToken(email, userToken.refreshToken)
     }
 
 }
