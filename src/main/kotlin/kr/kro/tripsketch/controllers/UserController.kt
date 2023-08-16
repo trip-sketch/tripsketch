@@ -42,7 +42,7 @@ class UserController(
 
     @PatchMapping
     fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody profileDto: ProfileDto): ResponseEntity<Any> {
-        val actualToken = token.removePrefix("Bearer ").trim()
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
 
         if (!jwtService.validateToken(actualToken)) {
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
