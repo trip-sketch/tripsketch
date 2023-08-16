@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.domain.Follow
+import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserProfileDto
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
@@ -14,91 +15,75 @@ class FollowService(
     private val userRepository: UserRepository
 ) {
 
-    fun follow(token: String, following: String) {
+    fun follow(token: String, followingNickname: String) {
+        val followingEmail = userService.findUserByNickname(followingNickname)?.email
+            ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         val follower = jwtService.getEmailFromToken(token)
-        if (follower == following) {
+        if (follower == followingEmail) {
             throw IllegalArgumentException("자신을 구독할 수 없습니다.")
         }
-        userService.findUserByEmail(following) ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        if (!followRepository.existsByFollowerAndFollowing(follower, following)) {
-            followRepository.save(Follow(follower = follower, following = following))
+        if (!followRepository.existsByFollowerAndFollowing(follower, followingEmail)) {
+            followRepository.save(Follow(follower = follower, following = followingEmail))
         } else {
             throw IllegalArgumentException("이미 구독 중입니다.")
         }
     }
 
-    fun unfollow(token: String, following: String) {
+    fun unfollow(token: String, followingNickname: String) {
+        val followingEmail = userService.findUserByNickname(followingNickname)?.email
+            ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         val follower = jwtService.getEmailFromToken(token)
-        if (follower == following) {
+        if (follower == followingEmail) {
             throw IllegalArgumentException("자신을 구독 취소할 수 없습니다.")
         }
-        userService.findUserByEmail(following) ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        if (followRepository.existsByFollowerAndFollowing(follower, following)) {
-            followRepository.deleteByFollowerAndFollowing(follower, following)
+        if (followRepository.existsByFollowerAndFollowing(follower, followingEmail)) {
+            followRepository.deleteByFollowerAndFollowing(follower, followingEmail)
         } else {
             throw IllegalArgumentException("구독 하지 않은 사용자를 취소 할 수 없습니다.")
         }
     }
 
-    fun unfollowMe(token: String, follower: String) {
+    fun unfollowMe(token: String, followerNickname: String) {
+        val followerEmail = userService.findUserByNickname(followerNickname)?.email
+            ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         val following = jwtService.getEmailFromToken(token)
-        if (follower == following) {
+        if (followerEmail == following) {
             throw IllegalArgumentException("자신을 구독 취소를 할 수 없습니다.")
         }
-        userService.findUserByEmail(follower) ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        if (followRepository.existsByFollowerAndFollowing(follower, following)) {
-            followRepository.deleteByFollowerAndFollowing(follower, following)
+        if (followRepository.existsByFollowerAndFollowing(followerEmail, following)) {
+            followRepository.deleteByFollowerAndFollowing(followerEmail, following)
         } else {
             throw IllegalArgumentException("구독 하지 않은 사용자를 취소할 수 없습니다.")
         }
     }
 
-    fun getFollowings(followerEmail: String): List<UserProfileDto> {
-        val follower = userRepository.findByEmail(followerEmail)
-        val followerProfile = follower?.let {
-            UserProfileDto(
-                email = it.email,
-                nickname = it.nickname,
-                introduction = it.introduction,
-                profileImageUrl = it.profileImageUrl
-            )
-        }
-
+    fun getFollowings(followerNickname: String): List<ProfileDto> {
+        val followerEmail = userService.findUserByNickname(followerNickname)?.email
+            ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         val followings = followRepository.findByFollower(followerEmail).map { follow ->
             val user = userRepository.findByEmail(follow.following)
-            UserProfileDto(
-                email = user?.email,
+            ProfileDto(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
-                profileImageUrl = user?.profileImageUrl
+                profileImageUrl = user?.profileImageUrl,
             )
         }
 
-        return listOfNotNull(followerProfile) + followings
+        return followings
     }
 
-
-    fun getFollowers(followingEmail: String): List<UserProfileDto> {
-        val following = userRepository.findByEmail(followingEmail)
-        val followingProfile = following?.let {
-            UserProfileDto(
-                email = it.email,
-                nickname = it.nickname,
-                introduction = it.introduction,
-                profileImageUrl = it.profileImageUrl
-            )
-        }
-
+    fun getFollowers(followingNickname: String): List<ProfileDto> {
+        val followingEmail = userService.findUserByNickname(followingNickname)?.email
+            ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         val followers = followRepository.findByFollowing(followingEmail).map { follow ->
             val user = userRepository.findByEmail(follow.follower)
-            UserProfileDto(
-                email = user?.email,
+            ProfileDto(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
-                profileImageUrl = user?.profileImageUrl
+                profileImageUrl = user?.profileImageUrl,
             )
         }
 
-        return listOfNotNull(followingProfile) + followers
+        return followers
     }
 }
