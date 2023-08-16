@@ -30,20 +30,9 @@ class UserController(
         }
     }
 
-
     @GetMapping("/nickname")
     fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
-        return if (user != null) {
-            ResponseEntity.ok(toDto(user))
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
-
-    @GetMapping("/email")
-    fun getUserByEmail(@RequestParam email: String): ResponseEntity<UserDto> {
-        val user = userService.findUserByEmail(email)
         return if (user != null) {
             ResponseEntity.ok(toDto(user))
         } else {
