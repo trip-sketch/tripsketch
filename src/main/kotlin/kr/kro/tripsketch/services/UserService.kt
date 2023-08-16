@@ -1,6 +1,8 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.dto.AdditionalUserInfo
+import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.dto.UserRegistrationDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.repositories.UserRepository
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository,
     private val jwtService: JwtService,
+    private val nicknameService: NickNameService,
 ) {
 
     fun registerUser(userRegistrationDto: UserRegistrationDto): User {
@@ -82,6 +85,36 @@ class UserService(
         val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
         user.kakaoRefreshToken = kakaoRefreshToken
         return userRepository.save(user)
+    }
+
+    fun handleUser(email: String): User {
+        var user = findUserByEmail(email)
+        if (user == null) {
+            var nickname: String
+            do {
+                nickname = nicknameService.generateRandomNickname()
+            } while (isNicknameExist(nickname))
+
+            val additionalUserInfo = AdditionalUserInfo(
+                nickname = nickname,
+                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                introduction = "안녕하세요! 만나서 반갑습니다!",
+            )
+            val userRegistrationDto = UserRegistrationDto(
+                email,
+                additionalUserInfo.nickname,
+                additionalUserInfo.profileImageUrl,
+                additionalUserInfo.introduction,
+            )
+            user = registerUser(userRegistrationDto)
+        }
+        return user
+    }
+
+    fun handleAndRefreshUserTokens(email: String, kakaoRefreshToken: String, userToken: TokenResponse) {
+        handleUser(email)
+        updateKakaoRefreshToken(email, kakaoRefreshToken)
+        updateUserRefreshToken(email, userToken.refreshToken)
     }
 
 }
