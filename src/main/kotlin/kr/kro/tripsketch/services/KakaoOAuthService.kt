@@ -1,7 +1,6 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.config.KakaoOAuthConfig
-import kr.kro.tripsketch.dto.TokenResponse
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
