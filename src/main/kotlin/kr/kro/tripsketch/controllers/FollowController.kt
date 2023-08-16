@@ -44,7 +44,7 @@ class FollowController(private val followService: FollowService) {
     }
 
     @GetMapping("/followers")
-    fun getFollowers(@Email @RequestParam nickname: String): List<ProfileDto> {
+    fun getFollowers(@RequestParam nickname: String): List<ProfileDto> {
         return followService.getFollowers(nickname)
     }
 }
