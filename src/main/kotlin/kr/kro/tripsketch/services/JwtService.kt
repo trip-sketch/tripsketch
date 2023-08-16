@@ -3,6 +3,7 @@ package kr.kro.tripsketch.services
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.stereotype.Service
 import java.util.*
@@ -15,8 +16,6 @@ class JwtService {
     private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
     private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1 hour
     private val refreshTokenValidityInMilliseconds: Long = EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
-
-    data class TokenResponse(val accessToken: String, val refreshToken: String, val accessTokenExpiryDate: Long, val refreshTokenExpiryDate: Long)
 
     fun createTokens(user: User): TokenResponse {
         val now = Date()
@@ -41,7 +40,7 @@ class JwtService {
             .signWith(secretKey)
             .compact()
 
-        return TokenResponse(accessToken, refreshToken, accessTokenValidity.time, refreshTokenValidity.time)
+        return TokenResponse(accessToken, refreshToken, refreshTokenValidity.time)
     }
 
     fun validateToken(token: String): Boolean {
