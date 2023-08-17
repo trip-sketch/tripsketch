@@ -11,7 +11,7 @@ class AuthService(
     private val jwtService: JwtService,
 ) {
 
-    fun authenticateViaKakao(code: String): TokenResponse? {
+    fun authenticateViaKakao(code: String, pushToken: String? = null): TokenResponse? {
         val (accessToken, refreshToken) = kakaoOAuthService.getKakaoAccessToken(code)
 
         if (accessToken == null || refreshToken == null) {
@@ -23,12 +23,24 @@ class AuthService(
         val tokenResponse = jwtService.createTokens(user)
         userService.updateUserRefreshToken(email, tokenResponse.refreshToken)
         userService.updateKakaoRefreshToken(email, refreshToken)
+
+        pushToken?.let {
+            userService.storeUserPushToken(email, it)
+        }
+
         return tokenResponse
     }
 
-    fun refreshUserToken(request: KakaoRefreshRequest): TokenResponse? {
+    fun refreshUserToken(request: KakaoRefreshRequest, pushToken: String? = null): TokenResponse? {
         val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null
         if (kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) == null) return null
-        return jwtService.createTokens(user)
+
+        val tokenResponse = jwtService.createTokens(user)
+
+        pushToken?.let {
+            userService.storeUserPushToken(user.email, it)
+        }
+
+        return tokenResponse
     }
 }
