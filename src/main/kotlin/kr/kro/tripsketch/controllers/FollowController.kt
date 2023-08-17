@@ -1,10 +1,8 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Email
 import kr.kro.tripsketch.dto.FollowDto
 import kr.kro.tripsketch.dto.ProfileDto
-import kr.kro.tripsketch.dto.UserProfileDto
 import kr.kro.tripsketch.services.FollowService
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.utils.TokenUtils

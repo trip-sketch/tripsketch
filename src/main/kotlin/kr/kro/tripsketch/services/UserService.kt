@@ -25,7 +25,7 @@ class UserService(
             user = User(
                 email = email,
                 nickname = nickname,
-                profileImageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                profileImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png",
                 introduction = "안녕하세요! 만나서 반갑습니다!"
             )
             user = userRepository.save(user)
