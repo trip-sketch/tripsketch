@@ -88,4 +88,11 @@ class UserService(
         return userRepository.save(user)
     }
 
+    fun storeUserPushToken(email: String, pushToken: String) {
+        val user = userRepository.findByEmail(email)
+            ?: throw IllegalArgumentException("User not found with email $email")
+        user.expoPushToken = pushToken
+        userRepository.save(user)
+    }
+
 }
