@@ -12,8 +12,9 @@ data class CommentDto(
     val content: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-    val likedBy: MutableSet<String> = mutableSetOf(),
     val replyTo: String? = null,
     val isDeleted: Boolean = false,
+    var isLiked: Boolean = false,
+    var numberOfComments: Int = 0,
     val children: MutableList<CommentDto> = mutableListOf(),
 )
