@@ -1,7 +1,7 @@
 package kr.kro.tripsketch.dto
 
-data class UserUpdateDto(
+data class ProfileDto(
     val nickname: String?,
-    val profileImageUrl: String?,
     val introduction: String?,
+    val profileImageUrl: String?
 )

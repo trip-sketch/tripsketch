@@ -23,7 +23,8 @@ data class User(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
     var kakaoRefreshToken: String? = null,     // 카카오로부터 발급받은 refreshToken
-    var ourRefreshToken: String? = null        // 서비스 자체에서 발급한 refreshToken
+    var ourRefreshToken: String? = null,    // 서비스 자체에서 발급한 refreshToken
+    var expoPushToken: String? = null, //Notification을 위한 Expo Notification Token
 )
 
 fun toDto(user: User): UserDto {

@@ -80,6 +80,12 @@ dependencies {
 
     // 오라클 SDK
     implementation("com.oracle.oci.sdk:oci-java-sdk-bom:2.7.1")
+
+    // for EXPO Notification
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    // JSON Parse
+    implementation("org.json:json:20210307")
 }
 
 tasks.withType<KotlinCompile> {
