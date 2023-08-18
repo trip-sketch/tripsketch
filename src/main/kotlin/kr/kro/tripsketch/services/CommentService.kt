@@ -27,6 +27,34 @@ class CommentService(
         return comments.map { fromComment(it, userRepository) }
     }
 
+    fun getIsLikedByTokenForTrip(actualToken: String, tripId: String): List<CommentDto> {
+        val userEmail = jwtService.getEmailFromToken(actualToken)
+        val updatedComments = isLikedByTokenForComments(userEmail, tripId)
+
+        return updatedComments.map { fromComment(it, userRepository) }
+    }
+
+    private fun isLikedByTokenForComments(userEmail: String, tripId: String): List<Comment> {
+        val comments = commentRepository.findAllByTripId(tripId)
+
+        return comments.map { comment ->
+            val isLiked = comment.likedBy.contains(userEmail)
+            val updatedComment = comment.copy(isLiked = isLiked)
+
+            val updatedChildren = comment.children.map { child ->
+                child.copy(isLiked = child.likedBy.contains(userEmail))
+            }.toMutableList()
+
+            updatedComment.copy(children = updatedChildren)
+        }
+    }
+
+
+
+
+
+
+
     fun createComment(actualToken: String, commentCreateDto: CommentCreateDto): CommentDto {
 
         val userEmail = jwtService.getEmailFromToken(actualToken)
@@ -128,8 +156,10 @@ class CommentService(
         val userEmail = jwtService.getEmailFromToken(token)
         if (comment.likedBy.contains(userEmail)) {
             comment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+            comment.numberOfComments -= 1
         } else {
             comment.likedBy.add(userEmail) // 좋아요 추가
+            comment.numberOfComments += 1
         }
 
         val savedComment = commentRepository.save(comment)
@@ -149,8 +179,10 @@ class CommentService(
         val userEmail = jwtService.getEmailFromToken(token)
         if (childComment.likedBy.contains(userEmail)) {
             childComment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+            childComment.numberOfComments -= 1
         } else {
             childComment.likedBy.add(userEmail) // 좋아요 추가
+            childComment.numberOfComments += 1
         }
 
         val savedParentComment = commentRepository.save(parentComment)
@@ -179,9 +211,10 @@ class CommentService(
                 content = comment.content,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
-                likedBy = comment.likedBy.toMutableSet(),
                 replyTo = comment.replyTo,
                 isDeleted = comment.isDeleted,
+                isLiked = comment.isLiked,
+                numberOfComments = comment.numberOfComments,
                 children = comment.children.map { fromComment(it, userRepository) }.toMutableList(),
             )
         }
