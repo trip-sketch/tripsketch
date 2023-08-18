@@ -15,6 +15,6 @@ data class CommentDto(
     val replyTo: String? = null,
     val isDeleted: Boolean = false,
     var isLiked: Boolean = false,
-    var numberOfComments: Int = 0,
+    var numberOfLikes: Int = 0,
     val children: MutableList<CommentDto> = mutableListOf(),
 )
