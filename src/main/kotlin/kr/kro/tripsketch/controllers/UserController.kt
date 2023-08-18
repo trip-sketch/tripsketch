@@ -1,8 +1,8 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.toDto
+import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
-import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.TokenUtils
@@ -30,7 +30,6 @@ class UserController(
         }
     }
 
-
     @GetMapping("/nickname")
     fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
@@ -42,15 +41,15 @@ class UserController(
     }
 
     @PatchMapping
-    fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody userUpdateDto: UserUpdateDto): ResponseEntity<Any> {
-        val actualToken = token.removePrefix("Bearer ").trim()
+    fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody profileDto: ProfileDto): ResponseEntity<Any> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
 
         if (!jwtService.validateToken(actualToken)) {
             return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
         }
 
         return try {
-            val updatedUser = userService.updateUser(actualToken, userUpdateDto)
+            val updatedUser = userService.updateUser(actualToken, profileDto)
             ResponseEntity.ok(toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(400).body(e.message)
