@@ -39,27 +39,27 @@ data class Trip(
         // hidden = updatedTrip.hidden // 추가: hidden 프로퍼티 업데이트
         updatedAt = LocalDateTime.now()
     }
-
-    fun TripDto.toTrip(): Trip {
-        return Trip(
-//            userId = this.userId,
-//            id = this.userId,
-            userEmail = this.userEmail,
-            scheduleId = this.scheduleId,
-            title = this.title,
-            content = this.content,
-            likes = this.likes,
-            views = this.views,
-            location = this.location,
-            startedAt = this.startedAt,
-            endAt = this.endAt,
-            hashtag = this.hashtag,
-            hidden = this.hidden,
-            createdAt = this.createdAt,
-            updatedAt = this.updatedAt,
-            deletedAt = this.deletedAt,
-//            likeFlag = this.likeFlag,
-            tripViews = this.tripViews
-        )
-    }
 }
+//    fun TripDto.toTrip(): Trip {
+//        return Trip(
+////            userId = this.userId,
+////            id = this.userId,
+//            userEmail = this.userEmail,
+//            scheduleId = this.scheduleId,
+//            title = this.title,
+//            content = this.content,
+//            likes = this.likes,
+//            views = this.views,
+//            location = this.location,
+//            startedAt = this.startedAt,
+//            endAt = this.endAt,
+//            hashtag = this.hashtag,
+//            hidden = this.hidden,
+//            createdAt = this.createdAt,
+//            updatedAt = this.updatedAt,
+//            deletedAt = this.deletedAt,
+////            likeFlag = this.likeFlag,
+//            tripViews = this.tripViews
+//        )
+//    }
+
