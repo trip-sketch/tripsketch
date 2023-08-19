@@ -6,7 +6,7 @@ data class TripCreateDto(
     var id: String? = null,
 //    var userId: String,
     var userEmail: String,
-    val nickname: String?,
+    var nickname: String?,
 //    var scheduleId: String,
     var title: String,
     var content: String,
