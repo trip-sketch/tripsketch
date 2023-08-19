@@ -1,16 +1,28 @@
 package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.Trip
+import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import kr.kro.tripsketch.utils.TokenUtils
+import kr.kro.tripsketch.services.JwtService
 
 
 @RestController
-@RequestMapping("/trips")
-class TripController(private val tripService: TripService) {
+@RequestMapping("api/trips")
+class TripController(private val tripService: TripService, private val jwtService: JwtService) {
+    @PostMapping
+    fun createTrip(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody tripCreateDto: TripCreateDto
+    ): ResponseEntity<TripDto> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        val createdTrip = tripService.createTrip(actualToken, tripCreateDto)
+        return ResponseEntity.ok(createdTrip)
+    }
 
     @GetMapping
     fun getAllTrips(): ResponseEntity<List<Trip>> {
@@ -28,18 +40,12 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    @PostMapping
-    fun createTrip(@RequestBody trip: Trip): ResponseEntity<Trip> {
-        val createdTrip = tripService.createOrUpdateTrip(trip)
-        return ResponseEntity.ok(createdTrip)
-    }
-
     @PutMapping("/{id}")
     fun updateTrip(@PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
         val existingTrip = tripService.getTripById(id)
         if (existingTrip != null) {
             trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
-            val updatedTrip = tripService.createOrUpdateTrip(trip)
+            val updatedTrip = tripService.updateTrip(trip)
             return ResponseEntity.ok(updatedTrip)
         }
         return ResponseEntity.notFound().build()
