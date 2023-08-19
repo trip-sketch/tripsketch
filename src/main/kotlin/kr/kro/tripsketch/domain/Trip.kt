@@ -8,8 +8,8 @@ import kr.kro.tripsketch.dto.TripDto
 
 @Document(collection = "trips")
 data class Trip(
-    // @Id var id: String? = null,
-    @Id var id: ObjectId = ObjectId.get(),
+     @Id val id: String? = null,
+//    @Id var id: ObjectId? = ObjectId.get() ,
     // var userId: ObjectId,            // 자동생성되니까.. 일단 String으로 구현!
     // var scheduleId: ObjectId,        // 자동생성되니까.. 일단 String으로 구현!
 //    var userId: String,
@@ -22,7 +22,7 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtag: String,
+    var hashtag: String? = null,
     var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
