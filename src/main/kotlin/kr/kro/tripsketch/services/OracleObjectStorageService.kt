@@ -11,53 +11,52 @@ import com.oracle.bmc.objectstorage.transfer.UploadConfiguration
 import com.oracle.bmc.objectstorage.transfer.UploadManager
 import com.oracle.bmc.objectstorage.transfer.UploadManager.UploadRequest
 import com.oracle.bmc.objectstorage.transfer.UploadManager.UploadResponse
-import kr.kro.tripsketch.repositories.UserRepository
 import java.io.InputStream
 
 @Service
 class OracleObjectStorageService {
     val namespaceName = "oracle.objectstorage.bucketname"
     val bucketName = "oracle.objectstorage.namespace"
-    val configurationFilePath = "~/resources/config"
-    val profile = "DEFAULT"
+    private val configurationFilePath = "~/resources/config"
+    private val profile = "DEFAULT"
 
-    val configFile = ConfigFileReader.parse(configurationFilePath, profile)
-    val provider = ConfigFileAuthenticationDetailsProvider(configFile)
-    val client: ObjectStorage = ObjectStorageClient(provider) // 여기서 바로 초기화
-    val uploadConfiguration = UploadConfiguration.builder()
-            .allowMultipartUploads(true)
-            .allowParallelUploads(true)
-            .build()
+    private val configFile = ConfigFileReader.parse(configurationFilePath, profile)
+    private val provider = ConfigFileAuthenticationDetailsProvider(configFile)
+    private val client: ObjectStorage = ObjectStorageClient.builder().build(provider)
+    private val uploadConfiguration = UploadConfiguration.builder()
+        .allowMultipartUploads(true)
+        .allowParallelUploads(true)
+        .build()
     val uploadManager: UploadManager = UploadManager(client, uploadConfiguration)
-    fun uploadImageAndGetUrl(file: MultipartFile): String {
-        val objectName = file.originalFilename // 오리지널 파일 이름을 객체 이름으로 사용
 
+    fun uploadImageAndGetUrl(file: MultipartFile): String? {
+        val objectName = file.originalFilename
         val inputStream: InputStream = file.inputStream
 
-        val request = PutObjectRequest.builder()
-                .bucketName(bucketName)
-                .namespaceName(namespaceName)
-                .objectName(objectName)
-                .contentType(file.contentType)
-                .contentLength(file.size)
-                .build()
+        val putObjectReq = PutObjectRequest.builder()
+            .bucketName(bucketName)
+            .namespaceName(namespaceName)
+            .objectName(objectName)
+            .contentType(file.contentType)
+            .contentLength(file.size)
+            .build()
 
-        val uploadDetails = UploadRequest.builder()
-                .allowOverwrite(true)
-                .putObjectRequest(request)
-                .build(inputStream)
+        val uploadDetails = UploadRequest.builder(inputStream, file.size)
+            .allowOverwrite(true)
+            .build(putObjectReq)
 
-        // 업로드 요청 및 응답 받기
         val response: UploadResponse = uploadManager.upload(uploadDetails)
 
-        // InputStream 정리
         inputStream.close()
 
-        // 객체 URL 가져오기
-        val objectUrl = getObjectUrl(objectName)
-
-        return objectUrl
+        return objectName?.let { getObjectUrl(it) }
     }
+
+    private fun getObjectUrl(objectName: String): String {
+        return "https://your-object-storage-url/${bucketName}/${objectName}"
+    }
+}
+
 
 //    fun downloadImageAndGetUrl(objectName: String): String {
 //        val request = GetObjectRequest.builder()
