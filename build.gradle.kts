@@ -79,9 +79,8 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.17.1")
 
     // 오라클 SDK
-    implementation("com.oracle.oci.sdk:oci-java-sdk-bom:2.7.1") // 의존성+버전 관리
-    implementation("com.oracle.database.jdbc:ojdbc8:19.8.0.0") // 오라클 연결+데이터 액세스
-    implementation("com.oracle.oci.sdk:oci-java-sdk:3.23.0") // OCI SDK
+    implementation("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1")
+    implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.23.1")
 
     // for EXPO Notification
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
