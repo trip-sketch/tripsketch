@@ -2,6 +2,7 @@ package kr.kro.tripsketch.controllers
 
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.TripCreateDto
+import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
 import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.services.TripService
@@ -25,27 +26,33 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     @GetMapping
-    fun getAllTrips(): ResponseEntity<List<Trip>> {
-        val trips = tripService.getAllTrips()
-        return ResponseEntity.ok(trips)
+    fun getAllTrips(@RequestHeader("Authorization") token: String): ResponseEntity<Set<TripDto>> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        val findTrips = tripService.getAllTrips(actualToken)
+        return ResponseEntity.ok(findTrips)
     }
 
     @GetMapping("/{id}")
-    fun getTripById(@PathVariable id: String): ResponseEntity<Trip> {
-        val trip = tripService.getTripById(id)
-        return if (trip != null) {
-            ResponseEntity.ok(trip)
+    fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
+        val findTrip = tripService.getTripById(id)
+        if (findTrip != null) {
+            return ResponseEntity.ok(findTrip)
         } else {
-            ResponseEntity.notFound().build()
+            return ResponseEntity.notFound().build()
         }
     }
 
-    @PutMapping("/{id}")
-    fun updateTrip(@PathVariable id: String, @RequestBody trip: Trip): ResponseEntity<Trip> {
+    @PatchMapping("/{id}")
+    fun updateTrip(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable id: String,
+        @RequestBody tripUpdateDto: TripUpdateDto)
+    : ResponseEntity<TripDto> {
         val existingTrip = tripService.getTripById(id)
         if (existingTrip != null) {
-            trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
-            val updatedTrip = tripService.updateTrip(trip)
+//            trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
+            val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+            val updatedTrip = tripService.updateTrip(actualToken, tripUpdateDto)
             return ResponseEntity.ok(updatedTrip)
         }
         return ResponseEntity.notFound().build()
