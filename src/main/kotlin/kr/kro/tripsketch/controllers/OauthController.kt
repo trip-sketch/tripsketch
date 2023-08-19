@@ -27,7 +27,7 @@ class OauthController(
 
     @PostMapping("/kakao/refreshToken")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
-        val tokenResponse = authService.refreshUserToken(request, request.pushToken)
+        val tokenResponse = authService.refreshUserToken(request)
         return if (tokenResponse != null) {
             ResponseEntity.ok().body(tokenResponse)
         } else {
