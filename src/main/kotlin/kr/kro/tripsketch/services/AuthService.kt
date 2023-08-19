@@ -31,16 +31,10 @@ class AuthService(
         return tokenResponse
     }
 
-    fun refreshUserToken(request: KakaoRefreshRequest, pushToken: String? = null): TokenResponse? {
+    fun refreshUserToken(request: KakaoRefreshRequest): TokenResponse? {
         val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null
         if (kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) == null) return null
 
-        val tokenResponse = jwtService.createTokens(user)
-
-        pushToken?.let {
-            userService.storeUserPushToken(user.email, it)
-        }
-
-        return tokenResponse
+        return jwtService.createTokens(user)
     }
 }
