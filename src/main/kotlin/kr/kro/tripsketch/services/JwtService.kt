@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest
 class JwtService {
     private val secretKeyString = EnvLoader.getProperty("SECRET_KEY") ?: ""
     private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
-    private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1 hour
+    private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 600000 // 10 mins
     private val refreshTokenValidityInMilliseconds: Long = EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
 
     fun createTokens(user: User): TokenResponse {
