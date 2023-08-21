@@ -3,7 +3,6 @@ package kr.kro.tripsketch.services
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.domain.Follow
 import kr.kro.tripsketch.dto.ProfileDto
-import kr.kro.tripsketch.dto.UserProfileDto
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
 
@@ -11,15 +10,13 @@ import org.springframework.stereotype.Service
 class FollowService(
     private val followRepository: FollowRepository,
     private val userService: UserService,
-    private val jwtService: JwtService,
     private val userRepository: UserRepository,
     private val notificationService: NotificationService,
 ) {
 
-    fun follow(token: String, followingNickname: String) {
+    fun follow(followerEmail: String, followingNickname: String) {
         val followingEmail = userService.findUserByNickname(followingNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        val followerEmail = jwtService.getEmailFromToken(token)
         if (followerEmail == followingEmail) {
             throw IllegalArgumentException("자신을 구독할 수 없습니다.")
         }
@@ -36,29 +33,27 @@ class FollowService(
         }
     }
 
-    fun unfollow(token: String, followingNickname: String) {
+    fun unfollow(followerEmail: String, followingNickname: String) {
         val followingEmail = userService.findUserByNickname(followingNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        val follower = jwtService.getEmailFromToken(token)
-        if (follower == followingEmail) {
+        if (followerEmail == followingEmail) {
             throw IllegalArgumentException("자신을 구독 취소할 수 없습니다.")
         }
-        if (followRepository.existsByFollowerAndFollowing(follower, followingEmail)) {
-            followRepository.deleteByFollowerAndFollowing(follower, followingEmail)
+        if (followRepository.existsByFollowerAndFollowing(followerEmail, followingEmail)) {
+            followRepository.deleteByFollowerAndFollowing(followerEmail, followingEmail)
         } else {
             throw IllegalArgumentException("구독 하지 않은 사용자를 취소 할 수 없습니다.")
         }
     }
 
-    fun unfollowMe(token: String, followerNickname: String) {
+    fun unfollowMe(followingEmail: String, followerNickname: String) {
         val followerEmail = userService.findUserByNickname(followerNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        val following = jwtService.getEmailFromToken(token)
-        if (followerEmail == following) {
+        if (followerEmail == followingEmail) {
             throw IllegalArgumentException("자신을 구독 취소를 할 수 없습니다.")
         }
-        if (followRepository.existsByFollowerAndFollowing(followerEmail, following)) {
-            followRepository.deleteByFollowerAndFollowing(followerEmail, following)
+        if (followRepository.existsByFollowerAndFollowing(followerEmail, followingEmail)) {
+            followRepository.deleteByFollowerAndFollowing(followerEmail, followingEmail)
         } else {
             throw IllegalArgumentException("구독 하지 않은 사용자를 취소할 수 없습니다.")
         }
@@ -93,4 +88,5 @@ class FollowService(
 
         return followers
     }
+
 }
