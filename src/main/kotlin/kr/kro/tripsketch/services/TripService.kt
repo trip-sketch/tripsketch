@@ -21,20 +21,21 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
         val newTrip = Trip(
             userEmail = userEmail,
-            scheduleId = "scheduleId",
+            nickname = tripCreateDto.nickname,    // 이메일과 맞춰서 값 삽입
+//            scheduleId = "scheduleId",
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-            likes = 0,
-            views = 0,
-            location = "location",
+//            likes = 0,
+//            views = 0,
+            location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
-            hidden = false,
-            createdAt = LocalDateTime.now(),
-            updatedAt = null,
-            deletedAt = null,
-            tripViews = emptySet()
+//            hidden = false,
+//            createdAt = LocalDateTime.now(),
+//            updatedAt = null,
+//            deletedAt = null,
+//            tripViews = emptySet()
         )
 
         val createdTrip = tripRepository.save(newTrip)
@@ -85,20 +86,21 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
         val updateTrip = Trip(
             userEmail = userEmail,
-            scheduleId = "scheduleId",
+            nickname = tripUpdateDto.nickname,
+//            scheduleId = "scheduleId",
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,
-            likes = 0,
-            views = 0,
-            location = "location",
+//            likes = 0,
+//            views = 0,
+            location = tripUpdateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
-            hashtag = tripUpdateDto.hashtag,
-            hidden = false,
-            createdAt = tripUpdateDto.createdAt,
+            hashtag = tripUpdateDto.hashtag,        // DB 쪽에서 기존 데이터에  플러스 되어야하는거라면?
+//            hidden = false,
+//            createdAt = tripUpdateDto.createdAt,
             updatedAt = LocalDateTime.now(),
 //            deletedAt = null,
-            tripViews = tripUpdateDto.tripViews
+//            tripViews = tripUpdateDto.tripViews // DB에서 처리?
         )
 
         val updatedTrip = tripRepository.save(updateTrip)
@@ -115,7 +117,8 @@ fun fromTrip(trip: Trip): TripDto {
     return TripDto(
         id = trip.id,
         userEmail = trip.userEmail,
-        scheduleId = trip.scheduleId,
+        nickname = trip.nickname,
+//        scheduleId = trip.scheduleId,
         title = trip.title,
         content = trip.content,
         likes = trip.likes,
