@@ -2,6 +2,8 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.ProfileDto
+import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val followRepository: FollowRepository,
     private val jwtService: JwtService,
     private val nicknameService: NickNameService,
 ) {
@@ -51,22 +54,45 @@ class UserService(
         val email = jwtService.getEmailFromToken(token)
         val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
-        if (profileDto.nickname != null && profileDto.nickname != user.nickname) {
-            val existingUser = userRepository.findByNickname(profileDto.nickname)
-            if (existingUser != null) {
+        profileDto.nickname?.let {
+            if (it != user.nickname && isNicknameExist(it)) {  // <-- 닉네임이 기존 닉네임과 다르며, 중복인지 검사
                 throw IllegalArgumentException("이미 사용중인 닉네임입니다.")
             }
-            user.nickname = profileDto.nickname
+            user.nickname = it
         }
-        if (profileDto.profileImageUrl != null) {
-            user.profileImageUrl = profileDto.profileImageUrl
+
+        profileDto.profileImageUrl?.let {
+            user.profileImageUrl = it
         }
-        if (profileDto.introduction != null) {
-            user.introduction = profileDto.introduction
+
+        profileDto.introduction?.let {
+            user.introduction = it
         }
 
         return userRepository.save(user)
     }
+
+    fun updateUserByEmail(email: String, profileDto: ProfileDto): User {
+        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+
+        profileDto.nickname?.let {
+            if (it != user.nickname && isNicknameExist(it)) {
+                throw IllegalArgumentException("이미 사용중인 닉네임입니다.")
+            }
+            user.nickname = it
+        }
+
+        profileDto.profileImageUrl?.let {
+            user.profileImageUrl = it
+        }
+
+        profileDto.introduction?.let {
+            user.introduction = it
+        }
+
+        return userRepository.save(user)
+    }
+
 
     fun isNicknameExist(nickname: String): Boolean {
         return userRepository.existsByNickname(nickname)
@@ -95,4 +121,34 @@ class UserService(
         userRepository.save(user)
     }
 
+    fun getUserFollowInfo(email: String): Pair<Long, Long> {
+        val followingCount = followRepository.countByFollower(email)
+        val followersCount = followRepository.countByFollowing(email)
+
+        return Pair(followersCount, followingCount)
+    }
+
+    fun toDto(user: User, includeEmail: Boolean = true): UserDto {
+        val (followersCount, followingCount) = getUserFollowInfo(user.email)
+
+        return if (includeEmail) {
+            UserDto(
+                email = user.email,
+                nickname = user.nickname,
+                introduction = user.introduction,
+                profileImageUrl = user.profileImageUrl,
+                followersCount = followersCount,
+                followingCount = followingCount
+            )
+        } else {
+            UserDto(
+                email = null,
+                nickname = user.nickname,
+                introduction = user.introduction,
+                profileImageUrl = user.profileImageUrl,
+                followersCount = followersCount,
+                followingCount = followingCount
+            )
+        }
+    }
 }
