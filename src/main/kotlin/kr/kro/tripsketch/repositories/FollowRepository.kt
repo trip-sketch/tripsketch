@@ -8,4 +8,6 @@ interface FollowRepository : MongoRepository<Follow, String> {
     fun findByFollowing(following: String): List<Follow>
     fun existsByFollowerAndFollowing(follower: String, following: String): Boolean
     fun deleteByFollowerAndFollowing(follower: String, following: String)
+    fun countByFollower(follower: String): Long
+    fun countByFollowing(following: String): Long
 }

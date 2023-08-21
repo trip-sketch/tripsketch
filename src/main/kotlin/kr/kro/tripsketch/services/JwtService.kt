@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.services
 
+import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import kr.kro.tripsketch.domain.User
@@ -8,7 +9,7 @@ import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.stereotype.Service
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest
 
 @Service
 class JwtService {
@@ -16,6 +17,9 @@ class JwtService {
     private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
     private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 600000 // 10 mins
     private val refreshTokenValidityInMilliseconds: Long = EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
+
+
+    class CustomExpiredTokenException(message: String): RuntimeException(message)
 
     fun createTokens(user: User): TokenResponse {
         val now = Date()
@@ -47,6 +51,9 @@ class JwtService {
         return try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
             true
+        } catch (e: ExpiredJwtException) {
+            // 토큰이 만료된 경우 사용자 정의 예외를 발생시킵니다.
+            throw CustomExpiredTokenException("Token has expired")
         } catch (e: Exception) {
             // 토큰 파싱에 실패하면 false를 반환합니다.
             false
