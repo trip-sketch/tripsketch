@@ -52,10 +52,8 @@ class JwtService {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
             true
         } catch (e: ExpiredJwtException) {
-            // 토큰이 만료된 경우 사용자 정의 예외를 발생시킵니다.
             throw CustomExpiredTokenException("Token has expired")
         } catch (e: Exception) {
-            // 토큰 파싱에 실패하면 false를 반환합니다.
             false
         }
     }

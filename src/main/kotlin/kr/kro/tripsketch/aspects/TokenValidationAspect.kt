@@ -2,6 +2,7 @@ package kr.kro.tripsketch.aspects
 
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.annotations.TokenValidation
+import kr.kro.tripsketch.exceptions.CustomExpiredTokenException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.JwtService
@@ -27,7 +28,11 @@ class TokenValidationAspect(
         val token = jwtService.resolveToken(req)
             ?: throw UnauthorizedException("토큰이 제공되지 않았습니다.")
 
-        if (!jwtService.validateToken(token)) {
+        try {
+            jwtService.validateToken(token)
+        } catch (e: CustomExpiredTokenException) {
+            throw UnauthorizedException("토큰이 만료되었습니다.")
+        } catch (e: Exception) {
             throw UnauthorizedException("유효하지 않은 토큰입니다.")
         }
 
