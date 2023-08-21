@@ -23,11 +23,20 @@ class CommentController(private val commentService: CommentService, private val 
         return commentService.getCommentByTripId(tripId)
     }
 
+    @GetMapping("/{tripId}/liked")
+    fun getIsLikedByTokenForTrip(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable tripId: String
+    ): List<CommentDto> {
+        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
+        return commentService.getIsLikedByTokenForTrip(actualToken, tripId)
+    }
+
+
     @PostMapping("")
     fun createComment(
         @RequestHeader("Authorization") token: String, @RequestBody commentCreateDto: CommentCreateDto
     ): CommentDto {
-
         val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
         return commentService.createComment(actualToken, commentCreateDto)
     }
