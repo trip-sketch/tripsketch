@@ -30,4 +30,6 @@ data class Trip(
     var deletedAt: LocalDateTime? = null,
 //    var likeFlag: Int = 0,
     var tripViews: Set<String>? = setOf()
+    // to-do: 이미지 배열 받기
+    // var image: 
 )
