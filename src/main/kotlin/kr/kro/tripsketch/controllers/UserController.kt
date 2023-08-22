@@ -4,8 +4,10 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.annotations.TokenValidation
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -18,7 +20,6 @@ class UserController(
     @TokenValidation
     @GetMapping
     fun getUser(req: HttpServletRequest): ResponseEntity<Any> {
-        // req의 attribute에서 email 정보를 가져옵니다.
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
         return if (user != null) {
@@ -41,15 +42,16 @@ class UserController(
     @TokenValidation
     @PatchMapping
     fun updateUser(req: HttpServletRequest, @RequestBody profileDto: ProfileDto): ResponseEntity<Any> {
+        val email = req.getAttribute("userEmail") as String?
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         return try {
-            // req의 attribute에서 email 정보를 가져옵니다.
-            val email = req.getAttribute("userEmail") as String
             val updatedUser = userService.updateUserByEmail(email, profileDto)
             ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(400).body(e.message)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
+
 
     @TokenValidation(adminOnly = true)
     @GetMapping("/users")

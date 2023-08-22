@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 
 @Validated
 @RestController
@@ -22,7 +23,7 @@ class FollowController(
     @PostMapping
     fun follow(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
-            ?: throw IllegalArgumentException("이메일이 존재하지 않습니다.")
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.follow(email, followDto.nickname)
         return ResponseEntity.status(HttpStatus.OK).body("성공적으로 구독했습니다.")
     }
@@ -31,7 +32,7 @@ class FollowController(
     @DeleteMapping
     fun unfollow(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
-            ?: throw IllegalArgumentException("이메일이 존재하지 않습니다.")
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.unfollow(email, followDto.nickname)
         return ResponseEntity.status(HttpStatus.OK).body("구독 취소되었습니다.")
     }
@@ -40,7 +41,7 @@ class FollowController(
     @DeleteMapping("/unfollowMe")
     fun unfollowMe(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
-            ?: throw IllegalArgumentException("이메일이 존재하지 않습니다.")
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.unfollowMe(email, followDto.nickname)
         return ResponseEntity.status(HttpStatus.OK).body("해당 사용자의 구독을 취소했습니다.")
     }
