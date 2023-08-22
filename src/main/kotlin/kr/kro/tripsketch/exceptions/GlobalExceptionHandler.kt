@@ -12,5 +12,11 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(e.errorCode.httpStatus).body(e.message)
     }
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<String> {
+        val wrappedException = IllegalArgumentExceptionWrapper(e.message ?: "Invalid Argument")
+        return handleCustomException(wrappedException)
+    }
+
     // 기타 다른 예외 처리 메서드...
 }
