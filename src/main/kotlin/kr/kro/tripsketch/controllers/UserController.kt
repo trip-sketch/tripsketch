@@ -8,6 +8,7 @@ import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.UserService
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -64,7 +65,7 @@ class UserController(
     @TokenValidation(adminOnly = true)
     @GetMapping("/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
-    fun getAllUsers(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Any> {
+    fun getAllUsers(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Page<UserDto>> {
         val users = userService.getAllUsers(pageable)
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
