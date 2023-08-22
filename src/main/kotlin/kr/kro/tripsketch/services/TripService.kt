@@ -6,116 +6,100 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.repositories.TripRepository
-import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
+import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
-class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService) {
+class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService, private val userService: UserService) {
 
-    fun createTrip(actualToken: String, tripCreateDto: TripCreateDto): TripDto {
+    fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
+        val user = userService.findUserByEmail(email) 
 
-        val userEmail = jwtService.getEmailFromToken(actualToken)
-
-        val newTrip = Trip(
-            userEmail = userEmail,
-            scheduleId = "scheduleId",
+        val newTrip = Trip( 
+            userEmail = email,
+            nickname = user!!.nickname,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-            likes = 0,
-            views = 0,
-            location = "location",
+            // likes = 0,
+            // views = 0,  
+            location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
-            hidden = false,
-            createdAt = LocalDateTime.now(),
-            updatedAt = null,
-            deletedAt = null,
-            tripViews = emptySet()
         )
+        
+        // val tripEntity = toTrip(newTrip)
+        // val createdTripEntity = tripRepository.save(tripEntity)
+        // return fromTrip(createdTripEntity)
 
         val createdTrip = tripRepository.save(newTrip)
         return fromTrip(createdTrip)
     }
 
-
-//    fun createOrUpdateTrip(actualToken: String, tripCreateDto: TripCreateDto): TripDto {
-//
-//        val userEmail = jwtService.getEmailFromToken(actualToken)
-//
-//        val newTrip = Trip(
-//            userEmail = userEmail,
-//            scheduleId = "scheduleId",
-//            title = tripCreateDto.title,
-//            content = tripCreateDto.content,
-//            likes = 0,
-//            views = 0,
-//            location = "location",
-//            startedAt = LocalDateTime.now(),
-//            endAt = LocalDateTime.now(),
-//            hashtag = tripCreateDto.hashtag,
-//            hidden = false,
-//            createdAt = LocalDateTime.now(),
-//            updatedAt = null,
-//            deletedAt = null,
-//            tripViews = Set<String> = setOf()
-//        )
-//        return tripRepository.save(newTrip)
-//    }
-
-    fun getAllTrips(actualToken: String): Set<TripDto> {
-//        return tripRepository.findAll()
-        // to-do: actualToken 이 관리자일경우 해당 API 가 작동하게 해줄까?
+    fun getAllTrips(userEmail: String): Set<TripDto> {
         val findTrips = tripRepository.findAll()
         return findTrips.map { fromTrip(it) }.toSet()
     }
 
-    fun getTripById(id: String): TripDto? {
-//        return tripRepository.findById(id).orElse(null)
+    fun getTripById(userEmail: String, id: String): TripDto? {  // 자신이 작성한 trip id 만 조회 가능한지? 아니면 로그인상태면, 트립 id 로 조회가 가능한지?
         val findTrip = tripRepository.findById(id).orElse(null)
         return fromTrip(findTrip)
     }
 
-    fun updateTrip(actualToken: String, tripUpdateDto: TripUpdateDto): TripDto {
-
-        val userEmail = jwtService.getEmailFromToken(actualToken)
+    fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
+        val user = userService.findUserByEmail(email) 
 
         val updateTrip = Trip(
-            userEmail = userEmail,
-            scheduleId = "scheduleId",
+            userEmail = email,
+            nickname = user!!.nickname,
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,
-            likes = 0,
-            views = 0,
-            location = "location",
+            location = tripUpdateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
-            hashtag = tripUpdateDto.hashtag,
-            hidden = false,
-            createdAt = tripUpdateDto.createdAt,
+            hashtag = tripUpdateDto.hashtag,        // DB 쪽에서 기존 데이터에  플러스 되어야하는거라면?
             updatedAt = LocalDateTime.now(),
-//            deletedAt = null,
-            tripViews = tripUpdateDto.tripViews
         )
 
         val updatedTrip = tripRepository.save(updateTrip)
         return fromTrip(updatedTrip)
     }
 
-    fun deleteTripById(id: String) {
+    fun deleteTripById(userEmail: String, id: String) {
         tripRepository.deleteById(id)
     }
 }
 
+fun toTrip(tripDto: TripDto): Trip {
+    return Trip(
+        id = tripDto.id,
+        userEmail = tripDto.userEmail,
+        nickname = tripDto.nickname,
+        title = tripDto.title,
+        content = tripDto.content,
+        likes = tripDto.likes,
+        views = tripDto.views,
+        location = tripDto.location,
+        startedAt = tripDto.startedAt,
+        endAt = tripDto.endAt,
+        hashtag = tripDto.hashtag,
+        hidden = tripDto.hidden,
+        createdAt = tripDto.createdAt,
+        updatedAt = tripDto.updatedAt,
+        deletedAt = tripDto.deletedAt,
+        tripViews = tripDto.tripViews
+    )
+}
 
 fun fromTrip(trip: Trip): TripDto {
     return TripDto(
         id = trip.id,
         userEmail = trip.userEmail,
-        scheduleId = trip.scheduleId,
+        nickname = trip.nickname,
         title = trip.title,
         content = trip.content,
         likes = trip.likes,
@@ -130,72 +114,4 @@ fun fromTrip(trip: Trip): TripDto {
         deletedAt = trip.deletedAt,
         tripViews = trip.tripViews
     )
-
 }
-
-
-// @Service
-// class TripService(private val tripRepository: TripRepository) {
-
-//     // Trip 전체 조회
-//     fun getAllTrips(): List<Trip> {
-//         return tripRepository.findAll()
-//     }
-
-//     // Trip 조회
-//     fun findById(id: String): Trip? {
-//         return tripRepository.findById(id).orElseThrow { NoSuchElementException("Trip not found") }
-//     }
-
-//     // Trip 생성 및 수정
-//     fun createOrUpdateTrip(tripDto: TripDto): Trip {
-//         val trip = Trip(
-//             id = tripDto.id,
-//             userId = tripDto.userId,
-//             scheduleId = tripDto.scheduleId,
-//             title = tripDto.title,
-//             content = tripDto.content,
-//             likes = tripDto.likes,
-//             views = tripDto.views,
-//             location = tripDto.location,
-//             startedAt = tripDto.startedAt,
-//             endAt = tripDto.endAt,
-//             hashtag = tripDto.hashtag,
-//             hidden = tripDto.hidden,
-//             createdAt = tripDto.createdAt,
-//             updatedAt = tripDto.updatedAt,
-//             deletedAt = tripDto.deletedAt,
-//             likeFlag = tripDto.likeFlag,
-//             tripViews = tripDto.tripViews
-//         )
-//         return tripRepository.save(trip)
-//     }
-
-//     // Trip 생성 및 수정
-//     // fun createOrUpdateTrip(tripDto: TripDto): Trip {
-//     //     val trip = convertToEntity(tripDto)
-//     //     val savedTrip = tripRepository.save(trip)
-//     //     return convertToDto(savedTrip)
-//     // }
-
-//     // 삭제(soft delete)
-//     // fun deleteTripById(id: String) {
-//     //     return tripRepository.deleteTripById(id)
-//     // }
-
-//     // // 삭제(soft delete)
-//     // fun deleteTripById(id: String) {
-//     //     val trip = findById(id)
-//     fun deleteTripById(id: ObjectId) { // ObjectId 타입으로 변경
-//         val trip = findById(id.toString()) // ObjectId를 String으로 변환하여 findById 메서드에 전달
-//         if (trip != null) {
-//             trip.deletedAt = LocalDateTime.now()
-//             trip.hidden = 1 // 값은 체크 다시하기
-//             tripRepository.save(trip)
-//         } else {
-//             throw NoSuchElementException("Trip not found")
-//         }
-//     }
-
-
-// }
