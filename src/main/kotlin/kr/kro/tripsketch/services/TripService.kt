@@ -6,17 +6,19 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.repositories.TripRepository
-import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
+import kr.kro.tripsketch.domain.User
+import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
 class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService) {
 
     fun createTrip(userEmail: String, tripCreateDto: TripCreateDto): TripDto {
-
+        // val userDto = userService.toDto(userEmail)
+        // val nickname = userDto?.nickname ?: "DefaultNickname"
         val newTrip = Trip(
             userEmail = userEmail,
             title = tripCreateDto.title,
@@ -41,10 +43,10 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(findTrip)
     }
 
-    fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
+    fun updateTrip(userEmail: String, tripUpdateDto: TripUpdateDto): TripDto {
 
         val updateTrip = Trip(
-            userEmail = email,
+            userEmail = userEmail,
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,
             location = tripUpdateDto.location,
@@ -65,6 +67,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
 
 fun fromTrip(trip: Trip): TripDto {
+    
     return TripDto(
         id = trip.id,
         userEmail = trip.userEmail,
