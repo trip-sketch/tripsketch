@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.controllers
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.kro.tripsketch.dto.KakaoLoginRequest
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
@@ -10,15 +11,17 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/oauth")
 class OauthController(
     private val authService: AuthService
-
 ) {
 
     @GetMapping("/kakao/code")
+    @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
     fun kakaoCode(@RequestParam code: String): ResponseEntity<Any> {
         return ResponseEntity.ok().body(mapOf("code" to code))
     }
 
     @PostMapping("/kakao/login")
+    @ApiResponse(responseCode = "200", description = "카카오 로그인이 성공적으로 완료되었습니다.")
+    @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
     fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
         val tokenResponse = authService.authenticateViaKakao(request.code, request.pushToken)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
@@ -26,6 +29,8 @@ class OauthController(
     }
 
     @PostMapping("/kakao/refreshToken")
+    @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
+    @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
         val tokenResponse = authService.refreshUserToken(request)
         return if (tokenResponse != null) {
