@@ -5,7 +5,6 @@ import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
-import org.bson.types.ObjectId  // ObjectId import
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

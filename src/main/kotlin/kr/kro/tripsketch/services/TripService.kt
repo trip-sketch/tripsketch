@@ -24,8 +24,6 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             nickname = user!!.nickname,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-            // likes = 0,
-            // views = 0,  
             location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
