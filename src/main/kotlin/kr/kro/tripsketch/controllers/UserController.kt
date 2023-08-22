@@ -2,7 +2,6 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.annotations.TokenValidation
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.exceptions.BadRequestException
@@ -16,15 +15,13 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/user")
-class UserController(
-    private val userService: UserService
-) {
+class UserController(private val userService: UserService) {
 
-    @TokenValidation
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
+    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 또는 유효하지 않은 토큰.")
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
-    fun getUser(req: HttpServletRequest): ResponseEntity<UserDto> {
+    fun getUser(req: HttpServletRequest): ResponseEntity<Any> { // ResponseEntity의 제네릭 타입을 Any로 변경
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
         return if (user != null) {
@@ -33,6 +30,7 @@ class UserController(
             ResponseEntity.notFound().build()
         }
     }
+
 
     @GetMapping("/nickname")
     @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
@@ -46,7 +44,6 @@ class UserController(
         }
     }
 
-    @TokenValidation
     @PatchMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
@@ -62,8 +59,7 @@ class UserController(
         }
     }
 
-    @TokenValidation(adminOnly = true)
-    @GetMapping("/users")
+    @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
     fun getAllUsers(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Page<UserDto>> {
         val users = userService.getAllUsers(pageable)
