@@ -4,13 +4,12 @@ import java.time.LocalDateTime
 
 data class TripDto(
     var id: String? = null,
-//    var userId: String,
     var userEmail: String,
-    var scheduleId: String?,
+    var nickname: String?,      // to-do: user Id 처럼 사용
     var title: String,
     var content: String,
-    var likes: Int,
-    var views: Int,
+    var likes: Int?,
+    var views: Int?,
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
