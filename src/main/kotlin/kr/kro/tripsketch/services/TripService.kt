@@ -14,20 +14,27 @@ import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
-class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService) {
+class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService, private val userService: UserService) {
 
-    fun createTrip(userEmail: String, tripCreateDto: TripCreateDto): TripDto {
-        // val userDto = userService.toDto(userEmail)
-        // val nickname = userDto?.nickname ?: "DefaultNickname"
-        val newTrip = Trip(
-            userEmail = userEmail,
+    fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
+        val user = userService.findUserByEmail(email) 
+
+        val newTrip = Trip( 
+            userEmail = email,
+            nickname = user!!.nickname,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
+            // likes = 0,
+            // views = 0,  
             location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
         )
+        
+        // val tripEntity = toTrip(newTrip)
+        // val createdTripEntity = tripRepository.save(tripEntity)
+        // return fromTrip(createdTripEntity)
 
         val createdTrip = tripRepository.save(newTrip)
         return fromTrip(createdTrip)
@@ -43,10 +50,12 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(findTrip)
     }
 
-    fun updateTrip(userEmail: String, tripUpdateDto: TripUpdateDto): TripDto {
+    fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
+        val user = userService.findUserByEmail(email) 
 
         val updateTrip = Trip(
-            userEmail = userEmail,
+            userEmail = email,
+            nickname = user!!.nickname,
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,
             location = tripUpdateDto.location,
@@ -65,9 +74,28 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     }
 }
 
+fun toTrip(tripDto: TripDto): Trip {
+    return Trip(
+        id = tripDto.id,
+        userEmail = tripDto.userEmail,
+        nickname = tripDto.nickname,
+        title = tripDto.title,
+        content = tripDto.content,
+        likes = tripDto.likes,
+        views = tripDto.views,
+        location = tripDto.location,
+        startedAt = tripDto.startedAt,
+        endAt = tripDto.endAt,
+        hashtag = tripDto.hashtag,
+        hidden = tripDto.hidden,
+        createdAt = tripDto.createdAt,
+        updatedAt = tripDto.updatedAt,
+        deletedAt = tripDto.deletedAt,
+        tripViews = tripDto.tripViews
+    )
+}
 
 fun fromTrip(trip: Trip): TripDto {
-    
     return TripDto(
         id = trip.id,
         userEmail = trip.userEmail,

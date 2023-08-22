@@ -17,18 +17,17 @@ import kr.kro.tripsketch.services.JwtService
 @RequestMapping("api/trips")
 class TripController(private val tripService: TripService, private val jwtService: JwtService) {
 
-    @TokenValidation
     @PostMapping
     fun createTrip(
         req: HttpServletRequest,
         @RequestBody tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
-        val userEmail = req.getAttribute("userEmail") as String
-        val createdTrip = tripService.createTrip(userEmail, tripCreateDto)
+        val email = req.getAttribute("userEmail") as String
+        val createdTrip = tripService.createTrip(email, tripCreateDto)
         return ResponseEntity.ok(createdTrip)
     }
 
-    @TokenValidation
+    
     @GetMapping
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val userEmail = req.getAttribute("userEmail") as String
@@ -36,7 +35,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
-    @TokenValidation
+
     @GetMapping("/{id}")
     fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
         val userEmail = req.getAttribute("userEmail") as String
@@ -48,18 +47,17 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
     }
 
-    @TokenValidation
     @PatchMapping("/{id}")
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
         @RequestBody tripUpdateDto: TripUpdateDto)
     : ResponseEntity<TripDto> {
-        val userEmail = req.getAttribute("userEmail") as String
-        val existingTrip = tripService.getTripById(userEmail, id)
+        val email = req.getAttribute("userEmail") as String
+        val existingTrip = tripService.getTripById(email, id)
         if (existingTrip != null) {
 //            trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
-            val updatedTrip = tripService.updateTrip(userEmail, tripUpdateDto)
+            val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
             return ResponseEntity.ok(updatedTrip)
         }
         return ResponseEntity.notFound().build()
@@ -76,7 +74,6 @@ class TripController(private val tripService: TripService, private val jwtServic
     //     return ResponseEntity.notFound().build()
     // }
 
-    @TokenValidation
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Unit> {
         val userEmail = req.getAttribute("userEmail") as String
