@@ -20,4 +20,4 @@ class UnauthorizedException(message: String) : CustomException(ErrorCode.UNAUTHO
 class ForbiddenException(message: String) : CustomException(ErrorCode.FORBIDDEN, message)
 class CustomExpiredTokenException(message: String) : CustomException(ErrorCode.TOKEN_EXPIRED, message)
 class IllegalArgumentExceptionWrapper(message: String) : CustomException(ErrorCode.ILLEGAL_ARGUMENT, message)
-class BadRequestException(message: String) : CustomException(ErrorCode.ILLEGAL_ARGUMENT, message
+class BadRequestException(message: String) : CustomException(ErrorCode.ILLEGAL_ARGUMENT, message)
