@@ -15,61 +15,23 @@ import java.time.LocalDateTime
 @Service
 class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService) {
 
-    fun createTrip(actualToken: String, tripCreateDto: TripCreateDto): TripDto {
-
-        val userEmail = jwtService.getEmailFromToken(actualToken)
+    fun createTrip(userEmail: String, tripCreateDto: TripCreateDto): TripDto {
 
         val newTrip = Trip(
             userEmail = userEmail,
-            nickname = tripCreateDto.nickname,    // 이메일과 맞춰서 값 삽입
-//            scheduleId = "scheduleId",
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-//            likes = 0,
-//            views = 0,
             location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
-//            hidden = false,
-//            createdAt = LocalDateTime.now(),
-//            updatedAt = null,
-//            deletedAt = null,
-//            tripViews = emptySet()
         )
 
         val createdTrip = tripRepository.save(newTrip)
         return fromTrip(createdTrip)
     }
 
-
-//    fun createOrUpdateTrip(actualToken: String, tripCreateDto: TripCreateDto): TripDto {
-//
-//        val userEmail = jwtService.getEmailFromToken(actualToken)
-//
-//        val newTrip = Trip(
-//            userEmail = userEmail,
-//            scheduleId = "scheduleId",
-//            title = tripCreateDto.title,
-//            content = tripCreateDto.content,
-//            likes = 0,
-//            views = 0,
-//            location = "location",
-//            startedAt = LocalDateTime.now(),
-//            endAt = LocalDateTime.now(),
-//            hashtag = tripCreateDto.hashtag,
-//            hidden = false,
-//            createdAt = LocalDateTime.now(),
-//            updatedAt = null,
-//            deletedAt = null,
-//            tripViews = Set<String> = setOf()
-//        )
-//        return tripRepository.save(newTrip)
-//    }
-
     fun getAllTrips(actualToken: String): Set<TripDto> {
-//        return tripRepository.findAll()
-        // to-do: actualToken 이 관리자일경우 해당 API 가 작동하게 해줄까?
         val findTrips = tripRepository.findAll()
         return findTrips.map { fromTrip(it) }.toSet()
     }
@@ -86,7 +48,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
         val updateTrip = Trip(
             userEmail = userEmail,
-            nickname = tripUpdateDto.nickname,
+            // nickname = tripUpdateDto.nickname,
 //            scheduleId = "scheduleId",
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,

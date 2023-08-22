@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 
 data class TripUpdateDto(
     var id: String? = null,
-//    var userId: String,
     var userEmail: String,
     var nickname: String?,
 //    var scheduleId: String,
