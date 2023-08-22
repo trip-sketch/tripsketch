@@ -1,64 +1,68 @@
 package kr.kro.tripsketch.controllers
 
-import kr.kro.tripsketch.domain.toDto
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
-import kr.kro.tripsketch.services.JwtService
+import kr.kro.tripsketch.exceptions.BadRequestException
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.UserService
-import kr.kro.tripsketch.utils.TokenUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/user")
-class UserController(
-    private val userService: UserService,
-    private val jwtService: JwtService
-) {
+class UserController(private val userService: UserService) {
 
     @GetMapping
-    fun getUser(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
-        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
-        val email = jwtService.getEmailFromToken(actualToken)
+    @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
+    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 또는 유효하지 않은 토큰.")
+    @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
+    fun getUser(req: HttpServletRequest): ResponseEntity<Any> { // ResponseEntity의 제네릭 타입을 Any로 변경
+        val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
         return if (user != null) {
-            ResponseEntity.ok(toDto(user))
+            ResponseEntity.ok(userService.toDto(user, true)) // 이메일 포함
         } else {
             ResponseEntity.notFound().build()
         }
     }
 
+
     @GetMapping("/nickname")
+    @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
+    @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
     fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
-            ResponseEntity.ok(toDto(user))
+            ResponseEntity.ok(userService.toDto(user, false)) // 이메일 미포함
         } else {
             ResponseEntity.notFound().build()
         }
     }
 
     @PatchMapping
-    fun updateUser(@RequestHeader("Authorization") token: String, @RequestBody profileDto: ProfileDto): ResponseEntity<Any> {
-        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
-
-        if (!jwtService.validateToken(actualToken)) {
-            return ResponseEntity.status(401).body("유효하지 않은 토큰입니다.")
-        }
-
-        return try {
-            val updatedUser = userService.updateUser(actualToken, profileDto)
-            ResponseEntity.ok(toDto(updatedUser))
+    @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
+    fun updateUser(req: HttpServletRequest, @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
+        val email = req.getAttribute("userEmail") as String?
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        try {
+            val updatedUser = userService.updateUserByEmail(email, profileDto)
+            return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(400).body(e.message)
+            throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
         }
     }
 
-    @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): ResponseEntity<Page<UserDto>> {
+    @GetMapping("/admin/users")
+    @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
+    fun getAllUsers(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Page<UserDto>> {
         val users = userService.getAllUsers(pageable)
-        return ResponseEntity.ok(users.map { toDto(it) })
+        return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
 }

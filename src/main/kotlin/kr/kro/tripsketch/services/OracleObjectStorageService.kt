@@ -15,46 +15,46 @@ import java.io.InputStream
 
 @Service
 class OracleObjectStorageService {
-    val namespaceName = "oracle.objectstorage.bucketname"
-    val bucketName = "oracle.objectstorage.namespace"
-    private val configurationFilePath = "~/resources/config"
-    private val profile = "DEFAULT"
+//    val namespaceName = "oracle.objectstorage.bucketname"
+//    val bucketName = "oracle.objectstorage.namespace"
+//    private val configurationFilePath = "~/resources/config"
+//    private val profile = "DEFAULT"
+//
+//    private val configFile = ConfigFileReader.parse(configurationFilePath, profile)
+//    private val provider = ConfigFileAuthenticationDetailsProvider(configFile)
+//    private val client: ObjectStorage = ObjectStorageClient.builder().build(provider)
+//    private val uploadConfiguration = UploadConfiguration.builder()
+//        .allowMultipartUploads(true)
+//        .allowParallelUploads(true)
+//        .build()
+//    val uploadManager: UploadManager = UploadManager(client, uploadConfiguration)
 
-    private val configFile = ConfigFileReader.parse(configurationFilePath, profile)
-    private val provider = ConfigFileAuthenticationDetailsProvider(configFile)
-    private val client: ObjectStorage = ObjectStorageClient.builder().build(provider)
-    private val uploadConfiguration = UploadConfiguration.builder()
-        .allowMultipartUploads(true)
-        .allowParallelUploads(true)
-        .build()
-    val uploadManager: UploadManager = UploadManager(client, uploadConfiguration)
+//    fun uploadImageAndGetUrl(file: MultipartFile): String? {
+//        val objectName = file.originalFilename
+//        val inputStream: InputStream = file.inputStream
+//
+//        val putObjectReq = PutObjectRequest.builder()
+//            .bucketName(bucketName)
+//            .namespaceName(namespaceName)
+//            .objectName(objectName)
+//            .contentType(file.contentType)
+//            .contentLength(file.size)
+//            .build()
+//
+//        val uploadDetails = UploadRequest.builder(inputStream, file.size)
+//            .allowOverwrite(true)
+//            .build(putObjectReq)
+//
+//        val response: UploadResponse = uploadManager.upload(uploadDetails)
+//
+//        inputStream.close()
+//
+//        return objectName?.let { getObjectUrl(it) }
+//    }
 
-    fun uploadImageAndGetUrl(file: MultipartFile): String? {
-        val objectName = file.originalFilename
-        val inputStream: InputStream = file.inputStream
-
-        val putObjectReq = PutObjectRequest.builder()
-            .bucketName(bucketName)
-            .namespaceName(namespaceName)
-            .objectName(objectName)
-            .contentType(file.contentType)
-            .contentLength(file.size)
-            .build()
-
-        val uploadDetails = UploadRequest.builder(inputStream, file.size)
-            .allowOverwrite(true)
-            .build(putObjectReq)
-
-        val response: UploadResponse = uploadManager.upload(uploadDetails)
-
-        inputStream.close()
-
-        return objectName?.let { getObjectUrl(it) }
-    }
-
-    private fun getObjectUrl(objectName: String): String {
-        return "https://your-object-storage-url/${bucketName}/${objectName}"
-    }
+//    private fun getObjectUrl(objectName: String): String {
+//        return "https://your-object-storage-url/${bucketName}/${objectName}"
+//    }
 }
 
 
@@ -80,4 +80,3 @@ class OracleObjectStorageService {
 //
 //        return objectUrl
 //    }
-}
