@@ -31,45 +31,34 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(createdTrip)
     }
 
-    fun getAllTrips(actualToken: String): Set<TripDto> {
+    fun getAllTrips(userEmail: String): Set<TripDto> {
         val findTrips = tripRepository.findAll()
         return findTrips.map { fromTrip(it) }.toSet()
     }
 
-    fun getTripById(id: String): TripDto? {
-//        return tripRepository.findById(id).orElse(null)
+    fun getTripById(userEmail: String, id: String): TripDto? {  // 자신이 작성한 trip id 만 조회 가능한지? 아니면 로그인상태면, 트립 id 로 조회가 가능한지?
         val findTrip = tripRepository.findById(id).orElse(null)
         return fromTrip(findTrip)
     }
 
-    fun updateTrip(actualToken: String, tripUpdateDto: TripUpdateDto): TripDto {
-
-        val userEmail = jwtService.getEmailFromToken(actualToken)
+    fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
 
         val updateTrip = Trip(
-            userEmail = userEmail,
-            // nickname = tripUpdateDto.nickname,
-//            scheduleId = "scheduleId",
+            userEmail = email,
             title = tripUpdateDto.title,
             content = tripUpdateDto.content,
-//            likes = 0,
-//            views = 0,
             location = tripUpdateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripUpdateDto.hashtag,        // DB 쪽에서 기존 데이터에  플러스 되어야하는거라면?
-//            hidden = false,
-//            createdAt = tripUpdateDto.createdAt,
             updatedAt = LocalDateTime.now(),
-//            deletedAt = null,
-//            tripViews = tripUpdateDto.tripViews // DB에서 처리?
         )
 
         val updatedTrip = tripRepository.save(updateTrip)
         return fromTrip(updatedTrip)
     }
 
-    fun deleteTripById(id: String) {
+    fun deleteTripById(userEmail: String, id: String) {
         tripRepository.deleteById(id)
     }
 }
@@ -80,7 +69,6 @@ fun fromTrip(trip: Trip): TripDto {
         id = trip.id,
         userEmail = trip.userEmail,
         nickname = trip.nickname,
-//        scheduleId = trip.scheduleId,
         title = trip.title,
         content = trip.content,
         likes = trip.likes,
@@ -95,72 +83,4 @@ fun fromTrip(trip: Trip): TripDto {
         deletedAt = trip.deletedAt,
         tripViews = trip.tripViews
     )
-
 }
-
-
-// @Service
-// class TripService(private val tripRepository: TripRepository) {
-
-//     // Trip 전체 조회
-//     fun getAllTrips(): List<Trip> {
-//         return tripRepository.findAll()
-//     }
-
-//     // Trip 조회
-//     fun findById(id: String): Trip? {
-//         return tripRepository.findById(id).orElseThrow { NoSuchElementException("Trip not found") }
-//     }
-
-//     // Trip 생성 및 수정
-//     fun createOrUpdateTrip(tripDto: TripDto): Trip {
-//         val trip = Trip(
-//             id = tripDto.id,
-//             userId = tripDto.userId,
-//             scheduleId = tripDto.scheduleId,
-//             title = tripDto.title,
-//             content = tripDto.content,
-//             likes = tripDto.likes,
-//             views = tripDto.views,
-//             location = tripDto.location,
-//             startedAt = tripDto.startedAt,
-//             endAt = tripDto.endAt,
-//             hashtag = tripDto.hashtag,
-//             hidden = tripDto.hidden,
-//             createdAt = tripDto.createdAt,
-//             updatedAt = tripDto.updatedAt,
-//             deletedAt = tripDto.deletedAt,
-//             likeFlag = tripDto.likeFlag,
-//             tripViews = tripDto.tripViews
-//         )
-//         return tripRepository.save(trip)
-//     }
-
-//     // Trip 생성 및 수정
-//     // fun createOrUpdateTrip(tripDto: TripDto): Trip {
-//     //     val trip = convertToEntity(tripDto)
-//     //     val savedTrip = tripRepository.save(trip)
-//     //     return convertToDto(savedTrip)
-//     // }
-
-//     // 삭제(soft delete)
-//     // fun deleteTripById(id: String) {
-//     //     return tripRepository.deleteTripById(id)
-//     // }
-
-//     // // 삭제(soft delete)
-//     // fun deleteTripById(id: String) {
-//     //     val trip = findById(id)
-//     fun deleteTripById(id: ObjectId) { // ObjectId 타입으로 변경
-//         val trip = findById(id.toString()) // ObjectId를 String으로 변환하여 findById 메서드에 전달
-//         if (trip != null) {
-//             trip.deletedAt = LocalDateTime.now()
-//             trip.hidden = 1 // 값은 체크 다시하기
-//             tripRepository.save(trip)
-//         } else {
-//             throw NoSuchElementException("Trip not found")
-//         }
-//     }
-
-
-// }

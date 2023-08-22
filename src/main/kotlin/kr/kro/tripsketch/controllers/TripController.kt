@@ -23,23 +23,24 @@ class TripController(private val tripService: TripService, private val jwtServic
         req: HttpServletRequest,
         @RequestBody tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
-
         val userEmail = req.getAttribute("userEmail") as String
-        val createdTrip = tripService.createTrip(email, tripCreateDto)
-
+        val createdTrip = tripService.createTrip(userEmail, tripCreateDto)
         return ResponseEntity.ok(createdTrip)
     }
 
+    @TokenValidation
     @GetMapping
-    fun getAllTrips(@RequestHeader("Authorization") token: String): ResponseEntity<Set<TripDto>> {
-        val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
-        val findTrips = tripService.getAllTrips(actualToken)
+    fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+        val userEmail = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllTrips(userEmail)
         return ResponseEntity.ok(findTrips)
     }
 
+    @TokenValidation
     @GetMapping("/{id}")
-    fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
-        val findTrip = tripService.getTripById(id)
+    fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
+        val userEmail = req.getAttribute("userEmail") as String
+        val findTrip = tripService.getTripById(userEmail, id)
         if (findTrip != null) {
             return ResponseEntity.ok(findTrip)
         } else {
@@ -47,17 +48,18 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
     }
 
+    @TokenValidation
     @PatchMapping("/{id}")
     fun updateTrip(
-        @RequestHeader("Authorization") token: String,
+        req: HttpServletRequest,
         @PathVariable id: String,
         @RequestBody tripUpdateDto: TripUpdateDto)
     : ResponseEntity<TripDto> {
-        val existingTrip = tripService.getTripById(id)
+        val userEmail = req.getAttribute("userEmail") as String
+        val existingTrip = tripService.getTripById(userEmail, id)
         if (existingTrip != null) {
 //            trip.id = ObjectId(id) // String을 ObjectId로 변환하여 사용
-            val actualToken = TokenUtils.validateAndExtractToken(jwtService, token)
-            val updatedTrip = tripService.updateTrip(actualToken, tripUpdateDto)
+            val updatedTrip = tripService.updateTrip(userEmail, tripUpdateDto)
             return ResponseEntity.ok(updatedTrip)
         }
         return ResponseEntity.notFound().build()
@@ -74,11 +76,13 @@ class TripController(private val tripService: TripService, private val jwtServic
     //     return ResponseEntity.notFound().build()
     // }
 
+    @TokenValidation
     @DeleteMapping("/{id}")
-    fun deleteTrip(@PathVariable id: String): ResponseEntity<Unit> {
-        val existingTrip = tripService.getTripById(id)
+    fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Unit> {
+        val userEmail = req.getAttribute("userEmail") as String
+        val existingTrip = tripService.getTripById(userEmail, id)
         if (existingTrip != null) {
-            tripService.deleteTripById(id)
+            tripService.deleteTripById(userEmail, id)
             return ResponseEntity.noContent().build()
         }
         return ResponseEntity.notFound().build()
