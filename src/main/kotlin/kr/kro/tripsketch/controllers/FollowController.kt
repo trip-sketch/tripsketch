@@ -2,7 +2,6 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
-import kr.kro.tripsketch.annotations.TokenValidation
 import kr.kro.tripsketch.dto.FollowDto
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.services.FollowService
@@ -20,7 +19,6 @@ class FollowController(
     private val followService: FollowService,
 ) {
 
-    @TokenValidation
     @PostMapping
     @ApiResponse(responseCode = "200", description = "성공적으로 구독했습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
@@ -31,7 +29,6 @@ class FollowController(
         return ResponseEntity.status(HttpStatus.OK).body("성공적으로 구독했습니다.")
     }
 
-    @TokenValidation
     @DeleteMapping
     @ApiResponse(responseCode = "200", description = "구독 취소되었습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
@@ -42,7 +39,6 @@ class FollowController(
         return ResponseEntity.status(HttpStatus.OK).body("구독 취소되었습니다.")
     }
 
-    @TokenValidation
     @DeleteMapping("/unfollowMe")
     @ApiResponse(responseCode = "200", description = "해당 사용자의 구독을 취소했습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
@@ -64,5 +60,4 @@ class FollowController(
     fun getFollowers(@RequestParam nickname: String): List<ProfileDto> {
         return followService.getFollowers(nickname)
     }
-
 }

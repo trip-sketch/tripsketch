@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 import jakarta.servlet.http.HttpServletRequest
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 
 @Service
 class JwtService {
@@ -18,8 +19,6 @@ class JwtService {
     private val accessTokenValidityInMilliseconds: Long = EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 600000 // 10 mins
     private val refreshTokenValidityInMilliseconds: Long = EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
 
-
-    class CustomExpiredTokenException(message: String): RuntimeException(message)
 
     fun createTokens(user: User): TokenResponse {
         val now = Date()
@@ -52,7 +51,7 @@ class JwtService {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
             true
         } catch (e: ExpiredJwtException) {
-            throw CustomExpiredTokenException("Token has expired")
+            throw UnauthorizedException("토큰이 만료되었습니다.")
         } catch (e: Exception) {
             false
         }

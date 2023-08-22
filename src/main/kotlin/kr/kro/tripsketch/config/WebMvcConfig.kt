@@ -36,16 +36,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @Configuration
-class WebMvcConfig(private val jwtService: JwtService) : WebMvcConfigurer {
+class WebMvcConfig(
+    private val jwtTokenInterceptor: JwtTokenInterceptor
+) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(JwtTokenInterceptor(jwtService))
+        registry.addInterceptor(jwtTokenInterceptor)
             .addPathPatterns("/**")
             .excludePathPatterns(
-                "/api/oauth/kakao/login",
-                "/api/oauth/kakao/refreshToken",
+                "/swagger-ui/**",
+                "/v3/**",
+                "/hello",
                 "/api/user/nickname",
                 "/api/follow/followings",
-                "/api/follow/followers"
+                "/api/follow/followers",
+                "/api/oauth/kakao/login",
+                "/api/oauth/kakao/refreshToken"
             )
     }
 }

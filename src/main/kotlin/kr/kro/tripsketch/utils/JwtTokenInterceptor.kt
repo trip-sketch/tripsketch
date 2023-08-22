@@ -2,24 +2,36 @@ package kr.kro.tripsketch.utils
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.JwtService
-import org.springframework.web.method.HandlerMethod
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
-class JwtTokenInterceptor(private val jwtService: JwtService) : HandlerInterceptor {
+@Component
+class JwtTokenInterceptor(
+    private val jwtService: JwtService,
+    @Value("\${admin.emails}") private val adminEmailsConfig: String
+) : HandlerInterceptor {
+
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         // GET 메소드는 인증을 체크하지 않고 통과
-        if (request.method.equals("GET", ignoreCase = true)) return true
-
-        val authorization = request.getHeader("Authorization") ?: run {
-            response.status = HttpServletResponse.SC_UNAUTHORIZED
-            return false
-        }
+        val authorization = request.getHeader("Authorization") ?: throw UnauthorizedException("Authorization 헤더가 없습니다.")
 
         val token = authorization.removePrefix("Bearer ").trim()
         if (!jwtService.validateToken(token)) {
-            response.status = HttpServletResponse.SC_UNAUTHORIZED
-            return false
+            throw UnauthorizedException("유효하지 않은 토큰입니다.")
+        }
+
+        val email = jwtService.getEmailFromToken(token)
+        request.setAttribute("userEmail", email)
+
+        // 관리자만의 접근이 필요한 경로를 확인합니다. (예: /admin/*)
+        if (request.requestURI.startsWith("/admin/")) {
+            if (!adminEmailsConfig.split(",").contains(email)) {
+                throw ForbiddenException("관리자만 접근 가능합니다.")
+            }
         }
 
         return true
