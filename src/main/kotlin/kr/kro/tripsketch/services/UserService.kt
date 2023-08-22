@@ -3,6 +3,7 @@ package kr.kro.tripsketch.services
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Page
@@ -56,7 +57,7 @@ class UserService(
 
         profileDto.nickname?.let {
             if (it != user.nickname && isNicknameExist(it)) {  // <-- 닉네임이 기존 닉네임과 다르며, 중복인지 검사
-                throw IllegalArgumentException("이미 사용중인 닉네임입니다.")
+                throw BadRequestException("이미 사용중인 닉네임입니다.")
             }
             user.nickname = it
         }
@@ -73,11 +74,11 @@ class UserService(
     }
 
     fun updateUserByEmail(email: String, profileDto: ProfileDto): User {
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+        val user = userRepository.findByEmail(email) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
         profileDto.nickname?.let {
             if (it != user.nickname && isNicknameExist(it)) {
-                throw IllegalArgumentException("이미 사용중인 닉네임입니다.")
+                throw BadRequestException("이미 사용중인 닉네임입니다.")
             }
             user.nickname = it
         }
