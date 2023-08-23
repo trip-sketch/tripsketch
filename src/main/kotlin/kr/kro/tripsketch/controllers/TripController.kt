@@ -39,11 +39,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     @GetMapping("/nickname")
     fun getTripByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
         val findTrips = tripService.getTripByNickname(nickname)
-        return if (findTrips != null) {
-            ResponseEntity.ok(findTrips)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        return ResponseEntity.ok(findTrips)
     }
 
     @GetMapping("/{id}")
@@ -71,17 +67,6 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
         return ResponseEntity.notFound().build()
     }
-
-    // @PutMapping("/{id}")
-    // fun updateTrip(@PathVariable id: ObjectId, @RequestBody trip: Trip): ResponseEntity<Trip> {
-    //     val existingTrip = tripService.getTripById(id.toHexString()) // ObjectId를 String으로 변환하여 사용
-    //     if (existingTrip != null) {
-    //         trip.id = id // 업데이트하려는 객체의 ID를 URL에서 받은 ID로 설정
-    //         val updatedTrip = tripService.createOrUpdateTrip(trip)
-    //         return ResponseEntity.ok(updatedTrip)
-    //     }
-    //     return ResponseEntity.notFound().build()
-    // }
 
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Unit> {
