@@ -16,7 +16,6 @@ class JwtTokenInterceptor(
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        // GET 메소드는 인증을 체크하지 않고 통과
         val authorization = request.getHeader("Authorization") ?: throw UnauthorizedException("Authorization 헤더가 없습니다.")
 
         val token = authorization.removePrefix("Bearer ").trim()
@@ -27,8 +26,8 @@ class JwtTokenInterceptor(
         val email = jwtService.getEmailFromToken(token)
         request.setAttribute("userEmail", email)
 
-        // 관리자만의 접근이 필요한 경로를 확인합니다. (예: /admin/*)
-        if (request.requestURI.startsWith("/admin/")) {
+        // 관리자만 접근이 필요한 경로를 확인합니다. (예: /admin/이 포함된 경우)
+        if (request.requestURI.contains("/admin/")) {
             if (!adminEmailsConfig.split(",").contains(email)) {
                 throw ForbiddenException("관리자만 접근 가능합니다.")
             }
