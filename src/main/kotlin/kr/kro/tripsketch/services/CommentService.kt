@@ -27,12 +27,13 @@ class CommentService(
         return comments.map { fromComment(it, userRepository) }
     }
 
-    fun getIsLikedByTokenForTrip(actualToken: String, tripId: String): List<CommentDto> {
-        val userEmail = jwtService.getEmailFromToken(actualToken)
-        val updatedComments = isLikedByTokenForComments(userEmail, tripId)
+    /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
+    fun getIsLikedByTokenForTrip(email: String, tripId: String): List<CommentDto> {
+        val updatedComments = isLikedByTokenForComments(email, tripId)
 
         return updatedComments.map { fromComment(it, userRepository) }
     }
+
 
     private fun isLikedByTokenForComments(userEmail: String, tripId: String): List<Comment> {
         val comments = commentRepository.findAllByTripId(tripId)
@@ -49,22 +50,14 @@ class CommentService(
         }
     }
 
-
-
-
-
-
-
-    fun createComment(actualToken: String, commentCreateDto: CommentCreateDto): CommentDto {
-
-        val userEmail = jwtService.getEmailFromToken(actualToken)
+    fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
         val parentComment: Comment? = commentCreateDto.parentId?.let {
             commentRepository.findById(it).orElse(null)
         }
 
         val comment = Comment(
-            userEmail = userEmail,
+            userEmail = email,
             tripId = commentCreateDto.tripId,
             parentId = commentCreateDto.parentId,
             content = commentCreateDto.content,
@@ -79,7 +72,7 @@ class CommentService(
             // parentId가 있는 경우: 새로운 댓글을 부모의 children 리스트에 추가하고 부모 댓글을 저장
             val childComment = Comment(
                 id = ObjectId().toString(), // 새로운 ObjectId 생성
-                userEmail = userEmail,
+                userEmail = email,
                 tripId = commentCreateDto.tripId,
                 parentId = commentCreateDto.parentId,
                 content = commentCreateDto.content,
@@ -89,7 +82,6 @@ class CommentService(
             val createdComment = commentRepository.save(parentComment)
             return fromComment(createdComment, userRepository)
         }
-
     }
 
     fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
@@ -150,15 +142,14 @@ class CommentService(
         commentRepository.save(parentComment)
     }
 
-    fun toggleLikeComment(token: String, id: String): CommentDto {
+    fun toggleLikeComment(email: String, id: String): CommentDto {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-        val userEmail = jwtService.getEmailFromToken(token)
-        if (comment.likedBy.contains(userEmail)) {
-            comment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+        if (comment.likedBy.contains(email)) {
+            comment.likedBy.remove(email) // 이미 좋아요를 누른 경우 좋아요 취소
             comment.numberOfLikes -= 1
         } else {
-            comment.likedBy.add(userEmail) // 좋아요 추가
+            comment.likedBy.add(email) // 좋아요 추가
             comment.numberOfLikes += 1
         }
 
@@ -166,7 +157,7 @@ class CommentService(
         return fromComment(savedComment, userRepository)
     }
 
-    fun toggleLikeChildrenComment(token: String, parentId: String, id: String): CommentDto {
+    fun toggleLikeChildrenComment(email: String, parentId: String, id: String): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -176,12 +167,11 @@ class CommentService(
         }
 
         val childComment = parentComment.children[childCommentIndex]
-        val userEmail = jwtService.getEmailFromToken(token)
-        if (childComment.likedBy.contains(userEmail)) {
-            childComment.likedBy.remove(userEmail) // 이미 좋아요를 누른 경우 좋아요 취소
+        if (childComment.likedBy.contains(email)) {
+            childComment.likedBy.remove(email) // 이미 좋아요를 누른 경우 좋아요 취소
             childComment.numberOfLikes -= 1
         } else {
-            childComment.likedBy.add(userEmail) // 좋아요 추가
+            childComment.likedBy.add(email) // 좋아요 추가
             childComment.numberOfLikes += 1
         }
 
