@@ -8,8 +8,7 @@ import kr.kro.tripsketch.dto.TripDto
 @Document(collection = "trips")
 data class Trip(
      @Id val id: String? = null,
-    var userEmail: String,
-    var nickname: String?,
+    var email: String,
     var title: String,
     var content: String,
     var likes: Int? = 0,

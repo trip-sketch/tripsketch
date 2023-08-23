@@ -1,11 +1,13 @@
 package kr.kro.tripsketch.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDateTime
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class TripDto(
     var id: String? = null,
-    var userEmail: String,
-    var nickname: String?,      // to-do: user Id 처럼 사용
+    var email: String?,
+    var nickname: String?,
     var title: String,
     var content: String,
     var likes: Int?,
