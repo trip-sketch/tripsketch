@@ -15,7 +15,8 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     private val restTemplate = RestTemplate()
 
-    private inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object : ParameterizedTypeReference<T>() {}
+    private inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> =
+        object : ParameterizedTypeReference<T>() {}
 
     private fun requestKakaoToken(params: LinkedMultiValueMap<String, String>): Map<String, Any>? {
         val url = "https://kauth.kakao.com/oauth/token"

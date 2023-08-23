@@ -6,6 +6,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.springframework.stereotype.Service
+import org.slf4j.LoggerFactory
 
 @Service
 class NotificationService(
@@ -13,6 +14,7 @@ class NotificationService(
 ) {
 
     private val client = OkHttpClient()
+    private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
     fun sendPushNotification(email: String, title: String, body: String) {
         val userToken = getUserToken(email) ?: throw IllegalArgumentException("User token not found for $email")
@@ -38,10 +40,16 @@ class NotificationService(
             .post(requestBody)
             .build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                println("Failed to send notification: ${response.body?.string()}")
+        try {
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    logger.info("Notification sent successfully!")
+                } else {
+                    logger.error("Failed to send notification: ${response.body?.string()}")
+                }
             }
+        } catch (e: Exception) {
+            logger.error("Error sending notification: ", e)
         }
     }
 }

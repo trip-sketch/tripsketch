@@ -36,7 +36,8 @@ class OauthController(
         return if (tokenResponse != null) {
             ResponseEntity.ok().body(tokenResponse)
         } else {
-            ResponseEntity.status(400).body("Unable to refresh the Kakao token. Please check the provided refresh token.")
+            ResponseEntity.status(400)
+                .body("Unable to refresh the Kakao token. Please check the provided refresh token.")
         }
     }
 }

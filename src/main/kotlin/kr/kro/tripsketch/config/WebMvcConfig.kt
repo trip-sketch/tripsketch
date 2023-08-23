@@ -50,7 +50,8 @@ class WebMvcConfig(
                 "/api/follow/followings",
                 "/api/follow/followers",
                 "/api/oauth/kakao/login",
-                "/api/oauth/kakao/refreshToken"
+                "/api/oauth/kakao/refreshToken",
+                "/api/oauth/kakao/code"
             )
     }
 }
