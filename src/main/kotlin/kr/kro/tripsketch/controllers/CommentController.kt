@@ -2,31 +2,31 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
+import kr.kro.tripsketch.dto.CommentChildrenCreateDto
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.dto.CommentCreateDto
 import kr.kro.tripsketch.services.CommentService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import kr.kro.tripsketch.services.JwtService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 @RestController
 @RequestMapping("api/comment")
-class CommentController(private val commentService: CommentService, private val jwtService: JwtService) {
+class CommentController(private val commentService: CommentService) {
 
     @GetMapping("/admin/comments")
     fun getAllComments(req: HttpServletRequest, pageable: Pageable): Page<CommentDto>{
         return commentService.getAllComments(pageable)
     }
 
-    @GetMapping("/tripId/{tripId}")
+    @GetMapping("/guest/{tripId}")
     fun getCommentByTripId(@PathVariable tripId: String): List<CommentDto> {
         return commentService.getCommentByTripId(tripId)
     }
 
-    @GetMapping("/{tripId}/liked")
+    @GetMapping("/user/{tripId}")
     fun getIsLikedByTokenForTrip(
         req: HttpServletRequest,
         @PathVariable tripId: String
@@ -44,6 +44,13 @@ class CommentController(private val commentService: CommentService, private val 
         return commentService.createComment(email, commentCreateDto)
     }
 
+    @PostMapping("/{parentId}")
+    fun createChildrenComment(
+        req: HttpServletRequest, @PathVariable parentId: String, @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto
+    ): CommentDto {
+        val email = req.getAttribute("userEmail") as String
+        return commentService.createChildrenComment(email, parentId, commentChildrenCreateDto)
+    }
 
     @PatchMapping("/{id}")
     fun updateCommentById(

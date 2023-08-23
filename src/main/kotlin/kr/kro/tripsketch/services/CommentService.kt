@@ -1,10 +1,7 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
-import kr.kro.tripsketch.dto.CommentDto
-import kr.kro.tripsketch.dto.CommentUpdateDto
-import kr.kro.tripsketch.dto.CommentCreateDto
-import kr.kro.tripsketch.dto.UserProfileDto
+import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -52,44 +49,48 @@ class CommentService(
         }
     }
 
-    fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
-        val parentComment: Comment? = commentCreateDto.parentId?.let {
-            commentRepository.findById(it).orElse(null)
-        }
+    // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
+    fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
         val comment = Comment(
             userEmail = email,
             tripId = commentCreateDto.tripId,
-            parentId = commentCreateDto.parentId,
             content = commentCreateDto.content,
-            replyTo = commentCreateDto.replyTo,
         )
+        val createdComment = commentRepository.save(comment)
+        return fromComment(createdComment, userRepository)
+    }
 
-        if (parentComment == null) {
-            // parentId가 없는 경우: 새로운 댓글을 저장하고 반환
-            val createdComment = commentRepository.save(comment)
-            return fromComment(createdComment, userRepository)
-        } else {
-            // parentId가 있는 경우: 새로운 댓글을 부모의 children 리스트에 추가하고 부모 댓글을 저장
-            val childComment = Comment(
-                id = ObjectId().toString(), // 새로운 ObjectId 생성
-                userEmail = email,
-                tripId = commentCreateDto.tripId,
-                parentId = commentCreateDto.parentId,
-                content = commentCreateDto.content,
-                replyTo = commentCreateDto.replyTo,
-            )
-            parentComment.children.add(childComment)
-            val createdComment = commentRepository.save(parentComment)
-            return fromComment(createdComment, userRepository)
+    fun createChildrenComment(
+        email: String,
+        parentId: String,
+        commentChildrenCreateDto: CommentChildrenCreateDto
+    ): CommentDto {
+
+        val parentComment: Comment = parentId.let {
+            commentRepository.findById(it).orElse(null)
         }
+            ?: // 적절한 에러 처리 로직 추가
+            throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
+
+        val childComment = Comment(
+            id = ObjectId().toString(), // 새로운 ObjectId 생성
+            userEmail = email,
+            tripId = commentChildrenCreateDto.tripId,
+            parentId = parentId,
+            content = commentChildrenCreateDto.content,
+            replyTo = commentChildrenCreateDto.replyTo,
+        )
+        parentComment.children.add(childComment)
+        val createdComment = commentRepository.save(parentComment)
+        return fromComment(createdComment, userRepository)
     }
 
     fun updateComment(email: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-        if(comment.userEmail != email){
+        if (comment.userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
         val updatedTime = LocalDateTime.now()
@@ -103,7 +104,12 @@ class CommentService(
         return fromComment(savedComment, userRepository)
     }
 
-    fun updateChildrenComment(email: String, parentId: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+    fun updateChildrenComment(
+        email: String,
+        parentId: String,
+        id: String,
+        commentUpdateDto: CommentUpdateDto
+    ): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -112,7 +118,7 @@ class CommentService(
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
 
-        if(parentComment.children[childCommentIndex].userEmail != email){
+        if (parentComment.children[childCommentIndex].userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
 
@@ -131,7 +137,7 @@ class CommentService(
     fun deleteComment(email: String, id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-        if(comment.userEmail != email){
+        if (comment.userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
         // Soft delete 처리
@@ -148,7 +154,7 @@ class CommentService(
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
         }
 
-        if(parentComment.children[childCommentIndex].userEmail != email){
+        if (parentComment.children[childCommentIndex].userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
 
