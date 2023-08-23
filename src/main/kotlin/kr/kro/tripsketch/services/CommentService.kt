@@ -5,21 +5,23 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
 import kr.kro.tripsketch.dto.CommentCreateDto
 import kr.kro.tripsketch.dto.UserProfileDto
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
-    private val jwtService: JwtService,
     private val userRepository: UserRepository
 ) {
 
-    fun getAllComments(): List<CommentDto> {
-        return commentRepository.findAll().map { fromComment(it, userRepository) }
+    fun getAllComments(pageable: Pageable): Page<CommentDto> {
+        return commentRepository.findAll(pageable).map { fromComment(it, userRepository) }
     }
 
     fun getCommentByTripId(tripId: String): List<CommentDto> {
@@ -84,9 +86,12 @@ class CommentService(
         }
     }
 
-    fun updateComment(id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+    fun updateComment(email: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+        if(comment.userEmail != email){
+            throw ForbiddenException("해당 사용자만 접근 가능합니다.")
+        }
         val updatedTime = LocalDateTime.now()
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
@@ -98,7 +103,7 @@ class CommentService(
         return fromComment(savedComment, userRepository)
     }
 
-    fun updateChildrenComment(parentId: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+    fun updateChildrenComment(email: String, parentId: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -106,6 +111,11 @@ class CommentService(
         if (childCommentIndex == -1) {
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
+
+        if(parentComment.children[childCommentIndex].userEmail != email){
+            throw ForbiddenException("해당 사용자만 접근 가능합니다.")
+        }
+
         val updatedTime = LocalDateTime.now()
         val updatedChildComment = parentComment.children[childCommentIndex].copy(
             content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
@@ -118,22 +128,28 @@ class CommentService(
         return fromComment(savedParentComment, userRepository)
     }
 
-    fun deleteComment(id: String) {
+    fun deleteComment(email: String, id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
-
+        if(comment.userEmail != email){
+            throw ForbiddenException("해당 사용자만 접근 가능합니다.")
+        }
         // Soft delete 처리
         val deletedComment = comment.copy(isDeleted = true)
         commentRepository.save(deletedComment)
     }
 
-    fun deleteChildrenComment(parentId: String, id: String) {
+    fun deleteChildrenComment(email: String, parentId: String, id: String) {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
         val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
         if (childCommentIndex == -1) {
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+        }
+
+        if(parentComment.children[childCommentIndex].userEmail != email){
+            throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
 
         // Soft delete 처리

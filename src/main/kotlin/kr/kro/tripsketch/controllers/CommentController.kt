@@ -9,17 +9,19 @@ import kr.kro.tripsketch.services.CommentService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import kr.kro.tripsketch.services.JwtService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 @RestController
 @RequestMapping("api/comment")
 class CommentController(private val commentService: CommentService, private val jwtService: JwtService) {
 
-    @GetMapping("/comments")
-    fun getAllComments(): List<CommentDto> {
-        return commentService.getAllComments()
+    @GetMapping("/admin/comments")
+    fun getAllComments(req: HttpServletRequest, pageable: Pageable): Page<CommentDto>{
+        return commentService.getAllComments(pageable)
     }
 
-    @GetMapping("/{tripId}")
+    @GetMapping("/tripId/{tripId}")
     fun getCommentByTripId(@PathVariable tripId: String): List<CommentDto> {
         return commentService.getCommentByTripId(tripId)
     }
@@ -50,7 +52,7 @@ class CommentController(private val commentService: CommentService, private val 
         @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
-        return commentService.updateComment(id, updatedComment)
+        return commentService.updateComment(email, id, updatedComment)
     }
 
     @PatchMapping("/{parentId}/{id}")
@@ -61,13 +63,13 @@ class CommentController(private val commentService: CommentService, private val 
         @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
-        return commentService.updateChildrenComment(parentId, id, updatedComment)
+        return commentService.updateChildrenComment(email, parentId, id, updatedComment)
     }
 
     @DeleteMapping("/{id}")
     fun deleteComment(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
-        commentService.deleteComment(id)
+        commentService.deleteComment(email, id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
 
@@ -78,7 +80,7 @@ class CommentController(private val commentService: CommentService, private val 
         @PathVariable id: String
     ): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
-        commentService.deleteChildrenComment(parentId, id)
+        commentService.deleteChildrenComment(email, parentId, id)
         return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
     }
 
