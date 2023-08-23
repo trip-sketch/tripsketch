@@ -11,5 +11,6 @@ data class TripUpdateDto(
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
     var hashtag: String? = null,
-    var updatedAt: LocalDateTime? = null
+    var updatedAt: LocalDateTime? = null,
+    var images: List<String>? = emptyList()
 )

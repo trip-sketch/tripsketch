@@ -26,6 +26,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
+            images = tripCreateDto.images
         )
 
         val createdTrip = tripRepository.save(newTrip)
@@ -59,6 +60,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             endAt = LocalDateTime.now(),
             hashtag = tripUpdateDto.hashtag,
             updatedAt = LocalDateTime.now(),
+            images = tripUpdateDto.images
         )
 
         val updatedTrip = tripRepository.save(updateTrip)
@@ -86,7 +88,8 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             createdAt = tripDto.createdAt,
             updatedAt = tripDto.updatedAt,
             deletedAt = tripDto.deletedAt,
-            tripViews = tripDto.tripViews
+            tripViews = tripDto.tripViews,
+            images = tripDto.images
         )
     }
 
@@ -111,7 +114,8 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
-                tripViews = trip.tripViews
+                tripViews = trip.tripViews,
+                images = trip.images
             )
 
         } else {
@@ -131,7 +135,8 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
-                tripViews = trip.tripViews
+                tripViews = trip.tripViews,
+                images = trip.images
             )
         }
     }

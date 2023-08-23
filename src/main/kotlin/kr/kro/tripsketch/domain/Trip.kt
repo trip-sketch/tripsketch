@@ -21,7 +21,6 @@ data class Trip(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var tripViews: Set<String>? = setOf()
-    // to-do: 이미지 배열 받기
-    // var image: 
+    var tripViews: Set<String>? = setOf(),
+    var images: List<String>? = emptyList()
 )
