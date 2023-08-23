@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
-
+    fun findTripByEmail(email: String): Set<Trip>
 }
