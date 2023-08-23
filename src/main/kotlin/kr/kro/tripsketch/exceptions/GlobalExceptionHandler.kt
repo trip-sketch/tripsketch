@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.utils
+package kr.kro.tripsketch.exceptions
 
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
@@ -28,6 +28,11 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<String>{
+        return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<String>{
         return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
     }
 }

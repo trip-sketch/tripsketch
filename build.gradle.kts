@@ -88,7 +88,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
     // JSON Parse
-    implementation("org.json:json:20210307")
+    implementation("org.json:json:20230618")
 }
 
 tasks.withType<KotlinCompile> {

@@ -49,8 +49,7 @@ class UserController(private val userService: UserService) {
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
     fun updateUser(req: HttpServletRequest, @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
-        val email = req.getAttribute("userEmail") as String?
-            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         try {
             val updatedUser = userService.updateUserByEmail(email, profileDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
