@@ -32,7 +32,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(createdTrip, false)
     }
 
-    fun getAllTrips(userEmail: String): Set<TripDto> {
+    fun getAllTrips(): Set<TripDto> {
         val findTrips = tripRepository.findAll()
         return findTrips.map { fromTrip(it, false) }.toSet()
     }
@@ -65,7 +65,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(updatedTrip, false)
     }
 
-    fun deleteTripById(userEmail: String, id: String) {
+    fun deleteTripById(email: String, id: String) {
         tripRepository.deleteById(id)
     }
 

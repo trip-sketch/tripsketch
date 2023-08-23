@@ -1,7 +1,10 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import kr.kro.tripsketch.domain.Trip
+import kr.kro.tripsketch.dto.FollowDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
@@ -26,23 +29,27 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(createdTrip)
     }
     
-    @GetMapping
-    fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val userEmail = req.getAttribute("userEmail") as String
-        val findTrips = tripService.getAllTrips(userEmail)
+    @GetMapping("/admin/trips")
+    fun getAllTrips(): ResponseEntity<Set<TripDto>> {
+//        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllTrips()
         return ResponseEntity.ok(findTrips)
     }
 
-    @GetMapping("/nickname/{nickname}")
-    fun getTripByNickname(@PathVariable nickname: String): ResponseEntity<Set<TripDto>> {
+    @GetMapping("/nickname")
+    fun getTripByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
         val findTrips = tripService.getTripByNickname(nickname)
-        return ResponseEntity.ok(findTrips)
+        return if (findTrips != null) {
+            ResponseEntity.ok(findTrips)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @GetMapping("/{id}")
     fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
-        val userEmail = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripById(userEmail, id)
+        val email = req.getAttribute("userEmail") as String
+        val findTrip = tripService.getTripById(email, id)
         return if (findTrip != null) {
             ResponseEntity.ok(findTrip)
         } else {
