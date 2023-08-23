@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.utils
+package kr.kro.tripsketch.exceptions
 
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
