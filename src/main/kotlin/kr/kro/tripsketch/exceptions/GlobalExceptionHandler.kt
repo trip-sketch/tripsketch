@@ -1,10 +1,8 @@
 package kr.kro.tripsketch.exceptions
 
-import kr.kro.tripsketch.exceptions.BadRequestException
-import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.exceptions.ForbiddenException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
@@ -34,5 +32,13 @@ class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException::class)
     fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<String>{
         return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationExceptions(e: MethodArgumentNotValidException): ResponseEntity<Map<String, String>> {
+        val errors = e.bindingResult.fieldErrors.associate {
+            it.field to it.defaultMessage!!
+        }
+        return ResponseEntity(errors, HttpStatus.BAD_REQUEST)
     }
 }
