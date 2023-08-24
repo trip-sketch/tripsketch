@@ -1,6 +1,10 @@
 package kr.kro.tripsketch.domain
 
-import kr.kro.tripsketch.dto.UserDto
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
+import org.jetbrains.annotations.NotNull
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -11,15 +15,27 @@ data class User(
     @Id val id: String? = null,
 
     @Indexed(unique = true)
+    @field:Email(message = "이메일 형식이어야 합니다.")
+    @field:NotBlank
     val email: String,
 
     @Indexed(unique = true)
+    @field:NotBlank(message = "닉네임을 입력해주세요.")
+    @field:Size(min = 2, max = 50, message = "2글자에서 50글자 사이만 가능합니다.")
     var nickname: String,
 
+    @field:Size(max = 500, message = "500글자 이내로 가능합니다.")
     var introduction: String?,
+
+    @field:Pattern(regexp = "^(https?:\\/\\/)?([\\w\\-])+\\.{1}([a-zA-Z]{2,63})([\\/\\w-]*)*\\/?\\??([^\\&\\#\\n])*\\&?([^\\&\\#\\n])*$",
+        message = "올바른 URL 형식이어야 합니다.")
     var profileImageUrl: String?,
 
+
+    @field:NotNull
     var createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @field:NotNull
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
     var kakaoRefreshToken: String? = null,     // 카카오로부터 발급받은 refreshToken
