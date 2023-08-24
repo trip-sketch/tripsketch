@@ -18,7 +18,7 @@ class OauthController(
     fun kakaoCode(@RequestParam code: String): ResponseEntity<Void> {
         val encryptedCode = EncryptionUtils.encryptAES(code)
         return ResponseEntity.ok()
-            .header("X-Encrypted-Code", encryptedCode)  // encryptedCode를 'X-Encrypted-Code'라는 헤더로 설정
+            .header("X-Encrypted-Code", encryptedCode)  // encryptedCode 'X-Encrypted-Code'라는 헤더로 설정
             .build()
     }
 
