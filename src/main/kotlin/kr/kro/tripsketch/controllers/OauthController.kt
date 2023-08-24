@@ -25,7 +25,7 @@ class OauthController(
     }
 
 
-    @PostMapping("/callback")
+    @GetMapping("/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
         val tokenResponse = authService.authenticateViaKakao(code)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
