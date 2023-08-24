@@ -17,7 +17,7 @@ class OauthController(
     private val kakaoOAuthService: KakaoOAuthService,
 ) {
 
-    @GetMapping("/startLogin")
+    @GetMapping("/login")
     fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
         val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
         response.sendRedirect(kakaoLoginUrl)
@@ -31,9 +31,10 @@ class OauthController(
             ?: return ResponseEntity.status(400).body("Authentication failed.")
 
         val oneTimeCode = authService.generateOneTimeCodeForToken(tokenResponse)
-        return ResponseEntity.ok().body(mapOf("oneTimeCode" to oneTimeCode))
-    }
 
+        val redirectUrl = "https://port-0-tripsketch-kvmh2mljz6ccl7.sel4.cloudtype.app/api/oauth/kakao/callback?oneTimeCode=$oneTimeCode"
+        return ResponseEntity.status(302).header("Location", redirectUrl).build()
+    }
 
     @GetMapping("/retrieveToken")
     fun retrieveToken(@RequestParam oneTimeCode: String, @RequestParam pushToken: String): ResponseEntity<TokenResponse> {
