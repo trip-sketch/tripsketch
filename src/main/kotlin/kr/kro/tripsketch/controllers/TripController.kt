@@ -9,6 +9,8 @@ import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.services.TripService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import kr.kro.tripsketch.utils.TokenUtils
@@ -30,8 +32,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
     
     @GetMapping("/admin/trips")
-    fun getAllTrips(): ResponseEntity<Set<TripDto>> {
-//        val email = req.getAttribute("userEmail") as String
+    fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val findTrips = tripService.getAllTrips()
         return ResponseEntity.ok(findTrips)
     }
@@ -41,6 +42,19 @@ class TripController(private val tripService: TripService, private val jwtServic
         val findTrips = tripService.getTripByNickname(nickname)
         return ResponseEntity.ok(findTrips)
     }
+
+//    @GetMapping("/nickname")
+//    fun getTripByNickname(
+//        @RequestParam nickname: String,
+//        pageable: Pageable
+//    ): ResponseEntity<Page<TripDto>> {
+////        val findTrips = tripService.getTripByNickname(nickname)
+////        return ResponseEntity.ok(findTrips)
+//
+//        val findTrips = tripService.getTripByNickname(nickname, pageable)
+//        println(findTrips)
+//        return ResponseEntity.ok(findTrips)
+//    }
 
     @GetMapping("/{id}")
     fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
