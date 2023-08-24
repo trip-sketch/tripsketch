@@ -62,6 +62,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
     fun getTripById(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
+        ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
         // 조회수
         if (!findTrip.tripViews.contains(email) && findTrip.email != email ) {
@@ -70,7 +71,6 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         }
 
         // to-do: likes
-
 
         tripRepository.save(findTrip)
         return fromTrip(findTrip, false)
