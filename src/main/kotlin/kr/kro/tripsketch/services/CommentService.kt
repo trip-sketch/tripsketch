@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -139,11 +140,17 @@ class CommentService(
     fun deleteComment(email: String, id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+        if (comment.isDeleted) {
+            throw BadRequestException("이미 삭제 된 댓글 입니다.")
+        }
         if (comment.userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
         // Soft delete 처리
-        val deletedComment = comment.copy(isDeleted = true)
+        val deletedComment = comment.copy(
+            content = "삭제 된 댓글입니다.",
+            isDeleted = true
+        )
         commentRepository.save(deletedComment)
     }
 
@@ -156,12 +163,17 @@ class CommentService(
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
         }
 
+        if (parentComment.children[childCommentIndex].isDeleted) {
+            throw BadRequestException("이미 삭제 된 댓글 입니다.")
+        }
+
         if (parentComment.children[childCommentIndex].userEmail != email) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
 
         // Soft delete 처리
-        val deletedChildComment = parentComment.children[childCommentIndex].copy(isDeleted = true)
+        val deletedChildComment =
+            parentComment.children[childCommentIndex].copy(content = "삭제 된 댓글입니다.", isDeleted = true)
         parentComment.children[childCommentIndex] = deletedChildComment
         commentRepository.save(parentComment)
     }
