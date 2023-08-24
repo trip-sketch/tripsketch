@@ -57,9 +57,8 @@ class TripController(private val tripService: TripService, private val jwtServic
 //    }
 
     @GetMapping("/{id}")
-    fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripById(email, id)
+    fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
+        val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
             ResponseEntity.ok(findTrip)
         } else {
@@ -74,7 +73,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         @RequestBody tripUpdateDto: TripUpdateDto)
     : ResponseEntity<TripDto> {
         val email = req.getAttribute("userEmail") as String
-        val existingTrip = tripService.getTripById(email, id)
+        val existingTrip = tripService.getTripById(id)
         if (existingTrip != null) {
             val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
             return ResponseEntity.ok(updatedTrip)
@@ -85,7 +84,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Unit> {
         val email = req.getAttribute("userEmail") as String
-        val existingTrip = tripService.getTripById(email, id)
+        val existingTrip = tripService.getTripById(id)
         if (existingTrip != null) {
             tripService.deleteTripById(email, id)
             return ResponseEntity.noContent().build()
