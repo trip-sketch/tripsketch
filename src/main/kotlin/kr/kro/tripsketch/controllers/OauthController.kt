@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.dto.KakaoLoginRequest
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
+import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.services.AuthService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import org.springframework.http.ResponseEntity
@@ -13,24 +14,34 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/oauth")
 class OauthController(
     private val authService: AuthService,
-    private val kakaoOAuthService: KakaoOAuthService
+    private val kakaoOAuthService: KakaoOAuthService,
 ) {
 
     @GetMapping("/startKakaoLogin")
     fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
         val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
         response.sendRedirect(kakaoLoginUrl)
-        return ResponseEntity.status(302).build() // 302는 일시적 리디렉션을 나타내는 상태 코드입니다.
+        return ResponseEntity.status(302).build()
     }
 
 
     @PostMapping("/kakao/callback")
-    fun kakaoCallback(@RequestParam code: String, @RequestParam pushToken: String? = null): ResponseEntity<Any> {
-        val tokenResponse = authService.authenticateViaKakao(code, pushToken)
+    fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
+        val tokenResponse = authService.authenticateViaKakao(code)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
-        return ResponseEntity.ok().body(tokenResponse)
+
+        val oneTimeCode = authService.generateOneTimeCodeForToken(tokenResponse)
+        val redirectUrl = "https://port-0-tripsketch-kvmh2mljz6ccl7.sel4.cloudtype.app/api/oauth/kakao/callback?oneTimeCode=$oneTimeCode"
+        return ResponseEntity.status(302).header("Location", redirectUrl).build()
     }
 
+    @GetMapping("/retrieveToken")
+    fun retrieveToken(@RequestParam oneTimeCode: String, @RequestParam pushToken: String): ResponseEntity<TokenResponse> {
+        val tokenResponse = authService.retrieveTokenByOneTimeCode(oneTimeCode, pushToken)
+            ?: return ResponseEntity.status(404).build() // 코드가 없을 경우 404 반환
+
+        return ResponseEntity.ok(tokenResponse)
+    }
 
     @GetMapping("/kakao/code")
     @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
@@ -47,10 +58,11 @@ class OauthController(
     @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
     fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
         val decryptedCode = EncryptionUtils.decryptAES(request.code) // 복호화 로직 추가
-        val tokenResponse = authService.authenticateViaKakao(decryptedCode, request.pushToken)
+        val tokenResponse = authService.authenticateViaKakao(decryptedCode)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
         return ResponseEntity.ok().body(tokenResponse)
     }
+
 
     @PostMapping("/kakao/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
