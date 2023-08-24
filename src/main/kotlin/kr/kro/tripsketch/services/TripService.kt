@@ -62,8 +62,20 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 
     fun getTripById(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
+
+        // 조회수
+        if (!findTrip.tripViews.contains(email) && findTrip.email != email ) {
+            findTrip.tripViews.add(email)
+            findTrip.views += 1
+        }
+
+        // to-do: likes
+
+
+        tripRepository.save(findTrip)
         return fromTrip(findTrip, false)
     }
+
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
 
@@ -95,7 +107,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             title = tripDto.title,
             content = tripDto.content,
             likes = tripDto.likes,
-            views = tripDto.views,
+            views = tripDto.views!!,
             location = tripDto.location,
             startedAt = tripDto.startedAt,
             endAt = tripDto.endAt,
@@ -104,7 +116,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             createdAt = tripDto.createdAt,
             updatedAt = tripDto.updatedAt,
             deletedAt = tripDto.deletedAt,
-            tripViews = tripDto.tripViews,
+//            tripViews = tripDto.tripViews,
             images = tripDto.images
         )
     }
@@ -130,7 +142,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
-                tripViews = trip.tripViews,
+//                tripViews = trip.tripViews,
                 images = trip.images
             )
 
@@ -151,7 +163,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
-                tripViews = trip.tripViews,
+//                tripViews = trip.tripViews,
                 images = trip.images
             )
         }
