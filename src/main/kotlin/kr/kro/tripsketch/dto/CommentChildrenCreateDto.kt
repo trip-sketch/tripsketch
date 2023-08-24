@@ -2,6 +2,7 @@ package kr.kro.tripsketch.dto
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+
 data class CommentChildrenCreateDto(
     @field:NotBlank(message = "게시물 아이디(tripId)는 필수 항목입니다.")
     val tripId: String,
