@@ -15,15 +15,20 @@ class OauthController(
 
     @GetMapping("/kakao/code")
     @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
-    fun kakaoCode(@RequestParam code: String): ResponseEntity<Any> {
-        return ResponseEntity.ok().body(mapOf("code" to code))
+    fun kakaoCode(@RequestParam code: String): ResponseEntity<Void> {
+        val encryptedCode = EncryptionUtils.encryptAES(code)
+        return ResponseEntity.ok()
+            .header("X-Encrypted-Code", encryptedCode)  // encryptedCode 'X-Encrypted-Code'라는 헤더로 설정
+            .build()
     }
+
 
     @PostMapping("/kakao/login")
     @ApiResponse(responseCode = "200", description = "카카오 로그인이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
     fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
-        val tokenResponse = authService.authenticateViaKakao(request.code, request.pushToken)
+        val decryptedCode = EncryptionUtils.decryptAES(request.code) // 복호화 로직 추가
+        val tokenResponse = authService.authenticateViaKakao(decryptedCode, request.pushToken)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
         return ResponseEntity.ok().body(tokenResponse)
     }
