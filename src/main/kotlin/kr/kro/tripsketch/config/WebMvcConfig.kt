@@ -52,7 +52,7 @@ class WebMvcConfig(
                 "/api/oauth/kakao/login",
                 "/api/oauth/kakao/refreshToken",
                 "/api/oauth/kakao/code",
-                "/api/comment/tripId/**"
+                "/api/comment/guest/**"
             )
     }
 }

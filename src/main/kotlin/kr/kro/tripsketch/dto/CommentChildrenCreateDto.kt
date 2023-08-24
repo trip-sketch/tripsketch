@@ -10,6 +10,6 @@ data class CommentChildrenCreateDto(
     @field:Size(max = 200, message = "댓글 내용(content)은 200자 이하로 입력해주세요.")
     val content: String,
 
-    @field:NotBlank(message = "답글 닉네임(replyTo)은  필수 항목입니다.")
-    val replyTo: String
+    @field:NotBlank(message = "답글 닉네임(replyToNickname)은  필수 항목입니다.")
+    val replyToNickname: String
 )

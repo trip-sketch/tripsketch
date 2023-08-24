@@ -14,7 +14,7 @@ data class Comment(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val likedBy: MutableSet<String> = mutableSetOf(),
-    val replyTo: String? = null,
+    val replyToEmail: String? = null,
     val children: MutableList<Comment> = mutableListOf(),
     val isDeleted: Boolean = false,
     val isLiked: Boolean = false,

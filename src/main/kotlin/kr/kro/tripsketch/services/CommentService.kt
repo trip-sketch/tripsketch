@@ -49,7 +49,6 @@ class CommentService(
         }
     }
 
-
     // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
     fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
@@ -74,14 +73,17 @@ class CommentService(
             ?: // 적절한 에러 처리 로직 추가
             throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
+        val mentionedUser = userRepository.findByNickname(commentChildrenCreateDto.replyToNickname)
+
         val childComment = Comment(
             id = ObjectId().toString(), // 새로운 ObjectId 생성
             userEmail = email,
             tripId = commentChildrenCreateDto.tripId,
             parentId = parentId,
             content = commentChildrenCreateDto.content,
-            replyTo = commentChildrenCreateDto.replyTo,
+            replyToEmail = mentionedUser!!.email,
         )
+
         parentComment.children.add(childComment)
         val createdComment = commentRepository.save(parentComment)
         return fromComment(createdComment, userRepository)
@@ -204,6 +206,8 @@ class CommentService(
     companion object {
         fun fromComment(comment: Comment, userRepository: UserRepository): CommentDto {
             val commenter = userRepository.findByEmail(comment.userEmail)
+            val mentionedUser = comment.replyToEmail?.let { userRepository.findByEmail(it) }
+
             val commenterProfile = commenter?.let {
                 UserProfileDto(
                     email = it.email,
@@ -213,9 +217,10 @@ class CommentService(
                 )
             }
 
+            val mentionedUserNickname = mentionedUser?.nickname
+
             return CommentDto(
                 id = comment.id,
-                userEmail = comment.userEmail,
                 userNickName = commenterProfile?.nickname ?: "", // 사용자가 없을 경우 대비
                 userProfileUrl = commenterProfile?.profileImageUrl ?: "", // 사용자가 없을 경우 대비
                 tripId = comment.tripId,
@@ -223,7 +228,7 @@ class CommentService(
                 content = comment.content,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
-                replyTo = comment.replyTo,
+                replyToNickname = mentionedUserNickname,
                 isDeleted = comment.isDeleted,
                 isLiked = comment.isLiked,
                 numberOfLikes = comment.numberOfLikes,
