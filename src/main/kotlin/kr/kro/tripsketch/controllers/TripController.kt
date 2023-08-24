@@ -39,10 +39,10 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getTripById(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
         val userEmail = req.getAttribute("userEmail") as String
         val findTrip = tripService.getTripById(userEmail, id)
-        if (findTrip != null) {
-            return ResponseEntity.ok(findTrip)
+        return if (findTrip != null) {
+            ResponseEntity.ok(findTrip)
         } else {
-            return ResponseEntity.notFound().build()
+            ResponseEntity.notFound().build()
         }
     }
 
