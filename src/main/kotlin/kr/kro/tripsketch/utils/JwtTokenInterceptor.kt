@@ -16,9 +16,11 @@ class JwtTokenInterceptor(
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        if (request.requestURI == "/api/oauth/kakao/callback" && request.getParameter("code") != null) {
+        if ((request.requestURI == "/api/oauth/kakao/callback" && request.getParameter("code") != null) ||
+            (request.requestURI == "/api/oauth/kakao/callback" && request.getParameter("response_type") != null)) {
             return true
         }
+
         val authorization = request.getHeader("Authorization") ?: throw UnauthorizedException("Authorization 헤더가 없습니다.")
 
         val token = authorization.removePrefix("Bearer ").trim()

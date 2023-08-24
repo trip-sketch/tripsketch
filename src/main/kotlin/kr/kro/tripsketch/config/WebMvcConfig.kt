@@ -50,7 +50,6 @@ class WebMvcConfig(
                 "/api/follow/followings",
                 "/api/follow/followers",
                 "/api/oauth/kakao/**",
-                "/api/oauth/kakao/callback/**",
                 "/api/comment/guest/**",
             )
     }
