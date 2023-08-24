@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.dto.KakaoLoginRequest
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
@@ -16,10 +17,12 @@ class OauthController(
 ) {
 
     @GetMapping("/startKakaoLogin")
-    fun startKakaoLogin(): ResponseEntity<String> {
+    fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
         val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
-        return ResponseEntity.ok(kakaoLoginUrl)
+        response.sendRedirect(kakaoLoginUrl)
+        return ResponseEntity.status(302).build() // 302는 일시적 리디렉션을 나타내는 상태 코드입니다.
     }
+
 
     @PostMapping("/kakao/callback")
     fun kakaoCallback(@RequestParam code: String, @RequestParam pushToken: String? = null): ResponseEntity<Any> {

@@ -1,14 +1,12 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import kr.kro.tripsketch.utils.TokenUtils
 import kr.kro.tripsketch.services.JwtService
 
 
