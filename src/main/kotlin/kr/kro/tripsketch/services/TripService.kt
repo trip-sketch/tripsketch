@@ -49,6 +49,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     fun getTripByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
         val findTrips = tripRepository.findTripByEmail(user!!.email)
+//            ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
         return findTrips.map { fromTrip(it, false) }.toSet()
     }
 
@@ -60,8 +61,9 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 //
 //    }
 
-    fun getTripById(email: String, id: String): TripDto? {
+    fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("해당 트립 ID가 존재하지 않습니다.")
         return fromTrip(findTrip, false)
     }
 

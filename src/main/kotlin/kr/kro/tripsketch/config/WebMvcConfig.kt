@@ -53,6 +53,7 @@ class WebMvcConfig(
                 "/api/oauth/kakao/refreshToken",
                 "/api/oauth/kakao/code",
                 "/api/trip/nickname",
+                "/api/trip/{id}",
                 "/api/comment/guest/**"
             )
     }
