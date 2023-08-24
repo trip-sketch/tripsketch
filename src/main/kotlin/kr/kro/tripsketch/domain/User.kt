@@ -21,7 +21,7 @@ data class User(
 
     @Indexed(unique = true)
     @field:NotBlank(message = "닉네임을 입력해주세요.")
-    @field:Size(min = 2, max = 50, message = "2글자에서 50글자 사이만 가능합니다.")
+    @field:Size(min = 3, max = 50, message = "2글자에서 50글자 사이만 가능합니다.")
     var nickname: String,
 
     @field:Size(max = 500, message = "500글자 이내로 가능합니다.")
