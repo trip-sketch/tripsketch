@@ -49,7 +49,7 @@ class WebMvcConfig(
                 "/api/user/nickname",
                 "/api/follow/followings",
                 "/api/follow/followers",
-                "/api/oauth/**",
+                "/api/oauth/kakao/**",
                 "/api/comment/guest/**"
             )
     }

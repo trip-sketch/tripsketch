@@ -11,13 +11,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/oauth")
+@RequestMapping("api/oauth/kakao")
 class OauthController(
     private val authService: AuthService,
     private val kakaoOAuthService: KakaoOAuthService,
 ) {
 
-    @GetMapping("/startKakaoLogin")
+    @GetMapping("/startLogin")
     fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
         val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
         response.sendRedirect(kakaoLoginUrl)
@@ -25,7 +25,7 @@ class OauthController(
     }
 
 
-    @PostMapping("/kakao/callback")
+    @PostMapping("/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Any> {
         val tokenResponse = authService.authenticateViaKakao(code)
             ?: return ResponseEntity.status(400).body("Authentication failed.")
@@ -43,7 +43,7 @@ class OauthController(
         return ResponseEntity.ok(tokenResponse)
     }
 
-    @GetMapping("/kakao/code")
+    @GetMapping("/code")
     @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
     fun kakaoCode(@RequestParam code: String): ResponseEntity<Void> {
         val encryptedCode = EncryptionUtils.encryptAES(code)
@@ -53,7 +53,7 @@ class OauthController(
     }
 
 
-    @PostMapping("/kakao/login")
+    @PostMapping("/login")
     @ApiResponse(responseCode = "200", description = "카카오 로그인이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
     fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
@@ -64,7 +64,7 @@ class OauthController(
     }
 
 
-    @PostMapping("/kakao/refreshToken")
+    @PostMapping("/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
