@@ -84,4 +84,10 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val kakaoAccountInfo = userInfo?.get("kakao_account") as? Map<*, *>
         return kakaoAccountInfo?.get("email") as? String
     }
+
+    fun getKakaoLoginUrl(): String {
+        val baseUrl = "https://kauth.kakao.com/oauth/authorize"
+        return "$baseUrl?client_id=${kakaoConfig.clientId}&redirect_uri=${kakaoConfig.redirectUri}&response_type=code"
+    }
+
 }

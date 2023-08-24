@@ -1,10 +1,6 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
-import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.FollowDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
@@ -13,7 +9,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import kr.kro.tripsketch.utils.TokenUtils
 import kr.kro.tripsketch.services.JwtService
 
 

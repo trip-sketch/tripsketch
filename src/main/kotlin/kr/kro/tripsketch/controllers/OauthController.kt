@@ -1,17 +1,36 @@
 package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.dto.KakaoLoginRequest
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
+import kr.kro.tripsketch.services.KakaoOAuthService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/oauth")
 class OauthController(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val kakaoOAuthService: KakaoOAuthService
 ) {
+
+    @GetMapping("/startKakaoLogin")
+    fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
+        val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
+        response.sendRedirect(kakaoLoginUrl)
+        return ResponseEntity.status(302).build() // 302는 일시적 리디렉션을 나타내는 상태 코드입니다.
+    }
+
+
+    @PostMapping("/kakao/callback")
+    fun kakaoCallback(@RequestParam code: String, @RequestParam pushToken: String? = null): ResponseEntity<Any> {
+        val tokenResponse = authService.authenticateViaKakao(code, pushToken)
+            ?: return ResponseEntity.status(400).body("Authentication failed.")
+        return ResponseEntity.ok().body(tokenResponse)
+    }
+
 
     @GetMapping("/kakao/code")
     @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
