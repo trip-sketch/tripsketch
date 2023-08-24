@@ -8,8 +8,7 @@ import kr.kro.tripsketch.dto.TripDto
 @Document(collection = "trips")
 data class Trip(
      @Id val id: String? = null,
-    var userEmail: String,
-    var nickname: String?,
+    var email: String,
     var title: String,
     var content: String,
     var likes: Int? = 0,
@@ -17,12 +16,11 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtag: String? = null,
+    var hashtag: Set<String>? = setOf(),
     var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var tripViews: Set<String>? = setOf()
-    // to-do: 이미지 배열 받기
-    // var image: 
+    var tripViews: Set<String>? = setOf(),
+    var images: List<String>? = emptyList()
 )
