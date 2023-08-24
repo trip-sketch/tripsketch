@@ -31,7 +31,7 @@ class OauthController(
             ?: return ResponseEntity.status(400).body("Authentication failed.")
 
         val oneTimeCode = authService.generateOneTimeCodeForToken(tokenResponse)
-        val redirectUrl = "https://port-0-tripsketch-kvmh2mljz6ccl7.sel4.cloudtype.app/api/oauth/kakao/callback?oneTimeCode=$oneTimeCode"
+        val redirectUrl = "https://port-0-tripsketch-kvmh2mljz6ccl7.sel4.cloudtype.app/api/oauth/kakao/callbackForToken?oneTimeCode=$oneTimeCode"
         return ResponseEntity.status(302).header("Location", redirectUrl).build()
     }
 
