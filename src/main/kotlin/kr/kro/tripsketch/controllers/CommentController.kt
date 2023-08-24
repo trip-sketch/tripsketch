@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.validation.annotation.Validated
 
 @RestController
 @RequestMapping("api/comment")
@@ -38,7 +39,7 @@ class CommentController(private val commentService: CommentService) {
 
     @PostMapping("")
     fun createComment(
-        req: HttpServletRequest, @RequestBody commentCreateDto: CommentCreateDto
+        req: HttpServletRequest, @Validated @RequestBody commentCreateDto: CommentCreateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
         return commentService.createComment(email, commentCreateDto)
@@ -46,7 +47,7 @@ class CommentController(private val commentService: CommentService) {
 
     @PostMapping("/{parentId}")
     fun createChildrenComment(
-        req: HttpServletRequest, @PathVariable parentId: String, @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto
+        req: HttpServletRequest, @PathVariable parentId: String, @Validated @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
         return commentService.createChildrenComment(email, parentId, commentChildrenCreateDto)
@@ -56,7 +57,7 @@ class CommentController(private val commentService: CommentService) {
     fun updateCommentById(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @RequestBody updatedComment: CommentUpdateDto
+        @Validated @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
         return commentService.updateComment(email, id, updatedComment)
@@ -67,7 +68,7 @@ class CommentController(private val commentService: CommentService) {
         req: HttpServletRequest,
         @PathVariable parentId: String,
         @PathVariable id: String,
-        @RequestBody updatedComment: CommentUpdateDto
+        @Validated @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
         val email = req.getAttribute("userEmail") as String
         return commentService.updateChildrenComment(email, parentId, id, updatedComment)
