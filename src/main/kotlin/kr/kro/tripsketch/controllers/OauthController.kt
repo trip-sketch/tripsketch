@@ -44,7 +44,7 @@ class OauthController(
     }
 
 
-    @GetMapping("/api/oauth/kakao/redirect")
+    @GetMapping("/redirect")
     fun handleEncryptedOneTimeCode(@RequestParam encryptedOneTimeCode: String): ResponseEntity<Void> {
         return ResponseEntity.ok().build() // Body가 없는 200 OK 응답 반환
     }
