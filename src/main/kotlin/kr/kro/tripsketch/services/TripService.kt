@@ -7,6 +7,8 @@ import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.repositories.TripRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.UserDto
@@ -33,8 +35,14 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(createdTrip, false)
     }
 
+//    fun getAllTrips(): Set<TripDto> {
+//        val findTrips = tripRepository.findAll()
+//        return findTrips.map { fromTrip(it, false) }.toSet()
+//    }
+
     fun getAllTrips(): Set<TripDto> {
         val findTrips = tripRepository.findAll()
+        println(findTrips)
         return findTrips.map { fromTrip(it, false) }.toSet()
     }
 
@@ -43,6 +51,14 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         val findTrips = tripRepository.findTripByEmail(user!!.email)
         return findTrips.map { fromTrip(it, false) }.toSet()
     }
+
+//    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
+//        val user = userService.findUserByNickname(nickname)
+//        val findTrips = tripRepository.findTripByEmail(user!!.email, pageable)
+////        return findTrips.map { fromTrip(it, false) }.toSet()
+//        return findTrips.map { fromTrip(it, false) }.let { PageImpl(it.toList(), pageable, findTrips.totalElements) }
+//
+//    }
 
     fun getTripById(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
