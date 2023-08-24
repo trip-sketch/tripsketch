@@ -8,6 +8,6 @@ data class TripCreateDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtag: String? = null,
+    var hashtag: Set<String>? = setOf(),
     var images: List<String>? = emptyList()
 )
