@@ -11,8 +11,8 @@ data class Trip(
     var email: String,
     var title: String,
     var content: String,
-    var likes: Int? = 0,
-    var views: Int? = 0,
+    var likes: Int = 0,
+    var views: Int = 0,
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
@@ -21,6 +21,7 @@ data class Trip(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var tripViews: Set<String>? = setOf(),
+    var tripLikes: MutableSet<String> = mutableSetOf(),
+    var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList()
 )
