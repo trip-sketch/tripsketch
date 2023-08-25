@@ -22,7 +22,7 @@ class FollowController(
     @PostMapping
     @ApiResponse(responseCode = "200", description = "성공적으로 구독했습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun follow(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
+    fun follow(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
             ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.follow(email, followDto.nickname)
@@ -32,7 +32,7 @@ class FollowController(
     @DeleteMapping
     @ApiResponse(responseCode = "200", description = "구독 취소되었습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun unfollow(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
+    fun unfollow(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
             ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.unfollow(email, followDto.nickname)
@@ -42,7 +42,7 @@ class FollowController(
     @DeleteMapping("/unfollowMe")
     @ApiResponse(responseCode = "200", description = "해당 사용자의 구독을 취소했습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun unfollowMe(req: HttpServletRequest, @Valid @RequestBody followDto: FollowDto): ResponseEntity<String> {
+    fun unfollowMe(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
             ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         followService.unfollowMe(email, followDto.nickname)

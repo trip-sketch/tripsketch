@@ -49,12 +49,9 @@ class WebMvcConfig(
                 "/api/user/nickname",
                 "/api/follow/followings",
                 "/api/follow/followers",
-                "/api/oauth/kakao/login",
-                "/api/oauth/kakao/refreshToken",
-                "/api/oauth/kakao/code",
-                "/api/trip/nickname",
-                "/api/trip/{id}",
-                "/api/comment/guest/**"
+                "/api/oauth/kakao/**",
+                "/api/comment/guest/**",
+                "/api/trip/nickname"
             )
     }
 }
