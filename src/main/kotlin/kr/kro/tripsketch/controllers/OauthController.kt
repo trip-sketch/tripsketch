@@ -14,7 +14,7 @@ class OauthController(
 ) {
 
     @GetMapping("/callback")
-    fun kakaoCallback(@RequestParam code: String): ResponseEntity<Void> {
+    fun kakaoCallback(@RequestParam code: String): ResponseEntity<String> {
         val tokenResponse = authService.authenticateViaKakao(code)
             ?: return ResponseEntity.status(400).build() // Authentication failed
 
@@ -24,7 +24,40 @@ class OauthController(
             set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
         }
 
-        return ResponseEntity.ok().headers(headers).build()
+        // 로그인 성공 페이지 HTML
+        val responseBody = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Login Successful</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        display: flex; 
+                        justify-content: center; 
+                        align-items: center; 
+                        height: 100vh; 
+                        background-color: #f4f4f4;
+                    }
+                    .message {
+                        padding: 20px;
+                        background-color: #4caf50;
+                        color: white;
+                        border-radius: 5px;
+                    }                
+                </style>
+            </head>
+            <body>
+                <div class="message">
+                    로그인이 성공적으로 완료되었습니다!
+                </div>
+            </body>
+            </html>
+        """.trimIndent()
+
+        return ResponseEntity.ok().headers(headers).body(responseBody)
     }
 
     @PostMapping("/refreshToken")
