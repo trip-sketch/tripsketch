@@ -2,11 +2,11 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletResponse
-import kr.kro.tripsketch.dto.KakaoLoginRequest
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.services.AuthService
 import kr.kro.tripsketch.services.KakaoOAuthService
+import kr.kro.tripsketch.utils.EncryptionUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
