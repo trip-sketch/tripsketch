@@ -1,5 +1,7 @@
 package kr.kro.tripsketch.services
 
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.domain.TokenCode
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.dto.TokenResponse
@@ -66,4 +68,22 @@ class AuthService(
             refreshTokenExpiryDate = tokenCodeEntity.refreshTokenExpiryDate
         )
     }
+
+    fun setAuthenticationCookies(response: HttpServletResponse, tokenResponse: TokenResponse) {
+        setCookie(response, "accessToken", tokenResponse.accessToken)
+        setCookie(response, "refreshToken", tokenResponse.refreshToken)
+        setCookie(response, "refreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+    }
+
+    private fun setCookie(response: HttpServletResponse, name: String, value: String) {
+        val cookie = Cookie(name, value)
+        configureCookie(cookie)
+        response.addCookie(cookie)
+    }
+
+    private fun configureCookie(cookie: Cookie) {
+        cookie.path = "/"
+        cookie.secure = true
+    }
+
 }
