@@ -30,13 +30,17 @@ class OauthController(
     @PostMapping("/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
-    fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
+    fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
         val tokenResponse = authService.refreshUserToken(request)
         return if (tokenResponse != null) {
-            ResponseEntity.ok().body(tokenResponse)
+            val headers = HttpHeaders().apply {
+                set("AccessToken", tokenResponse.accessToken)
+                set("RefreshToken", tokenResponse.refreshToken)
+                set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+            }
+            ResponseEntity.ok().headers(headers).build()
         } else {
-            ResponseEntity.status(400)
-                .body("Unable to refresh the Kakao token. Please check the provided refresh token.")
+            ResponseEntity.status(400).build()
         }
     }
 
