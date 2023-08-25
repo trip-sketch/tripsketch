@@ -23,13 +23,13 @@ class UserController(private val userService: UserService) {
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
     fun getUser(
         req: HttpServletRequest,
-        @RequestParam expoPushToken: String
+        @RequestParam token: String
     ): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
 
         // Store the expoPushToken for the user
-        userService.storeUserPushToken(email, expoPushToken)
+        userService.storeUserPushToken(email, token)
 
         return if (user != null) {
             ResponseEntity.ok(userService.toDto(user, true)) // 이메일 포함
@@ -37,7 +37,6 @@ class UserController(private val userService: UserService) {
             ResponseEntity.notFound().build()
         }
     }
-
 
 
     @GetMapping("/nickname")
