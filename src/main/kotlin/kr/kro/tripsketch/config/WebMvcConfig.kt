@@ -51,6 +51,8 @@ class WebMvcConfig(
                 "/api/follow/followers",
                 "/api/oauth/kakao/**",
                 "/api/comment/guest/**",
+                "/api/trip/nickname",
+                "/api/geocode"
             )
     }
 }
