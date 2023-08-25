@@ -50,7 +50,8 @@ class WebMvcConfig(
                 "/api/follow/followings",
                 "/api/follow/followers",
                 "/api/oauth/**",
-                "/api/comment/guest/**"
+                "/api/comment/guest/**",
+                "/api/trip/nickname"
             )
     }
 }

@@ -35,16 +35,19 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(createdTrip, false)
     }
 
+
 //    fun getAllTrips(): Set<TripDto> {
 //        val findTrips = tripRepository.findAll()
 //        return findTrips.map { fromTrip(it, false) }.toSet()
 //    }
+
 
     fun getAllTrips(): Set<TripDto> {
         val findTrips = tripRepository.findAll()
         println(findTrips)
         return findTrips.map { fromTrip(it, false) }.toSet()
     }
+
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
@@ -60,6 +63,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
 //
 //    }
 
+
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
         ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -71,16 +75,22 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         }
 
         // to-do: likes
+        if (findTrip.tripLikes.contains(email)) {
+            // 좋아요 상태 표시
+            println("좋아요 상태표시")
+        }
 
         tripRepository.save(findTrip)
         return fromTrip(findTrip, false)
     }
+
 
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         return fromTrip(findTrip, false)
     }
+
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
 
@@ -100,6 +110,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         return fromTrip(updatedTrip, false)
     }
 
+
     fun deleteTripById(email: String, id: String) {
         tripRepository.deleteById(id)
     }
@@ -111,7 +122,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             email = tripDto.email!!,
             title = tripDto.title,
             content = tripDto.content,
-            likes = tripDto.likes,
+            likes = tripDto.likes!!,
             views = tripDto.views!!,
             location = tripDto.location,
             startedAt = tripDto.startedAt,
@@ -121,6 +132,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
             createdAt = tripDto.createdAt,
             updatedAt = tripDto.updatedAt,
             deletedAt = tripDto.deletedAt,
+            tripLikes = tripDto.tripLikes,
 //            tripViews = tripDto.tripViews,
             images = tripDto.images
         )
@@ -147,6 +159,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
+                tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
                 images = trip.images
             )
@@ -168,6 +181,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
                 deletedAt = trip.deletedAt,
+                tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
                 images = trip.images
             )

@@ -20,6 +20,8 @@ data class TripDto(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-//    var tripViews: Set<String>? = setOf(),
-    var images: List<String>? = emptyList()
+    var tripLikes: MutableSet<String> = mutableSetOf(),
+//    var tripViews: MutableSet<String> = mutableSetOf(),
+    var images: List<String>? = emptyList(),
+//    var isLiked: Boolean
 )
