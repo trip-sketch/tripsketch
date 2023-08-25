@@ -18,13 +18,6 @@ class OauthController(
     private val kakaoOAuthService: KakaoOAuthService,
 ) {
 
-    @GetMapping("/login")
-    fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
-        val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
-        response.sendRedirect(kakaoLoginUrl)
-        return ResponseEntity.status(302).build()
-    }
-
     @GetMapping("/callback")
     fun kakaoCallback(@RequestParam code: String): ResponseEntity<Void> {
         val tokenResponse = authService.authenticateViaKakao(code)
