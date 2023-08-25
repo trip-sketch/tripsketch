@@ -51,7 +51,7 @@ class OauthController(
             </head>
             <body>
                 <div class="message">
-                    로그인이 성공적으로 완료되었습니다!
+                    로그인이 성공적으로 완료되었습니다!~
                 </div>
             </body>
             </html>
