@@ -28,7 +28,6 @@ class UserController(private val userService: UserService) {
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
 
-        // Store the expoPushToken for the user
         userService.storeUserPushToken(email, token)
 
         return if (user != null) {
