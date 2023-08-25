@@ -7,6 +7,7 @@ import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.services.AuthService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.utils.EncryptionUtils
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -25,13 +26,17 @@ class OauthController(
     }
 
     @GetMapping("/callback")
-    fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Any> {
+    fun kakaoCallback(@RequestParam code: String): ResponseEntity<Void> {
         val tokenResponse = authService.authenticateViaKakao(code)
-            ?: return ResponseEntity.status(400).body("Authentication failed.")
+            ?: return ResponseEntity.status(400).build() // Authentication failed
 
-        authService.setAuthenticationCookies(response, tokenResponse)
+        val headers = HttpHeaders().apply {
+            set("AccessToken", tokenResponse.accessToken)
+            set("RefreshToken", tokenResponse.refreshToken)
+            set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+        }
 
-        return ResponseEntity.ok().body("Cookies set successfully.")
+        return ResponseEntity.ok().headers(headers).build()
     }
 
     @PostMapping("/refreshToken")
@@ -46,25 +51,5 @@ class OauthController(
                 .body("Unable to refresh the Kakao token. Please check the provided refresh token.")
         }
     }
-
-//    @GetMapping("/code")
-//    @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
-//    fun kakaoCode(@RequestParam code: String): ResponseEntity<Void> {
-//        val encryptedCode = EncryptionUtils.encryptAES(code)
-//        return ResponseEntity.ok()
-//            .header("X-Encrypted-Code", encryptedCode)  // encryptedCode 'X-Encrypted-Code'라는 헤더로 설정
-//            .build()
-//    }
-//
-//
-//    @PostMapping("/login")
-//    @ApiResponse(responseCode = "200", description = "카카오 로그인이 성공적으로 완료되었습니다.")
-//    @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
-//    fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
-//        val decryptedCode = EncryptionUtils.decryptAES(request.code) // 복호화 로직 추가
-//        val tokenResponse = authService.authenticateViaKakao(decryptedCode)
-//            ?: return ResponseEntity.status(400).body("Authentication failed.")
-//        return ResponseEntity.ok().body(tokenResponse)
-//    }
 
 }
