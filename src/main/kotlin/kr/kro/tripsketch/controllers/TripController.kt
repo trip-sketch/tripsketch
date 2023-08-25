@@ -52,6 +52,17 @@ class TripController(private val tripService: TripService, private val jwtServic
 //    }
 
     @GetMapping("/{id}")
+    fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrip = tripService.getTripByEmailAndId(email, id)
+        return if (findTrip != null) {
+            ResponseEntity.ok(findTrip)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
         val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
