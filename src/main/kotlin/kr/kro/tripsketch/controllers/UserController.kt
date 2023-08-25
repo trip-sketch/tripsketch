@@ -10,6 +10,7 @@ import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,9 +21,15 @@ class UserController(private val userService: UserService) {
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 또는 유효하지 않은 토큰.")
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
-    fun getUser(req: HttpServletRequest): ResponseEntity<Any> { // ResponseEntity의 제네릭 타입을 Any로 변경
+    fun getUser(
+        req: HttpServletRequest,
+        @RequestParam token: String
+    ): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
+
+        userService.storeUserPushToken(email, token)
+
         return if (user != null) {
             ResponseEntity.ok(userService.toDto(user, true)) // 이메일 포함
         } else {
@@ -47,7 +54,7 @@ class UserController(private val userService: UserService) {
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun updateUser(req: HttpServletRequest, @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
+    fun updateUser(req: HttpServletRequest, @Validated @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
         val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         try {
             val updatedUser = userService.updateUserByEmail(email, profileDto)
