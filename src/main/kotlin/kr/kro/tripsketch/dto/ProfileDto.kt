@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.dto
 
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
 
