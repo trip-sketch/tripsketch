@@ -141,6 +141,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     fun fromTrip(trip: Trip, includeEmail: Boolean = true): TripDto {
 
         val user = userService.findUserByEmail(trip.email)
+        val isLiked = trip.tripLikes.contains(trip.email)  // 사용자의 email 정보를 바로 사용
 
         return if (includeEmail) {
             TripDto(
@@ -161,6 +162,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
+                isLiked = isLiked,
                 images = trip.images
             )
 
@@ -183,6 +185,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
+                isLiked = isLiked,
                 images = trip.images
             )
         }
