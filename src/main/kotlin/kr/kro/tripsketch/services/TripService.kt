@@ -6,6 +6,7 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.services.TripLikeService
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,7 +17,12 @@ import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
-class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService, private val userService: UserService) {
+class TripService(
+    private val tripRepository: TripRepository,
+    private val jwtService: JwtService,
+    private val userService: UserService,
+    private val tripLikeService: TripLikeService
+) {
 
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
 
@@ -111,8 +117,20 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     }
 
 
-    fun deleteTripById(email: String, id: String) {
-        tripRepository.deleteById(id)
+    fun deleteTripById(email: String, id: String): Unit {
+//        tripRepository.deleteById(id)
+
+        val findTrip = tripRepository.findById(id).orElseThrow {
+            EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        }
+
+        if (findTrip.email == email) {
+            findTrip.hidden = true
+            findTrip.deletedAt = LocalDateTime.now()
+            tripRepository.save(findTrip)
+        } else {
+            throw IllegalAccessException("삭제할 권한이 없습니다.")
+        }
     }
 
 
