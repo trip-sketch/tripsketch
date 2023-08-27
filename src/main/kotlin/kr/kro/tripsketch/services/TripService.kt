@@ -42,12 +42,6 @@ class TripService(
     }
 
 
-//    fun getAllTrips(): Set<TripDto> {
-//        val findTrips = tripRepository.findAll()
-//        return findTrips.map { fromTrip(it, false) }.toSet()
-//    }
-
-
     fun getAllTrips(): Set<TripDto> {
         val findTrips = tripRepository.findAll()
         println(findTrips)
