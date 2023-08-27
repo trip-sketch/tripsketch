@@ -8,6 +8,7 @@ import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+@Service
 class TripLikeService(private val tripRepository: TripRepository) {
 
     fun likeTrip(email: String, id: String) {
