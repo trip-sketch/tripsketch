@@ -24,7 +24,7 @@ class FollowService(
             followRepository.save(Follow(follower = followerEmail, following = followingEmail))
             val followerNickname = userService.findUserByEmail(followerEmail)?.nickname ?: "Unknown user"
             notificationService.sendPushNotification(
-                followingEmail,
+                listOf(followingEmail), // 리스트 형태로 전달
                 "구독!",
                 "$followerNickname 님이 당신을 구독했습니다. "
             )
@@ -32,6 +32,7 @@ class FollowService(
             throw IllegalArgumentException("이미 구독 중입니다.")
         }
     }
+
 
     fun unfollow(followerEmail: String, followingNickname: String) {
         val followingEmail = userService.findUserByNickname(followingNickname)?.email
