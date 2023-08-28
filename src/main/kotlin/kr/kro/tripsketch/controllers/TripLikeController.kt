@@ -22,13 +22,13 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         @PathVariable id: String
     ): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String
-        try {
+        return try {
             tripLikeService.likeTrip(email, id)
-            return ResponseEntity.ok("게시물이 좋아요 되었습니다.")
+            ResponseEntity.ok("게시물이 좋아요 되었습니다.")
         } catch (ex: EntityNotFoundException) {
-            return ResponseEntity.notFound().build()
+            ResponseEntity.notFound().build()
         } catch (ex: IllegalStateException) {
-            return ResponseEntity.badRequest().body(ex.message)
+            ResponseEntity.badRequest().body(ex.message)
         }
     }
 
@@ -38,13 +38,13 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         @PathVariable id: String
     ): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String
-        try {
+        return try {
             tripLikeService.unlikeTrip(email, id)
-            return ResponseEntity.ok("게시물 좋아요가 취소되었습니다.")
+            ResponseEntity.ok("게시물 좋아요가 취소되었습니다.")
         } catch (ex: EntityNotFoundException) {
-            return ResponseEntity.notFound().build()
+            ResponseEntity.notFound().build()
         } catch (ex: IllegalStateException) {
-            return ResponseEntity.badRequest().body(ex.message)
+            ResponseEntity.badRequest().body(ex.message)
         }
     }
 }
