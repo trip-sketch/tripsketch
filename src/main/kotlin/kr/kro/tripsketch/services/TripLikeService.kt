@@ -17,7 +17,6 @@ class TripLikeService(private val tripRepository: TripRepository) {
         val trip = tripRepository.findById(tripIdAndEmailDto.id).orElseThrow {
             EntityNotFoundException("조회되는 게시물이 없습니다.")
         }
-
         if (!trip.tripLikes.contains(tripIdAndEmailDto.email)) {
             trip.tripLikes.add(tripIdAndEmailDto.email)
             trip.likes++
@@ -32,14 +31,14 @@ class TripLikeService(private val tripRepository: TripRepository) {
         val trip = tripRepository.findById(tripIdAndEmailDto.id).orElseThrow {
             EntityNotFoundException("조회되는 게시물이 없습니다.")
         }
-
         if (trip.tripLikes.contains(tripIdAndEmailDto.email)) {
             trip.tripLikes.remove(tripIdAndEmailDto.email)
             trip.likes--
             tripRepository.save(trip)
+        } else {
+            throw IllegalStateException("This user has not liked the trip")
         }
     }
-
 }
 
 class EntityNotFoundException(message: String) : RuntimeException(message)
