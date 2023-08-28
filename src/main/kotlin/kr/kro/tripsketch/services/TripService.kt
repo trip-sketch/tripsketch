@@ -72,15 +72,14 @@ class TripService(
         if (!findTrip.tripViews.contains(email) && findTrip.email != email ) {
             findTrip.tripViews.add(email)
             findTrip.views += 1
+            tripRepository.save(findTrip)
         }
 
-        // to-do: likes
-        if (findTrip.tripLikes.contains(email)) {
-            // 좋아요 상태 표시
-            println("좋아요 상태표시")
-        }
+        // to-do: likes - fromTrip 함수에서 처리
+//        if (findTrip.tripLikes.contains(email)) {
+//            println("좋아요 상태표시")
+//        }
 
-        tripRepository.save(findTrip)
         return fromTrip(findTrip, false)
     }
 
