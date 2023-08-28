@@ -6,6 +6,7 @@ import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.services.TripLikeService
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,7 +17,12 @@ import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
-class TripService(private val tripRepository: TripRepository, private val jwtService: JwtService, private val userService: UserService) {
+class TripService(
+    private val tripRepository: TripRepository,
+    private val jwtService: JwtService,
+    private val userService: UserService,
+    private val tripLikeService: TripLikeService
+) {
 
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
 
@@ -34,12 +40,6 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         val createdTrip = tripRepository.save(newTrip)
         return fromTrip(createdTrip, false)
     }
-
-
-//    fun getAllTrips(): Set<TripDto> {
-//        val findTrips = tripRepository.findAll()
-//        return findTrips.map { fromTrip(it, false) }.toSet()
-//    }
 
 
     fun getAllTrips(): Set<TripDto> {
@@ -72,15 +72,14 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
         if (!findTrip.tripViews.contains(email) && findTrip.email != email ) {
             findTrip.tripViews.add(email)
             findTrip.views += 1
+            tripRepository.save(findTrip)
         }
 
-        // to-do: likes
-        if (findTrip.tripLikes.contains(email)) {
-            // 좋아요 상태 표시
-            println("좋아요 상태표시")
-        }
+        // to-do: likes - fromTrip 함수에서 처리
+//        if (findTrip.tripLikes.contains(email)) {
+//            println("좋아요 상태표시")
+//        }
 
-        tripRepository.save(findTrip)
         return fromTrip(findTrip, false)
     }
 
@@ -111,8 +110,20 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     }
 
 
-    fun deleteTripById(email: String, id: String) {
-        tripRepository.deleteById(id)
+    fun deleteTripById(email: String, id: String): Unit {
+//        tripRepository.deleteById(id)
+
+        val findTrip = tripRepository.findById(id).orElseThrow {
+            EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        }
+
+        if (findTrip.email == email) {
+            findTrip.hidden = true
+            findTrip.deletedAt = LocalDateTime.now()
+            tripRepository.save(findTrip)
+        } else {
+            throw IllegalAccessException("삭제할 권한이 없습니다.")
+        }
     }
 
 
@@ -141,6 +152,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
     fun fromTrip(trip: Trip, includeEmail: Boolean = true): TripDto {
 
         val user = userService.findUserByEmail(trip.email)
+        val isLiked = trip.tripLikes.contains(trip.email)  // 사용자의 email 정보를 바로 사용
 
         return if (includeEmail) {
             TripDto(
@@ -161,6 +173,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
+                isLiked = isLiked,
                 images = trip.images
             )
 
@@ -183,6 +196,7 @@ class TripService(private val tripRepository: TripRepository, private val jwtSer
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
 //                tripViews = trip.tripViews,
+                isLiked = isLiked,
                 images = trip.images
             )
         }
