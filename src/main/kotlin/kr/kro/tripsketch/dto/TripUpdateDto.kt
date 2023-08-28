@@ -10,6 +10,8 @@ data class TripUpdateDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     var hashtag: String? = null,
     var updatedAt: LocalDateTime? = null
 )

@@ -13,6 +13,8 @@ data class TripDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
+    val latitude: Double? = null, // 위도
+    val longitude: Double? = null, // 경도
     var hashtag: String? = null,
     var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
