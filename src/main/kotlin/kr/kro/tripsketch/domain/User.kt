@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import org.hibernate.validator.constraints.Length
 import org.jetbrains.annotations.NotNull
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
@@ -27,10 +28,8 @@ data class User(
     @field:Size(max = 500, message = "500글자 이내로 가능합니다.")
     var introduction: String?,
 
-    @field:Pattern(regexp = "^(https?:\\/\\/)?([\\w\\-])+\\.{1}([a-zA-Z]{2,63})([\\/\\w-]*)*\\/?\\??([^\\&\\#\\n])*\\&?([^\\&\\#\\n])*$",
-        message = "올바른 URL 형식이어야 합니다.")
+    @field:Length(min = 5, max = 500, message = "텍스트 길이는 5자 이상 500자 이하이어야 합니다.")
     var profileImageUrl: String?,
-
 
     @field:NotNull
     var createdAt: LocalDateTime = LocalDateTime.now(),
