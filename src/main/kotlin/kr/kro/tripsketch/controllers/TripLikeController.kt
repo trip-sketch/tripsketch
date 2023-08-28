@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import kr.kro.tripsketch.services.JwtService
 
 
+@RestController
 @RequestMapping("api/trip/like")
 class TripLikeController(private val tripLikeService: TripLikeService) {
 
@@ -24,12 +25,13 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         val email = req.getAttribute("userEmail") as String
         return try {
             tripLikeService.likeTrip(email, id)
-            ResponseEntity.ok("게시물이 좋아요 되었습니다.")
+            ResponseEntity.ok("게시물을 좋아요 하였습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
-        } catch (ex: IllegalStateException) {
-            ResponseEntity.badRequest().body(ex.message)
         }
+//        catch (ex: IllegalStateException) {
+//            ResponseEntity.badRequest().body(ex.message)
+//        }
     }
 
     @PostMapping("/{id}/unlike")
@@ -43,9 +45,10 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
             ResponseEntity.ok("게시물 좋아요가 취소되었습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
-        } catch (ex: IllegalStateException) {
-            ResponseEntity.badRequest().body(ex.message)
         }
+//        catch (ex: IllegalStateException) {
+//            ResponseEntity.badRequest().body(ex.message)
+//        }
     }
 }
 
