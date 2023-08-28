@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
+import kr.kro.tripsketch.dto.TripIdAndEmailDto
 import kr.kro.tripsketch.services.TripService
 import kr.kro.tripsketch.services.TripLikeService
 import org.springframework.data.domain.Page
@@ -14,17 +15,19 @@ import kr.kro.tripsketch.services.JwtService
 
 
 @RestController
-@RequestMapping("api/trip/like")
+@RequestMapping("api/trip")
 class TripLikeController(private val tripLikeService: TripLikeService) {
 
-    @PostMapping("/{id}/like")
+    @PostMapping("/like")
     fun likeTrip(
         req: HttpServletRequest,
-        @PathVariable id: String
+//        @PathVariable id: String
+        @RequestBody tripIdAndEmailDto: TripIdAndEmailDto
     ): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String
         return try {
-            tripLikeService.likeTrip(email, id)
+//            tripLikeService.likeTrip(email, id)
+            tripLikeService.likeTrip(tripIdAndEmailDto)
             ResponseEntity.ok("게시물을 좋아요 하였습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
@@ -34,15 +37,17 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
 //        }
     }
 
-    @PostMapping("/{id}/unlike")
+    @PostMapping("/unlike")
     fun unlikeTrip(
         req: HttpServletRequest,
-        @PathVariable id: String
+//        @PathVariable id: String
+        @RequestBody tripIdAndEmailDto: TripIdAndEmailDto
     ): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String
         return try {
-            tripLikeService.unlikeTrip(email, id)
-            ResponseEntity.ok("게시물 좋아요가 취소되었습니다.")
+//            tripLikeService.unlikeTrip(email, id)
+            tripLikeService.likeTrip(tripIdAndEmailDto)
+            ResponseEntity.ok("게시물 좋아요를 취소하였습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
         }

@@ -75,11 +75,6 @@ class TripService(
             tripRepository.save(findTrip)
         }
 
-        // to-do: likes - fromTrip 함수에서 처리
-//        if (findTrip.tripLikes.contains(email)) {
-//            println("좋아요 상태표시")
-//        }
-
         return fromTrip(findTrip, false)
     }
 
@@ -152,7 +147,7 @@ class TripService(
     fun fromTrip(trip: Trip, includeEmail: Boolean = true): TripDto {
 
         val user = userService.findUserByEmail(trip.email)
-        val isLiked = trip.tripLikes.contains(trip.email)  // 사용자의 email 정보를 바로 사용
+        val isLiked = trip.tripLikes.contains(trip.email)
 
         return if (includeEmail) {
             TripDto(
