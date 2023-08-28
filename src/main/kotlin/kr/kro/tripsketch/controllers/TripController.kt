@@ -94,7 +94,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         if (findTrip != null) {
             tripService.deleteTripById(email, id)
 //            return ResponseEntity.noContent().build()
-            return ResponseEntity.ok("게시물이 삭제되었습니다")
+            return ResponseEntity.ok("게시물이 삭제되었습니다.")
         }
         return ResponseEntity.notFound().build()
     }
