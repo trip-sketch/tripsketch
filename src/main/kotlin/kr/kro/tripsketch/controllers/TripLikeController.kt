@@ -1,8 +1,6 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.TripCreateDto
-import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripIdAndEmailDto
 import kr.kro.tripsketch.services.TripService
