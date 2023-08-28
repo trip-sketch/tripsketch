@@ -1,70 +1,80 @@
 package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
-import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.services.AuthService
-import kr.kro.tripsketch.services.KakaoOAuthService
-import kr.kro.tripsketch.utils.EncryptionUtils
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/oauth/kakao")
 class OauthController(
-    private val authService: AuthService,
-    private val kakaoOAuthService: KakaoOAuthService,
+    private val authService: AuthService
 ) {
 
-    @GetMapping("/login")
-    fun startKakaoLogin(response: HttpServletResponse): ResponseEntity<Void> {
-        val kakaoLoginUrl = kakaoOAuthService.getKakaoLoginUrl()
-        response.sendRedirect(kakaoLoginUrl)
-        return ResponseEntity.status(302).build()
-    }
-
     @GetMapping("/callback")
-    fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Any> {
+    fun kakaoCallback(@RequestParam code: String): ResponseEntity<String> {
         val tokenResponse = authService.authenticateViaKakao(code)
-            ?: return ResponseEntity.status(400).body("Authentication failed.")
+            ?: return ResponseEntity.status(400).build() // Authentication failed
 
-        authService.setAuthenticationCookies(response, tokenResponse)
+        val headers = HttpHeaders().apply {
+            set("AccessToken", tokenResponse.accessToken)
+            set("RefreshToken", tokenResponse.refreshToken)
+            set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+        }
 
-        return ResponseEntity.ok().body("Cookies set successfully.")
+        // 로그인 성공 페이지 HTML
+        val responseBody = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Login Successful</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        display: flex; 
+                        justify-content: center; 
+                        align-items: center; 
+                        height: 100vh; 
+                        background-color: #f4f4f4;
+                    }
+                    .message {
+                        padding: 20px;
+                        background-color: #4caf50;
+                        color: white;
+                        border-radius: 5px;
+                    }                
+                </style>
+            </head>
+            <body>
+                <div class="message">
+                    로그인이 성공적으로 완료되었습니다!~
+                </div>
+            </body>
+            </html>
+        """.trimIndent()
+
+        return ResponseEntity.ok().headers(headers).body(responseBody)
     }
 
     @PostMapping("/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
-    fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Any> {
+    fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
         val tokenResponse = authService.refreshUserToken(request)
         return if (tokenResponse != null) {
-            ResponseEntity.ok().body(tokenResponse)
+            val headers = HttpHeaders().apply {
+                set("AccessToken", tokenResponse.accessToken)
+                set("RefreshToken", tokenResponse.refreshToken)
+                set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+            }
+            ResponseEntity.ok().headers(headers).build()
         } else {
-            ResponseEntity.status(400)
-                .body("Unable to refresh the Kakao token. Please check the provided refresh token.")
+            ResponseEntity.status(400).build()
         }
     }
-
-//    @GetMapping("/code")
-//    @ApiResponse(responseCode = "200", description = "카카오 코드를 성공적으로 반환합니다.")
-//    fun kakaoCode(@RequestParam code: String): ResponseEntity<Void> {
-//        val encryptedCode = EncryptionUtils.encryptAES(code)
-//        return ResponseEntity.ok()
-//            .header("X-Encrypted-Code", encryptedCode)  // encryptedCode 'X-Encrypted-Code'라는 헤더로 설정
-//            .build()
-//    }
-//
-//
-//    @PostMapping("/login")
-//    @ApiResponse(responseCode = "200", description = "카카오 로그인이 성공적으로 완료되었습니다.")
-//    @ApiResponse(responseCode = "400", description = "인증에 실패했습니다.")
-//    fun kakaoLogin(@RequestBody request: KakaoLoginRequest): ResponseEntity<Any> {
-//        val decryptedCode = EncryptionUtils.decryptAES(request.code) // 복호화 로직 추가
-//        val tokenResponse = authService.authenticateViaKakao(decryptedCode)
-//            ?: return ResponseEntity.status(400).body("Authentication failed.")
-//        return ResponseEntity.ok().body(tokenResponse)
-//    }
 
 }

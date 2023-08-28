@@ -21,9 +21,15 @@ class UserController(private val userService: UserService) {
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 또는 유효하지 않은 토큰.")
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
-    fun getUser(req: HttpServletRequest): ResponseEntity<Any> { // ResponseEntity의 제네릭 타입을 Any로 변경
+    fun getUser(
+        req: HttpServletRequest,
+        @RequestParam token: String
+    ): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
         val user = userService.findUserByEmail(email)
+
+        userService.storeUserPushToken(email, token)
+
         return if (user != null) {
             ResponseEntity.ok(userService.toDto(user, true)) // 이메일 포함
         } else {
