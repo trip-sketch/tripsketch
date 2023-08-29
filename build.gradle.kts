@@ -82,6 +82,8 @@ dependencies {
     // 오라클 SDK
     implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1"))
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.23.1")
+    implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
+    implementation("org.junit.jupiter:junit-jupiter-engine:5.8.0")
 
     // for EXPO Notification
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
