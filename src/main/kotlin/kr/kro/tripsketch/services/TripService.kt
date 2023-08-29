@@ -62,7 +62,8 @@ class TripService(
 //    }
 
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
-        val findTrip = tripRepository.findById(id).orElse(null)
+//        val findTrip = tripRepository.findById(id).orElse(null)
+        val findTrip = tripRepository.findByIdAndHiddenIsFalse(id)
         ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
         // 조회수
@@ -76,13 +77,15 @@ class TripService(
 
 
     fun getTripById(id: String): TripDto? {
-        val findTrip = tripRepository.findById(id).orElse(null)
+//        val findTrip = tripRepository.findById(id).orElse(null)
+        val findTrip = tripRepository.findByIdAndHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         return fromTrip(findTrip, "",false)
     }
 
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
+//        val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
         val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
         }
