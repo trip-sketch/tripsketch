@@ -94,18 +94,25 @@ class TripController(private val tripService: TripService, private val jwtServic
         req: HttpServletRequest,
         @PathVariable id: String,
         @RequestBody tripUpdateDto: TripUpdateDto)
-    : ResponseEntity<TripDto> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripById(id)
-        if (findTrip != null) {
-            val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
-            return ResponseEntity.ok(updatedTrip)
+    : ResponseEntity<Any> {
+        return try {
+            val email = req.getAttribute("userEmail") as String
+            val findTrip = tripService.getTripById(id)
+            if (findTrip != null) {
+                val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
+                ResponseEntity.ok(updatedTrip)
+            } else {
+                ResponseEntity.notFound().build()
+            }
+        } catch (ex: EntityNotFoundException) {
+            ResponseEntity.notFound().build()
+        } catch (ex: IllegalAccessException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
         }
-        return ResponseEntity.notFound().build()
     }
 
     @DeleteMapping("/{id}")
-    fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> {
+    fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         return try {
             val email = req.getAttribute("userEmail") as String
             val findTrip = tripService.getTripById(id)
