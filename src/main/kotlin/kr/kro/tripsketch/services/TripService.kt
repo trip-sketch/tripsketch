@@ -71,7 +71,7 @@ class TripService(
             findTrip.views += 1
             tripRepository.save(findTrip)
         }
-        return fromTrip(findTrip, "",false)
+        return fromTrip(findTrip, email,false)
     }
 
 
@@ -84,7 +84,7 @@ class TripService(
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
-            EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+            EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
         }
         if (findTrip.email == email) {
             val updateTrip = Trip(
@@ -108,7 +108,7 @@ class TripService(
 
     fun deleteTripById(email: String, id: String): Unit {
         val findTrip = tripRepository.findById(id).orElseThrow {
-            EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+            EntityNotFoundException("삭제할 게시글이 존재하지 않습니다.")
         }
         if (findTrip.email == email) {
             findTrip.hidden = true
