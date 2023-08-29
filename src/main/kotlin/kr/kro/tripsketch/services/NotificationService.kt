@@ -27,6 +27,7 @@ class NotificationService(
             errorMsg
         }
     }
+
     private fun getUserToken(email: String): String? {
         val user = userService.findUserByEmail(email)
         return user?.expoPushToken
