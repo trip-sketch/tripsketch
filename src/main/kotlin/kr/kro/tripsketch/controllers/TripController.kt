@@ -100,7 +100,8 @@ class TripController(private val tripService: TripService, private val jwtServic
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
                 val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
-                ResponseEntity.ok(updatedTrip)
+//                ResponseEntity.ok(updatedTrip)
+                ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
             }
@@ -129,4 +130,20 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
     }
 
+}
+
+//private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
+//    val responseBody = mapOf(
+//        "message" to message,
+//        "trip" to returnedTripDto
+//    )
+//    return this.body(responseBody)
+//}
+
+private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
+    val responseBody = mapOf(
+        "message" to message,
+        "trip" to returnedTripDto
+    )
+    return this.body(responseBody)
 }
