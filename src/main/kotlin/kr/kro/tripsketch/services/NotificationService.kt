@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import org.springframework.stereotype.Service
@@ -17,14 +18,15 @@ class NotificationService(
     private val client = OkHttpClient()
     private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
-    fun sendPushNotification(emails: List<String>, title: String, body: String): String {
+    fun sendPushNotification(emails: List<String>, title: String, body: String): Response {
         val tokens = emails.mapNotNull { getUserToken(it) }
         return if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body)
         } else {
-            val errorMsg = "No valid push tokens found for the given emails."
-            logger.warn(errorMsg)
-            errorMsg
+            Response.Builder()
+                .code(400)  // 예: 400번 코드로 설정
+                .message("No valid push tokens found for the given emails.")
+                .build()
         }
     }
 
@@ -39,7 +41,7 @@ class NotificationService(
         message: String,
         sound: String? = null,
         badge: Int? = null
-    ): String {
+    ): Response {
         val jsonArray = JSONArray()
 
         pushTokens.forEach { token ->
@@ -62,21 +64,6 @@ class NotificationService(
             .post(requestBody)
             .build()
 
-        return try {
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    logger.info("Notification sent successfully!")
-                    "Notification sent successfully!"  // 성공 메시지 반환
-                } else {
-                    val errorMsg = "Failed to send notification: ${response.body?.string()}"
-                    logger.error(errorMsg)
-                    errorMsg  // 에러 메시지 반환
-                }
-            }
-        } catch (e: Exception) {
-            val errorMsg = "Error sending notification: ${e.message}"
-            logger.error(errorMsg, e)
-            errorMsg  // 예외 발생 시 에러 메시지 반환
-        }
+        return client.newCall(request).execute()
     }
 }
