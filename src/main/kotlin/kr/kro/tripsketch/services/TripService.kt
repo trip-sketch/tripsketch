@@ -71,7 +71,6 @@ class TripService(
             findTrip.views += 1
             tripRepository.save(findTrip)
         }
-
         return fromTrip(findTrip, "",false)
     }
 
@@ -79,25 +78,31 @@ class TripService(
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        println(findTrip.id)
         return fromTrip(findTrip, "",false)
     }
 
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
-        val updateTrip = Trip(
-            email = email,
-            title = tripUpdateDto.title,
-            content = tripUpdateDto.content,
-            location = tripUpdateDto.location,
-            startedAt = LocalDateTime.now(),
-            endAt = LocalDateTime.now(),
-            hashtag = tripUpdateDto.hashtag,
-            updatedAt = LocalDateTime.now(),
-            images = tripUpdateDto.images
-        )
-        val updatedTrip = tripRepository.save(updateTrip)
-        return fromTrip(updatedTrip, "",false)
+        val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
+            EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        }
+        if (findTrip.email == email) {
+            val updateTrip = Trip(
+                email = email,
+                title = tripUpdateDto.title,
+                content = tripUpdateDto.content,
+                location = tripUpdateDto.location,
+                startedAt = LocalDateTime.now(),
+                endAt = LocalDateTime.now(),
+                hashtag = tripUpdateDto.hashtag,
+                updatedAt = LocalDateTime.now(),
+                images = tripUpdateDto.images
+            )
+            val updatedTrip = tripRepository.save(updateTrip)
+            return fromTrip(updatedTrip, "",false)
+        } else {
+            throw IllegalAccessException("수정할 권한이 없습니다.")
+        }
     }
 
 
@@ -105,7 +110,6 @@ class TripService(
         val findTrip = tripRepository.findById(id).orElseThrow {
             EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
         }
-
         if (findTrip.email == email) {
             findTrip.hidden = true
             findTrip.deletedAt = LocalDateTime.now()
@@ -139,19 +143,8 @@ class TripService(
     }
 
     fun fromTrip(trip: Trip, currentUserEmail: String, includeEmail: Boolean = true): TripDto {
-
         val user = userService.findUserByEmail(trip.email)
-//        val isLiked = trip.tripLikes.contains(trip.email)
-//        val isLiked = if (currentUserEmail == null) {
-//            false
-//        } else if (currentUserEmail!= null && trip.tripLikes.contains(currentUserEmail)) {
-//            true
-//        } else {
-//            false
-//        }
-
         val isLiked = trip.tripLikes.contains(currentUserEmail)
-
         return if (includeEmail) {
             TripDto(
                 id = trip.id,
@@ -174,7 +167,6 @@ class TripService(
                 isLiked = isLiked,
                 images = trip.images
             )
-
         } else {
             TripDto(
                 id = trip.id,
