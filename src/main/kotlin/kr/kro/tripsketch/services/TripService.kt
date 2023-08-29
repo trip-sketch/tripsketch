@@ -24,6 +24,7 @@ class TripService(
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
             hashtag = tripCreateDto.hashtag,
+            public = tripCreateDto.public,
             images = tripCreateDto.images
         )
         val createdTrip = tripRepository.save(newTrip)
@@ -151,6 +152,7 @@ class TripService(
             startedAt = tripDto.startedAt,
             endAt = tripDto.endAt,
             hashtag = tripDto.hashtag,
+            public = tripDto.public,
             hidden = tripDto.hidden,
             createdAt = tripDto.createdAt,
             updatedAt = tripDto.updatedAt,
@@ -177,6 +179,7 @@ class TripService(
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
                 hashtag = trip.hashtag,
+                public = trip.public ?: true,
                 hidden = trip.hidden,
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
@@ -199,6 +202,7 @@ class TripService(
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
                 hashtag = trip.hashtag,
+                public = trip.public ?: true,
                 hidden = trip.hidden,
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
