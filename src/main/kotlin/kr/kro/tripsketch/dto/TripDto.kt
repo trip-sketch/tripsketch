@@ -16,6 +16,7 @@ data class TripDto(
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
     var hashtag: Set<String>? = setOf(),
+    var public: Boolean,
     var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
