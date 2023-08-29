@@ -132,14 +132,6 @@ class TripController(private val tripService: TripService, private val jwtServic
 
 }
 
-//private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
-//    val responseBody = mapOf(
-//        "message" to message,
-//        "trip" to returnedTripDto
-//    )
-//    return this.body(responseBody)
-//}
-
 private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
     val responseBody = mapOf(
         "message" to message,
