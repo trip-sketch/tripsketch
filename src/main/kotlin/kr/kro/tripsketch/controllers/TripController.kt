@@ -2,14 +2,13 @@ package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.TripCreateDto
-import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripDto
+import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import kr.kro.tripsketch.services.JwtService
 
 
 @RestController
@@ -28,7 +27,21 @@ class TripController(private val tripService: TripService, private val jwtServic
     
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val findTrips = tripService.getAllTrips()
+        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllTrips(email)
+        return ResponseEntity.ok(findTrips)
+    }
+
+    @GetMapping("/trips")
+    fun getAllTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllTripsByUser(email)
+        return ResponseEntity.ok(findTrips)
+    }
+
+    @GetMapping("/guest/trips")
+    fun getAllTripsByGuest(): ResponseEntity<Set<TripDto>> {
+        val findTrips = tripService.getAllTripsByGuest()
         return ResponseEntity.ok(findTrips)
     }
 
@@ -66,7 +79,11 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
         val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
-            ResponseEntity.ok(findTrip)
+            if (!findTrip.hidden) {
+                ResponseEntity.ok(findTrip)
+            } else {
+                ResponseEntity.notFound().build()
+            }
         } else {
             ResponseEntity.notFound().build()
         }
@@ -89,14 +106,20 @@ class TripController(private val tripService: TripService, private val jwtServic
 
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripById(id)
-        if (findTrip != null) {
-            tripService.deleteTripById(email, id)
-//            return ResponseEntity.noContent().build()
-            return ResponseEntity.ok("게시물이 삭제되었습니다.")
+        return try {
+            val email = req.getAttribute("userEmail") as String
+            val findTrip = tripService.getTripById(id)
+            if (findTrip != null) {
+                tripService.deleteTripById(email, id)
+                ResponseEntity.ok("게시물이 삭제되었습니다.")
+            } else {
+                ResponseEntity.notFound().build()
+            }
+        } catch (ex: EntityNotFoundException) {
+            ResponseEntity.notFound().build()
+        } catch (ex: IllegalAccessException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
         }
-        return ResponseEntity.notFound().build()
     }
 
 }

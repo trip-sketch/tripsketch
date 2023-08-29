@@ -1,19 +1,11 @@
 package kr.kro.tripsketch.services
 
-import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.CommentDto
-import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
+import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
-import kr.kro.tripsketch.services.TripLikeService
 import kr.kro.tripsketch.repositories.TripRepository
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import kr.kro.tripsketch.domain.User
-import kr.kro.tripsketch.dto.UserDto
-import kr.kro.tripsketch.repositories.UserRepository
 import java.time.LocalDateTime
 
 @Service
@@ -23,9 +15,7 @@ class TripService(
     private val userService: UserService,
     private val tripLikeService: TripLikeService
 ) {
-
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
-
         val newTrip = Trip( 
             email = email,
             title = tripCreateDto.title,
@@ -36,24 +26,31 @@ class TripService(
             hashtag = tripCreateDto.hashtag,
             images = tripCreateDto.images
         )
-
         val createdTrip = tripRepository.save(newTrip)
-        return fromTrip(createdTrip, false)
+        return fromTrip(createdTrip, email,false)
     }
 
-
-    fun getAllTrips(): Set<TripDto> {
+    fun getAllTrips(email: String): Set<TripDto> {
         val findTrips = tripRepository.findAll()
-        println(findTrips)
-        return findTrips.map { fromTrip(it, false) }.toSet()
+        return findTrips.map { fromTrip(it, email, false) }.toSet()
     }
 
+    fun getAllTripsByUser(email: String): Set<TripDto> {
+        val findTrips = tripRepository.findByHiddenIsFalse()
+        return findTrips.map { fromTrip(it, email,false) }.toSet()
+    }
+
+    fun getAllTripsByGuest(): Set<TripDto> {
+        val findTrips = tripRepository.findByHiddenIsFalse()
+        return findTrips.map { fromTrip(it, "",false) }.toSet()
+    }
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = tripRepository.findTripByEmail(user!!.email)
+//        val findTrips = tripRepository.findTripByEmail(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
 //            ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
-        return findTrips.map { fromTrip(it, false) }.toSet()
+        return findTrips.map { fromTrip(it, "",false) }.toSet()
     }
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
@@ -75,19 +72,19 @@ class TripService(
             tripRepository.save(findTrip)
         }
 
-        return fromTrip(findTrip, false)
+        return fromTrip(findTrip, "",false)
     }
 
 
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        return fromTrip(findTrip, false)
+        println(findTrip.id)
+        return fromTrip(findTrip, "",false)
     }
 
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
-
         val updateTrip = Trip(
             email = email,
             title = tripUpdateDto.title,
@@ -99,15 +96,12 @@ class TripService(
             updatedAt = LocalDateTime.now(),
             images = tripUpdateDto.images
         )
-
         val updatedTrip = tripRepository.save(updateTrip)
-        return fromTrip(updatedTrip, false)
+        return fromTrip(updatedTrip, "",false)
     }
 
 
     fun deleteTripById(email: String, id: String): Unit {
-//        tripRepository.deleteById(id)
-
         val findTrip = tripRepository.findById(id).orElseThrow {
             EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
         }
@@ -144,10 +138,19 @@ class TripService(
         )
     }
 
-    fun fromTrip(trip: Trip, includeEmail: Boolean = true): TripDto {
+    fun fromTrip(trip: Trip, currentUserEmail: String, includeEmail: Boolean = true): TripDto {
 
         val user = userService.findUserByEmail(trip.email)
-        val isLiked = trip.tripLikes.contains(trip.email)
+//        val isLiked = trip.tripLikes.contains(trip.email)
+//        val isLiked = if (currentUserEmail == null) {
+//            false
+//        } else if (currentUserEmail!= null && trip.tripLikes.contains(currentUserEmail)) {
+//            true
+//        } else {
+//            false
+//        }
+
+        val isLiked = trip.tripLikes.contains(currentUserEmail)
 
         return if (includeEmail) {
             TripDto(

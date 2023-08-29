@@ -1,15 +1,15 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.TripDto
-import kr.kro.tripsketch.dto.TripIdAndEmailDto
-import kr.kro.tripsketch.services.TripService
+import kr.kro.tripsketch.dto.TripIdDto
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.TripLikeService
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import kr.kro.tripsketch.services.JwtService
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
@@ -19,39 +19,31 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
     @PostMapping("/like")
     fun likeTrip(
         req: HttpServletRequest,
-//        @PathVariable id: String
-        @RequestBody tripIdAndEmailDto: TripIdAndEmailDto
+        @RequestBody tripIdDto: TripIdDto
     ): ResponseEntity<String> {
-        val email = req.getAttribute("userEmail") as String
+        val email = req.getAttribute("userEmail") as String?
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         return try {
-//            tripLikeService.likeTrip(email, id)
-            tripLikeService.likeTrip(tripIdAndEmailDto)
-            ResponseEntity.ok("게시물을 좋아요 하였습니다.")
+            tripLikeService.likeTrip(email, tripIdDto.id)
+            ResponseEntity.status(HttpStatus.OK).body("해당 게시물을 '좋아요'하였습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
         }
-//        catch (ex: IllegalStateException) {
-//            ResponseEntity.badRequest().body(ex.message)
-//        }
     }
 
     @PostMapping("/unlike")
     fun unlikeTrip(
         req: HttpServletRequest,
-//        @PathVariable id: String
-        @RequestBody tripIdAndEmailDto: TripIdAndEmailDto
+        @RequestBody tripIdDto: TripIdDto
     ): ResponseEntity<String> {
-        val email = req.getAttribute("userEmail") as String
+        val email = req.getAttribute("userEmail") as String?
+            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
         return try {
-//            tripLikeService.unlikeTrip(email, id)
-            tripLikeService.likeTrip(tripIdAndEmailDto)
-            ResponseEntity.ok("게시물 좋아요를 취소하였습니다.")
+            tripLikeService.unlikeTrip(email, tripIdDto.id)
+            ResponseEntity.status(HttpStatus.OK).body("좋아요 취소")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
         }
-//        catch (ex: IllegalStateException) {
-//            ResponseEntity.badRequest().body(ex.message)
-//        }
     }
 }
 
