@@ -17,15 +17,16 @@ class NotificationService(
     private val client = OkHttpClient()
     private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
-    fun sendPushNotification(emails: List<String>, title: String, body: String) {
+    fun sendPushNotification(emails: List<String>, title: String, body: String): String {
         val tokens = emails.mapNotNull { getUserToken(it) }
-        if (tokens.isNotEmpty()) {
+        return if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body)
         } else {
-            logger.warn("No valid push tokens found for the given emails.")
+            val errorMsg = "No valid push tokens found for the given emails."
+            logger.warn(errorMsg)
+            errorMsg
         }
     }
-
     private fun getUserToken(email: String): String? {
         val user = userService.findUserByEmail(email)
         return user?.expoPushToken
@@ -37,7 +38,7 @@ class NotificationService(
         message: String,
         sound: String? = null,
         badge: Int? = null
-    ) {
+    ): String {
         val jsonArray = JSONArray()
 
         pushTokens.forEach { token ->
@@ -60,16 +61,21 @@ class NotificationService(
             .post(requestBody)
             .build()
 
-        try {
+        return try {
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     logger.info("Notification sent successfully!")
+                    "Notification sent successfully!"  // 성공 메시지 반환
                 } else {
-                    logger.error("Failed to send notification: ${response.body?.string()}")
+                    val errorMsg = "Failed to send notification: ${response.body?.string()}"
+                    logger.error(errorMsg)
+                    errorMsg  // 에러 메시지 반환
                 }
             }
         } catch (e: Exception) {
-            logger.error("Error sending notification: ", e)
+            val errorMsg = "Error sending notification: ${e.message}"
+            logger.error(errorMsg, e)
+            errorMsg  // 예외 발생 시 에러 메시지 반환
         }
     }
 }
