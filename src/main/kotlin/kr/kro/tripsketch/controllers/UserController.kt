@@ -11,6 +11,7 @@ import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -75,16 +76,18 @@ class UserController(private val userService: UserService, private val notificat
 
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
-        val responseMessage = notificationService.sendPushNotification(
+        val expoResponse = notificationService.sendPushNotification(
             listOf(notificationRequest.email),
             notificationRequest.title,
             notificationRequest.body
         )
 
-        return if (responseMessage.contains("successfully")) {
-            ResponseEntity.ok(responseMessage)
+        val status = HttpStatus.resolve(expoResponse.code)
+
+        return if (status?.is2xxSuccessful == true) {
+            ResponseEntity.ok(expoResponse.body?.string() ?: "Notification sent successfully!")
         } else {
-            ResponseEntity.badRequest().body(responseMessage)
+            ResponseEntity.status(status ?: HttpStatus.BAD_REQUEST).body(expoResponse.body?.string())
         }
     }
 
