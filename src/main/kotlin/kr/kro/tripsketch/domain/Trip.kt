@@ -3,7 +3,6 @@ package kr.kro.tripsketch.domain
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
-import kr.kro.tripsketch.dto.TripDto
 
 @Document(collection = "trips")
 data class Trip(
@@ -16,8 +15,7 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtag: Set<String>? = setOf(),
-    var hidden: Boolean = false,
+    var hashtag: Set<String>? = setOf(),var hidden: Boolean = false,        // 게시글 삭제 여부
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,

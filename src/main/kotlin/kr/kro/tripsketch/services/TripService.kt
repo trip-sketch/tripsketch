@@ -83,6 +83,22 @@ class TripService(
         return fromTrip(findTrip, "",false)
     }
 
+    // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+
+
+    // to-do : (마이페이지) 카테고리(hashtag) + 닉네임으로 조회
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+
+
+    // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+    // 인기있는 게시물은 어떻게 따지나? (기준 - 조회수, 좋아요 갯수, comment 갯수 있음)
+
+
+    // to-do : (탐색 페이지) 검색어 + 등록일 기준 최신순으로 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
 //        val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
