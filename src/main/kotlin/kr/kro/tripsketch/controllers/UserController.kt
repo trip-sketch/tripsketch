@@ -2,10 +2,12 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
+import kr.kro.tripsketch.dto.NotificationRequest
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService) {
+class UserController(private val userService: UserService, private val notificationService: NotificationService) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -70,4 +72,20 @@ class UserController(private val userService: UserService) {
         val users = userService.getAllUsers(pageable)
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
+
+    @PostMapping("/send")
+    fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
+        val responseMessage = notificationService.sendPushNotification(
+            listOf(notificationRequest.expoPushToken),
+            notificationRequest.title,
+            notificationRequest.body
+        )
+
+        return if (responseMessage.contains("successfully")) {
+            ResponseEntity.ok(responseMessage)
+        } else {
+            ResponseEntity.badRequest().body(responseMessage)
+        }
+    }
+
 }
