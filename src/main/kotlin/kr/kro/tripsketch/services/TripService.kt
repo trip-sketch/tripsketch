@@ -142,6 +142,7 @@ class TripService(
                 images = tripUpdateDto.images
             )
             val updatedTrip = tripRepository.save(updateTrip)
+
             return fromTrip(updatedTrip, "", false)
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
@@ -192,14 +193,19 @@ class TripService(
         val user = userService.findUserByEmail(trip.email)
         val isLiked = trip.tripLikes.contains(currentUserEmail)
         val hashtags = mutableSetOf<String>()
-
+//        println("hashtagInfo: $trip.hashtagInfo added to hashtags")
         trip.hashtagInfo?.let { hashtagInfo ->
-            hashtags.addAll(hashtagInfo.keys)
-            val etcValues: Set<String>? = hashtagInfo["etc"]?.etc
-            if (etcValues != null) {
-                hashtags.addAll(etcValues)
+            with(hashtagInfo) {
+                val nonEmptyFields = listOf(countryCode, country, city, municipality, name, displayName, road, address)
+                hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() })
+                etc?.let {
+                    hashtags.addAll(it)
+                }
             }
         }
+
+
+//        println("hashtags: $hashtags added to hashtags")
 
         return if (includeEmail) {
             TripDto(
@@ -254,9 +260,12 @@ class TripService(
         }
     }
 
-    fun fromTripToUpdate(trip: Trip, currentUserEmail: String, includeEmail: Boolean = true): TripUpdateResponseDto {
+    fun fromTripToUpdate(trip: Trip, currentUserEmail: String, includeEmail: Boolean = false): TripUpdateResponseDto {
         val user = userService.findUserByEmail(trip.email)
         val isLiked = trip.tripLikes.contains(currentUserEmail)
+
+//        println("trip.hashtagInfo")
+//        println(trip.hashtagInfo)
 
         return TripUpdateResponseDto(
             id = trip.id,

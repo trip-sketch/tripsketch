@@ -16,7 +16,7 @@ data class TripUpdateResponseDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtagInfo: Map<String, HashtagInfo>? = null,
+    var hashtagInfo: HashtagInfo? = null,
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도
     var public: Boolean,
