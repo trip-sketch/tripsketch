@@ -4,6 +4,7 @@ import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -11,9 +12,11 @@ import java.time.LocalDateTime
 @Service
 class TripService(
     private val tripRepository: TripRepository,
+    private val followRepository: FollowRepository,
     private val jwtService: JwtService,
     private val userService: UserService,
-    private val tripLikeService: TripLikeService
+    private val tripLikeService: TripLikeService,
+    private val notificationService: NotificationService
 ) {
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
         val newTrip = Trip( 
@@ -28,6 +31,17 @@ class TripService(
             images = tripCreateDto.images
         )
         val createdTrip = tripRepository.save(newTrip)
+
+        // 나를 팔로우하는 사람들에게 알람 보내기 기능
+//        val followingEmail = followRepository.findByFollowing(email)
+//        println(followingEmail)
+//        val followerNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
+//
+//        notificationService.sendPushNotification(
+//            listOf(followingEmail),
+//            "새로운 여행의 시작, 트립스케치",
+//            "님이 새로운 글을 작성하였습니다."
+//        )
         return fromTrip(createdTrip, email,false)
     }
 

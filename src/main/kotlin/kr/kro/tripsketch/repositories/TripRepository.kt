@@ -23,6 +23,7 @@ interface TripRepository : MongoRepository<Trip, String> {
     // public 값이 true이고 hidden 값이 false인 게시물 조회
     fun findByPublicIsTrueAndHiddenIsFalse(): Set<Trip>
 
+
 }
 
 
