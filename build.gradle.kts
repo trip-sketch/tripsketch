@@ -28,6 +28,7 @@ dependencies {
     // 코틀린 리플렉션 기능
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+
     // 스프링 MVC를 사용한 웹 애플리케이션, RESTful 애플리케이션을 만들기 위한 스타터
     // 기본적으로 내장 컨테이너로 Tomcat을 사용합니다.
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -80,8 +81,12 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.17.1")
 
     // 오라클 SDK
-    implementation("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1")
+    implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1"))
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.23.1")
+
+    //테스트 프레임워크
+    implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
+    implementation("org.junit.jupiter:junit-jupiter-engine:5.8.0")
 
     // for EXPO Notification
     implementation("com.squareup.okhttp3:okhttp:4.9.1")

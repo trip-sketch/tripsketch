@@ -1,82 +1,62 @@
 package kr.kro.tripsketch.services
 
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import com.oracle.bmc.ConfigFileReader
-import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
-import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.ObjectStorageClient
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
-import com.oracle.bmc.objectstorage.transfer.UploadConfiguration
-import com.oracle.bmc.objectstorage.transfer.UploadManager
-import com.oracle.bmc.objectstorage.transfer.UploadManager.UploadRequest
-import com.oracle.bmc.objectstorage.transfer.UploadManager.UploadResponse
+import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
+import com.oracle.bmc.objectstorage.requests.GetObjectRequest
+import com.oracle.bmc.objectstorage.responses.GetObjectResponse
+import org.springframework.web.multipart.MultipartFile
+import java.io.File
 import java.io.InputStream
 
 @Service
 class OracleObjectStorageService {
-//    val namespaceName = "oracle.objectstorage.bucketname"
-//    val bucketName = "oracle.objectstorage.namespace"
-//    private val configurationFilePath = "~/resources/config"
-//    private val profile = "DEFAULT"
-//
-//    private val configFile = ConfigFileReader.parse(configurationFilePath, profile)
-//    private val provider = ConfigFileAuthenticationDetailsProvider(configFile)
-//    private val client: ObjectStorage = ObjectStorageClient.builder().build(provider)
-//    private val uploadConfiguration = UploadConfiguration.builder()
-//        .allowMultipartUploads(true)
-//        .allowParallelUploads(true)
-//        .build()
-//    val uploadManager: UploadManager = UploadManager(client, uploadConfiguration)
 
-//    fun uploadImageAndGetUrl(file: MultipartFile): String? {
-//        val objectName = file.originalFilename
-//        val inputStream: InputStream = file.inputStream
-//
-//        val putObjectReq = PutObjectRequest.builder()
-//            .bucketName(bucketName)
-//            .namespaceName(namespaceName)
-//            .objectName(objectName)
-//            .contentType(file.contentType)
-//            .contentLength(file.size)
-//            .build()
-//
-//        val uploadDetails = UploadRequest.builder(inputStream, file.size)
-//            .allowOverwrite(true)
-//            .build(putObjectReq)
-//
-//        val response: UploadResponse = uploadManager.upload(uploadDetails)
-//
-//        inputStream.close()
-//
-//        return objectName?.let { getObjectUrl(it) }
-//    }
+    data class GetObjectResponse(val objectUrl: String?)
 
-//    private fun getObjectUrl(objectName: String): String {
-//        return "https://your-object-storage-url/${bucketName}/${objectName}"
-//    }
-}
+    fun uploadImageAndGetUrl(bucketName: String, file: MultipartFile): String {
+        // OCI SDK 설정
+        val oracleTenancy = "ORACLE_TENANCY"
+        val oracleBaseUrl = "ORACLE_BASEURL"
+        val configFile = ConfigFileReader.parse("~/.oci/config")
+        val authDetailsProvider = ConfigFileAuthenticationDetailsProvider(configFile)
 
+        // Object Storage 클라이언트 생성
+        val objectStorageClient = ObjectStorageClient.builder()
+            .build(authDetailsProvider)
 
-//    fun downloadImageAndGetUrl(objectName: String): String {
-//        val request = GetObjectRequest.builder()
-//                .bucketName(bucketName)
+        try {
+            // 파일 업로드
+            val objectName: String = file.originalFilename ?: "example.txt"
+            val objectData = String(file.bytes)
+            val putObjectRequest = PutObjectRequest.builder()
+                .namespaceName(configFile.get(oracleTenancy))
+                .bucketName(bucketName)
+                .objectName(objectName)
+                .putObjectBody(objectData.byteInputStream())
+                .build()
+            objectStorageClient.putObject(putObjectRequest)
+
+            // 파일 URL 생성
+//            val namespaceName = System.getenv("ORACLE_NAMESPACE")
+//            val getObjectRequest = GetObjectRequest.builder()
 //                .namespaceName(namespaceName)
+//                .bucketName(bucketName)
 //                .objectName(objectName)
 //                .build()
-//
-//        val response: GetObjectResponse = client.getObject(request)
-//
-//        // 다운로드된 객체의 InputStream 가져오기
-//        val inputStream: InputStream = response.inputStream
-//
-//        // InputStream을 파일로 저장하거나, 다운로드할 수 있는 URL을 생성하는 등의 작업을 수행할 수 있습니다.
-//
-//        // InputStream 정리
-//        inputStream.close()
-//
-//        // 객체 URL 가져오기
-//        val objectUrl = getObjectUrl(objectName)
-//
-//        return objectUrl
-//    }
+
+            val bucketUrl = oracleBaseUrl // 버킷 URL
+            val objectUrl = "$bucketUrl/$objectName" // URL 조합
+
+            System.out.println(objectUrl)
+
+            return objectUrl
+
+        } finally {
+            // 연결 종료
+            objectStorageClient.close()
+        }
+    }
+}

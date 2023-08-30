@@ -47,6 +47,7 @@ class WebMvcConfig(
                 "/v3/**",
                 "/hello",
                 "/api/user/nickname",
+                "/api/user/send",
                 "/api/follow/followings",
                 "/api/follow/followers",
                 "/api/oauth/kakao/**",
