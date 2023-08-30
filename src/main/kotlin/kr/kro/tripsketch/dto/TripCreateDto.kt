@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.dto
 
+import kr.kro.tripsketch.domain.HashtagInfo
 import java.time.LocalDateTime
 
 data class TripCreateDto(
@@ -10,6 +11,6 @@ data class TripCreateDto(
     var endAt: LocalDateTime = LocalDateTime.now(),
     val latitude: Double? = null,
     val longitude: Double? = null,
-    var hashtag: Set<String>? = setOf(),
+    var hashtagInfo: Map<String, HashtagInfo>? = null,
     var images: List<String>? = emptyList()
 )
