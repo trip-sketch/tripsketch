@@ -52,7 +52,7 @@ class WebMvcConfig(
                 "/api/follow/followers",
                 "/api/oauth/kakao/**",
                 "/api/comment/guest/**",
-                "/api/trip/nickname",
+                "/api/trip/nickname/**",
                 "/api/trip/guest/**",
                 "/api/geocode",
                 "/api/user/uploadImage"
