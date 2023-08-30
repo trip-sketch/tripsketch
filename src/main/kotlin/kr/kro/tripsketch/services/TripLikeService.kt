@@ -1,42 +1,38 @@
 package kr.kro.tripsketch.services
 
-import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripDto
-import kr.kro.tripsketch.dto.TripCreateDto
-import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
-class TripLikeService(private val tripRepository: TripRepository) {
-
-    fun likeTrip(email: String, id: String) {
-        val trip = tripRepository.findById(id).orElseThrow {
-            EntityNotFoundException("조회되는 게시물이 없습니다.")
-        }
-
-        if (!trip.tripLikes.contains(email)) {
-            trip.tripLikes.add(email)
-            trip.likes++
-            tripRepository.save(trip)
+class TripLikeService(
+    private val tripRepository: TripRepository
+) {
+    fun likeTrip(email: String, tripId: String) {
+        val findTrip = tripRepository.findById(tripId).orElse(null)
+            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
+        println(findTrip)
+        if (!findTrip.tripLikes.contains(email)) {
+            findTrip.tripLikes.add(email)
+            findTrip.likes++
+            tripRepository.save(findTrip)
         } else {
-            throw IllegalStateException("Trip is already liked by this user")
+            throw IllegalStateException("이미 좋아요한 게시물입니다.")
         }
     }
 
-    fun unlikeTrip(email: String, id: String) {
-        val trip = tripRepository.findById(id).orElseThrow {
+    fun unlikeTrip(email: String, tripId: String)  {
+        val findTrip = tripRepository.findById(tripId).orElseThrow {
             EntityNotFoundException("조회되는 게시물이 없습니다.")
         }
-
-        if (trip.tripLikes.contains(email)) {
-            trip.tripLikes.remove(email)
-            trip.likes--
-            tripRepository.save(trip)
+        println(findTrip)
+        if (findTrip.tripLikes.contains(email)) {
+            findTrip.tripLikes.remove(email)
+            findTrip.likes--
+            tripRepository.save(findTrip)
+        } else {
+            throw IllegalStateException("이미 좋아요 취소한 게시물입니다.")
         }
     }
-
 }
 
 class EntityNotFoundException(message: String) : RuntimeException(message)
