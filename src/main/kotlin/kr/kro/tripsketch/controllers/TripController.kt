@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
@@ -78,6 +79,17 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
         val email = req.getAttribute("userEmail") as String
         val findTrip = tripService.getTripByEmailAndId(email, id)
+        return if (findTrip != null) {
+            ResponseEntity.ok(findTrip)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping("modify/{id}")
+    fun getTripByEmailAndIdToUpdate(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripUpdateResponseDto> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrip = tripService.getTripByEmailAndIdToUpdate(email, id)
         return if (findTrip != null) {
             ResponseEntity.ok(findTrip)
         } else {
