@@ -9,6 +9,7 @@ import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 
@@ -115,7 +116,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @RequestBody tripUpdateDto: TripUpdateDto)
+        @Validated @RequestBody tripUpdateDto: TripUpdateDto)
     : ResponseEntity<Any> {
         return try {
             val email = req.getAttribute("userEmail") as String

@@ -19,7 +19,7 @@ data class Trip(
     var hidden: Boolean = false,        // 게시글 삭제 여부
     val latitude: Double? = null,
     val longitude: Double? = null,
-    var hashtagInfo: Map<String, HashtagInfo>? = null,
+    var hashtagInfo: HashtagInfo? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
