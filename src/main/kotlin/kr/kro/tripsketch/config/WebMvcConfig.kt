@@ -53,6 +53,7 @@ class WebMvcConfig(
                 "/api/oauth/kakao/**",
                 "/api/comment/guest/**",
                 "/api/trip/nickname",
+                "/api/trip/guest/**",
                 "/api/geocode"
             )
     }
