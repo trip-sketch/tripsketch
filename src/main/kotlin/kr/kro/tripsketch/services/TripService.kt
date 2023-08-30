@@ -1,10 +1,10 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.domain.HashtagInfo
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.repositories.TripRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -17,21 +17,21 @@ class TripService(
     private val tripLikeService: TripLikeService
 ) {
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
-        val newTrip = Trip( 
+        val newTrip = Trip(
             email = email,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
             location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
-            latitude =tripCreateDto.latitude,
+            latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
             hashtagInfo = tripCreateDto.hashtagInfo,
             public = tripCreateDto.public,
             images = tripCreateDto.images
         )
         val createdTrip = tripRepository.save(newTrip)
-        return fromTrip(createdTrip, email,false)
+        return fromTrip(createdTrip, email, false)
     }
 
     fun getAllTrips(email: String): Set<TripDto> {
@@ -57,7 +57,7 @@ class TripService(
     fun getAllTripsByGuest(): Set<TripDto> {
         val findTrips = tripRepository.findByPublicIsTrueAndHiddenIsFalse()
             ?: throw IllegalArgumentException("작성된 게시글이 존재하지 않습니다.")
-        return findTrips.map { fromTrip(it, "",false) }.toSet()
+        return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
@@ -65,7 +65,7 @@ class TripService(
 //        val findTrips = tripRepository.findTripByEmail(user!!.email)
         val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
 //            ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
-        return findTrips.map { fromTrip(it, "",false) }.toSet()
+        return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
@@ -79,15 +79,21 @@ class TripService(
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
 //        val findTrip = tripRepository.findById(id).orElse(null)
         val findTrip = tripRepository.findByIdAndHiddenIsFalse(id)
-        ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
         // 조회수
-        if (!findTrip.tripViews.contains(email) && findTrip.email != email ) {
+        if (!findTrip.tripViews.contains(email) && findTrip.email != email) {
             findTrip.tripViews.add(email)
             findTrip.views += 1
             tripRepository.save(findTrip)
         }
-        return fromTrip(findTrip, email,false)
+        return fromTrip(findTrip, email, false)
+    }
+
+    fun getTripByEmailAndIdToUpdate(email: String, id: String): TripUpdateResponseDto? {
+        val findTrip = tripRepository.findByIdAndHiddenIsFalse(id)
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        return fromTripToUpdate(findTrip, email, false)
     }
 
 
@@ -95,7 +101,7 @@ class TripService(
 //        val findTrip = tripRepository.findById(id).orElse(null)
         val findTrip = tripRepository.findByIdAndHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        return fromTrip(findTrip, "",false)
+        return fromTrip(findTrip, "", false)
     }
 
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
@@ -128,7 +134,7 @@ class TripService(
                 location = tripUpdateDto.location,
                 startedAt = LocalDateTime.now(),
                 endAt = LocalDateTime.now(),
-                latitude =tripUpdateDto.latitude,
+                latitude = tripUpdateDto.latitude,
                 longitude = tripUpdateDto.longitude,
                 hashtagInfo = tripUpdateDto.hashtagInfo,
                 public = tripUpdateDto.public,
@@ -136,7 +142,7 @@ class TripService(
                 images = tripUpdateDto.images
             )
             val updatedTrip = tripRepository.save(updateTrip)
-            return fromTrip(updatedTrip, "",false)
+            return fromTrip(updatedTrip, "", false)
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }
@@ -195,7 +201,6 @@ class TripService(
             }
         }
 
-
         return if (includeEmail) {
             TripDto(
                 id = trip.id,
@@ -208,7 +213,7 @@ class TripService(
                 location = trip.location,
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
-                latitude =trip.latitude,
+                latitude = trip.latitude,
                 longitude = trip.longitude,
                 hashtag = hashtags,
                 public = trip.public ?: true,
@@ -234,7 +239,7 @@ class TripService(
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
                 public = trip.public ?: true,
-                latitude =trip.latitude,
+                latitude = trip.latitude,
                 longitude = trip.longitude,
                 hashtag = hashtags,
                 hidden = trip.hidden,
@@ -247,6 +252,36 @@ class TripService(
                 images = trip.images
             )
         }
+    }
+
+    fun fromTripToUpdate(trip: Trip, currentUserEmail: String, includeEmail: Boolean = true): TripUpdateResponseDto {
+        val user = userService.findUserByEmail(trip.email)
+        val isLiked = trip.tripLikes.contains(currentUserEmail)
+
+        return TripUpdateResponseDto(
+            id = trip.id,
+            email = trip.email,
+            nickname = user!!.nickname,
+            title = trip.title,
+            content = trip.content,
+            likes = trip.likes,
+            views = trip.views,
+            location = trip.location,
+            startedAt = trip.startedAt,
+            endAt = trip.endAt,
+            latitude = trip.latitude,
+            longitude = trip.longitude,
+            hashtagInfo = trip.hashtagInfo,
+            public = trip.public ?: true,
+            hidden = trip.hidden,
+            createdAt = trip.createdAt,
+            updatedAt = trip.updatedAt,
+            deletedAt = trip.deletedAt,
+            tripLikes = trip.tripLikes,
+//                tripViews = trip.tripViews,
+            isLiked = isLiked,
+            images = trip.images
+        )
     }
 
 }
