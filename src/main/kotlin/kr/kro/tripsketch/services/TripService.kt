@@ -180,28 +180,7 @@ class TripService(
 //            images = tripDto.images
 //        )
 //    }
-    fun toTrip(tripDto: TripDto): Trip {
-        return Trip(
-            id = tripDto.id,
-            email = tripDto.email!!,
-            title = tripDto.title,
-            content = tripDto.content,
-            likes = tripDto.likes!!,
-            views = tripDto.views!!,
-            location = tripDto.location,
-            startedAt = tripDto.startedAt,
-            endAt = tripDto.endAt,
-            hashtag = tripDto.hashtag,
-            public = tripDto.public,
-            hidden = tripDto.hidden,
-            createdAt = tripDto.createdAt,
-            updatedAt = tripDto.updatedAt,
-            deletedAt = tripDto.deletedAt,
-            tripLikes = tripDto.tripLikes,
-//            tripViews = tripDto.tripViews,
-            images = tripDto.images
-        )
-    }
+
 
     fun fromTrip(trip: Trip, currentUserEmail: String, includeEmail: Boolean = true): TripDto {
         val user = userService.findUserByEmail(trip.email)

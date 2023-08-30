@@ -20,7 +20,6 @@ data class Trip(
     val latitude: Double? = null,
     val longitude: Double? = null,
     var hashtagInfo: Map<String, HashtagInfo>? = null,
-    var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
