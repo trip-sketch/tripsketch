@@ -24,7 +24,9 @@ class TripController(private val tripService: TripService, private val jwtServic
         val createdTrip = tripService.createTrip(email, tripCreateDto)
         return ResponseEntity.ok(createdTrip)
     }
-    
+
+
+    // trip 게시글 전체 조회 (public, hidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val email = req.getAttribute("userEmail") as String
@@ -40,9 +42,17 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     @GetMapping("/guest/trips")
-    fun getAllTripsByGuest(): ResponseEntity<Set<TripDto>> {
-        val findTrips = tripService.getAllTripsByGuest()
-        return ResponseEntity.ok(findTrips)
+    fun getAllTripsByGuest(): ResponseEntity<Any> {
+        return try {
+            val findTrips = tripService.getAllTripsByGuest()
+            if (findTrips.isNotEmpty()) {
+                ResponseEntity.ok(findTrips)
+            } else {
+                ResponseEntity.notFound().build()
+            }
+        } catch (ex: IllegalAccessException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
+        }
     }
 
     @GetMapping("/nickname")
