@@ -99,9 +99,9 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
-    @PostMapping("/uploadImage")
-    fun uploadImage(@RequestBody uploadFileRequest: UploadFileRequest, @RequestParam("bucketName") bucketName: String): ResponseEntity<String> {
-        val imageUrl = oracleObjectStorageService.uploadImageAndGetUrl(bucketName, uploadFileRequest.file)
+    @PostMapping("/uploadImage", consumes = ["multipart/form-data"])
+    fun uploadImage(@RequestParam("file") uploadFile: MultipartFile, @RequestParam("bucketName") bucketName: String): ResponseEntity<String> {
+        val imageUrl = oracleObjectStorageService.uploadImageAndGetUrl(bucketName, uploadFile)
         return ResponseEntity.ok(imageUrl)
     }
 }
