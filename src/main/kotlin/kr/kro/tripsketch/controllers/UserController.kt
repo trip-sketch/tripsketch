@@ -79,7 +79,11 @@ class UserController(private val userService: UserService, private val notificat
         val expoResponse = notificationService.sendPushNotification(
             listOf(notificationRequest.email),
             notificationRequest.title,
-            notificationRequest.body
+            notificationRequest.body,
+            notificationRequest.commentId,
+            notificationRequest.parentId,
+            notificationRequest.tripId,
+            notificationRequest.nickname
         )
 
         val status = HttpStatus.resolve(expoResponse.code)
