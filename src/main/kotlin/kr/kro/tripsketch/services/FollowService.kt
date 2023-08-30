@@ -26,7 +26,8 @@ class FollowService(
             notificationService.sendPushNotification(
                 listOf(followingEmail), // 리스트 형태로 전달
                 "새로운 여행의 시작, 트립스케치",
-                "$followerNickname 님이 당신을 구독했습니다. "
+                "$followerNickname 님이 당신을 구독했습니다. ",
+                nickname = followerNickname  // 팔로워의 닉네임을 데이터로 전달
             )
         } else {
             throw IllegalArgumentException("이미 구독 중입니다.")

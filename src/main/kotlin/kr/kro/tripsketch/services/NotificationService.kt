@@ -16,12 +16,19 @@ class NotificationService(
 ) {
 
     private val client = OkHttpClient()
-    private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
-    fun sendPushNotification(emails: List<String>, title: String, body: String): Response {
+    fun sendPushNotification(
+        emails: List<String>,
+        title: String,
+        body: String,
+        commentId: String? = null,
+        parentId: String? = null,
+        tripId: String? = null,
+        nickname: String? = null
+    ): Response {
         val tokens = emails.mapNotNull { getUserToken(it) }
         return if (tokens.isNotEmpty()) {
-            sendExpoPushNotification(tokens, title, body)
+            sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname)
         } else {
             Response.Builder()
                 .code(400)  // 예: 400번 코드로 설정
@@ -39,16 +46,28 @@ class NotificationService(
         pushTokens: List<String>,
         title: String,
         message: String,
+        commentId: String? = null,
+        parentId: String? = null,
+        tripId: String? = null,
+        nickname: String? = null,
         sound: String? = null,
         badge: Int? = null
     ): Response {
         val jsonArray = JSONArray()
 
         pushTokens.forEach { token ->
+            val dataJson = JSONObject().apply {
+                commentId?.let { put("commentId", it) }
+                parentId?.let { put("parentId", it) }  // parentId 추가
+                tripId?.let { put("tripId", it) }
+                nickname?.let { put("nickname", it) }
+            }
+
             val json = JSONObject()
                 .put("to", "ExponentPushToken[$token]")
                 .put("title", title)
                 .put("body", message)
+                .put("data", dataJson)
 
             sound?.let { json.put("sound", it) }
             badge?.let { json.put("badge", it) }
