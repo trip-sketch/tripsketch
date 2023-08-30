@@ -83,6 +83,7 @@ dependencies {
     // 오라클 SDK
     implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1"))
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.23.1")
+    implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey:3.23.1")
 
     //테스트 프레임워크
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
