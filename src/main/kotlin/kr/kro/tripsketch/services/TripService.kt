@@ -37,15 +37,18 @@ class TripService(
     }
 
     fun getAllTripsByUser(email: String): Set<TripDto> {
-        val findTrips = tripRepository.findByHiddenIsFalse()
-        return findTrips.map { fromTrip(it, email,false) }.toSet()
+//        val findTrips = tripRepository.findByHiddenIsFalse()
+//        return findTrips.map { fromTrip(it, email,false) }.toSet()
 
-        // to-do : 매개변수 이메일과 findTrips 에서의 email 과 동일하다면 비공개 포함하여 보여줌 - findByHiddenIsFalse
-
-
-        // to-do : 같지않다면 공개 게시물만 보여줌 - findByPublicIsTrueAndHiddenIsFalse
-
-
+        val findTrips: Set<Trip> = if (email.isNotEmpty()) {
+            // to-do : 매개변수 이메일과 findTrips 에서의 email 과 동일하다면 비공개 포함하여 보여줌 - findByHiddenIsFalse
+            tripRepository.findTripByEmail(email) +
+                    tripRepository.findByPublicIsTrueAndHiddenIsFalse()
+        } else {
+            // to-do : 같지않다면 공개 게시물만 보여줌 - findByPublicIsTrueAndHiddenIsFalse
+            tripRepository.findByPublicIsTrueAndHiddenIsFalse()
+        }
+        return findTrips.map { fromTrip(it, email, false) }.toSet()
     }
 
     fun getAllTripsByGuest(): Set<TripDto> {
