@@ -25,7 +25,7 @@ class FollowService(
             val followerNickname = userService.findUserByEmail(followerEmail)?.nickname ?: "Unknown user"
             notificationService.sendPushNotification(
                 listOf(followingEmail), // 리스트 형태로 전달
-                "구독!",
+                "트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. "
             )
         } else {
