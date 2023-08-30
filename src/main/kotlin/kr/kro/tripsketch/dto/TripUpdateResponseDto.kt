@@ -1,10 +1,11 @@
 package kr.kro.tripsketch.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import kr.kro.tripsketch.domain.HashtagInfo
 import java.time.LocalDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class TripDto(
+data class TripUpdateResponseDto(
     var id: String? = null,
     var email: String?,
     var nickname: String?,
@@ -15,7 +16,7 @@ data class TripDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    var hashtag: Set<String>? = setOf(),
+    var hashtagInfo: HashtagInfo? = null,
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도
     var public: Boolean,
