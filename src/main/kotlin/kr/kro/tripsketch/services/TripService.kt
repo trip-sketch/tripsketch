@@ -39,10 +39,18 @@ class TripService(
     fun getAllTripsByUser(email: String): Set<TripDto> {
         val findTrips = tripRepository.findByHiddenIsFalse()
         return findTrips.map { fromTrip(it, email,false) }.toSet()
+
+        // to-do : 매개변수 이메일과 findTrips 에서의 email 과 동일하다면 비공개 포함하여 보여줌 - findByHiddenIsFalse
+
+
+        // to-do : 같지않다면 공개 게시물만 보여줌 - findByPublicIsTrueAndHiddenIsFalse
+
+
     }
 
     fun getAllTripsByGuest(): Set<TripDto> {
-        val findTrips = tripRepository.findByHiddenIsFalse()
+        val findTrips = tripRepository.findByPublicIsTrueAndHiddenIsFalse()
+            ?: throw IllegalArgumentException("작성된 게시글이 존재하지 않습니다.")
         return findTrips.map { fromTrip(it, "",false) }.toSet()
     }
 
@@ -115,6 +123,7 @@ class TripService(
                 startedAt = LocalDateTime.now(),
                 endAt = LocalDateTime.now(),
                 hashtag = tripUpdateDto.hashtag,
+                public = tripUpdateDto.public,
                 updatedAt = LocalDateTime.now(),
                 images = tripUpdateDto.images
             )

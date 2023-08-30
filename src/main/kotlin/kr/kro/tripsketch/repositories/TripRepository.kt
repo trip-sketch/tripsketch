@@ -19,6 +19,11 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     // email과 hidden 값이 false인 게시물 조회
     fun findTripByEmailAndHiddenIsFalse(email: String): Set<Trip>
+
+    // public 값이 true이고 hidden 값이 false인 게시물 조회
+    fun findByPublicIsTrueAndHiddenIsFalse(): Set<Trip>
+
+
 }
 
 
