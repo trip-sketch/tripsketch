@@ -8,7 +8,6 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import org.springframework.stereotype.Service
-import org.slf4j.LoggerFactory
 
 @Service
 class NotificationService(
