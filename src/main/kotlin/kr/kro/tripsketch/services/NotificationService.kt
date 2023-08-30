@@ -28,7 +28,7 @@ class NotificationService(
     ): Response {
         val tokens = emails.mapNotNull { getUserToken(it) }
         return if (tokens.isNotEmpty()) {
-            sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl = profileUrl)
+            sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
             Response.Builder()
                 .code(400)  // 예: 400번 코드로 설정
