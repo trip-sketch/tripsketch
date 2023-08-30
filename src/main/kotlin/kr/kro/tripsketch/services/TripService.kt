@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.domain.Trip
+import kr.kro.tripsketch.domain.HashtagInfo
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripCreateDto
@@ -163,9 +164,10 @@ class TripService(
 
         trip.hashtagInfo?.let { hashtagInfo ->
             hashtags.addAll(hashtagInfo.keys)
-//            hashtagInfo.etc?.let { etcValues: Set<String> ->
-//                hashtags.addAll(etcValues)
-//            }
+            val etcValues: Set<String>? = hashtagInfo["etc"]?.etc
+            if (etcValues != null) {
+                hashtags.addAll(etcValues)
+            }
         }
 
 
