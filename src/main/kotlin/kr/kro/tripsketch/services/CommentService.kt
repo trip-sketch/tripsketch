@@ -6,6 +6,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import kr.kro.tripsketch.repositories.TripRepository
 import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,7 +16,9 @@ import java.time.LocalDateTime
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val notificationService: NotificationService,
+    private val tripRepository: TripRepository
 ) {
 
     fun getAllComments(pageable: Pageable): Page<CommentDto> {
@@ -53,12 +56,27 @@ class CommentService(
     // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
     fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
+        val findTrip = tripRepository.findByIdAndHiddenIsFalse(commentCreateDto.tripId)
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        val commenter = userRepository.findByEmail(email)
         val comment = Comment(
             userEmail = email,
             tripId = commentCreateDto.tripId,
             content = commentCreateDto.content,
         )
         val createdComment = commentRepository.save(comment)
+
+        val tripEmail = findTrip.email
+        // 알림 적용
+        notificationService.sendPushNotification(
+            listOf(tripEmail),
+            "새로운 여행의 시작, 트립스케치",
+            "${commenter!!.nickname} 님이 댓글을 남겼습니다. ",
+            nickname = commenter!!.nickname,
+            profileUrl = commenter!!.profileImageUrl,
+            tripId = comment.tripId,
+            commentId = comment.id
+        )
         return fromComment(createdComment, userRepository)
     }
 
