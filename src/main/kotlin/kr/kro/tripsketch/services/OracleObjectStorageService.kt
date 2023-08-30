@@ -1,16 +1,12 @@
 package kr.kro.tripsketch.services
 
 import org.springframework.stereotype.Service
-import com.oracle.bmc.ConfigFileReader
 import com.oracle.bmc.objectstorage.ObjectStorageClient
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest
-import com.oracle.bmc.objectstorage.responses.GetObjectResponse
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import java.io.InputStream
 import java.util.*
 
 @Service
@@ -42,12 +38,11 @@ class OracleObjectStorageService {
         try {
             // 파일 업로드
             val objectName: String = file.originalFilename ?: "example.txt"
-            val objectData = String(file.bytes)
             val putObjectRequest = PutObjectRequest.builder()
                 .namespaceName(oracleTenancy)
                 .bucketName(bucketName)
                 .objectName(objectName)
-                .putObjectBody(objectData.byteInputStream())
+                .putObjectBody(file.inputStream)  // 이 부분이 수정됨
                 .build()
             objectStorageClient.putObject(putObjectRequest)
 
@@ -59,8 +54,7 @@ class OracleObjectStorageService {
                  .objectName(objectName)
                  .build()
 
-            val bucketUrl = oracleBaseUrl // 버킷 URL
-            val objectUrl = "$bucketUrl/$objectName" // URL 조합
+            val objectUrl = "$oracleBaseUrl/$objectName" // URL 조합
 
             println(objectUrl)
 
