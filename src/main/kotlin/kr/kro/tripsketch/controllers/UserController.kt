@@ -9,16 +9,20 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
+import kr.kro.tripsketch.services.OracleObjectStorageService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import kr.kro.tripsketch.dto.UploadFileRequest
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val notificationService: NotificationService) {
+class UserController(private val userService: UserService, private val notificationService: NotificationService, private val oracleObjectStorageService: OracleObjectStorageService) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -79,7 +83,11 @@ class UserController(private val userService: UserService, private val notificat
         val expoResponse = notificationService.sendPushNotification(
             listOf(notificationRequest.email),
             notificationRequest.title,
-            notificationRequest.body
+            notificationRequest.body,
+            notificationRequest.commentId,
+            notificationRequest.parentId,
+            notificationRequest.tripId,
+            notificationRequest.nickname
         )
 
         val status = HttpStatus.resolve(expoResponse.code)
@@ -91,4 +99,9 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
+    @PostMapping("/uploadImage", consumes = ["multipart/form-data"])
+    fun uploadImage(@RequestParam("file") uploadFile: MultipartFile, @RequestParam("bucketName") bucketName: String): ResponseEntity<String> {
+        val imageUrl = oracleObjectStorageService.uploadImageAndGetUrl(bucketName, uploadFile)
+        return ResponseEntity.ok(imageUrl)
+    }
 }
