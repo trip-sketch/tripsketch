@@ -12,5 +12,6 @@ data class TripCreateDto(
     val latitude: Double? = null,
     val longitude: Double? = null,
     var hashtagInfo: Map<String, HashtagInfo>? = null,
+    var public: Boolean? = true,
     var images: List<String>? = emptyList()
 )

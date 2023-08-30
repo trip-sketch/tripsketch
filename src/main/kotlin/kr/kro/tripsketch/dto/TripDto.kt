@@ -18,6 +18,7 @@ data class TripDto(
     var hashtag: Set<String>? = setOf(),
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도
+    var public: Boolean,
     var hidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
