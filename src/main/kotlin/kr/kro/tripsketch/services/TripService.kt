@@ -33,15 +33,21 @@ class TripService(
         val createdTrip = tripRepository.save(newTrip)
 
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
-//        val followingEmail = followRepository.findByFollowing(email)
-//        println(followingEmail)
-//        val followerNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
-//
-//        notificationService.sendPushNotification(
-//            listOf(followingEmail),
-//            "새로운 여행의 시작, 트립스케치",
-//            "님이 새로운 글을 작성하였습니다."
-//        )
+//        val followerEmails = followRepository.findByFollowing(email)
+        val followers = followRepository.findByFollowing(email)
+        val filteredFollowers = followers.filter { it.follower != email }
+        val followerEmails = filteredFollowers.map { it.follower }
+        val followingNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
+
+        notificationService.sendPushNotification(
+            followerEmails,
+            "새로운 여행의 시작, 트립스케치",
+            "$followingNickname 님이 새로운 글을 작성하였습니다.",
+            null,
+            null,
+            createdTrip.id,
+            followingNickname
+        )
         return fromTrip(createdTrip, email,false)
     }
 
