@@ -33,7 +33,9 @@ class TripService(
             location = tripCreateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
-            hashtag = tripCreateDto.hashtag,
+            latitude =tripCreateDto.latitude,
+            longitude = tripCreateDto.longitude,
+            hashtagInfo = tripCreateDto.hashtagInfo,
             images = tripCreateDto.images
         )
 
@@ -100,7 +102,9 @@ class TripService(
             location = tripUpdateDto.location,
             startedAt = LocalDateTime.now(),
             endAt = LocalDateTime.now(),
-            hashtag = tripUpdateDto.hashtag,
+            latitude =tripUpdateDto.latitude,
+            longitude = tripUpdateDto.longitude,
+            hashtagInfo = tripUpdateDto.hashtagInfo,
             updatedAt = LocalDateTime.now(),
             images = tripUpdateDto.images
         )
@@ -127,32 +131,43 @@ class TripService(
     }
 
 
-    fun toTrip(tripDto: TripDto): Trip {
-        return Trip(
-            id = tripDto.id,
-            email = tripDto.email!!,
-            title = tripDto.title,
-            content = tripDto.content,
-            likes = tripDto.likes!!,
-            views = tripDto.views!!,
-            location = tripDto.location,
-            startedAt = tripDto.startedAt,
-            endAt = tripDto.endAt,
-            hashtag = tripDto.hashtag,
-            hidden = tripDto.hidden,
-            createdAt = tripDto.createdAt,
-            updatedAt = tripDto.updatedAt,
-            deletedAt = tripDto.deletedAt,
-            tripLikes = tripDto.tripLikes,
-//            tripViews = tripDto.tripViews,
-            images = tripDto.images
-        )
-    }
+//    fun toTrip(tripDto: TripDto): Trip {
+//        return Trip(
+//            id = tripDto.id,
+//            email = tripDto.email!!,
+//            title = tripDto.title,
+//            content = tripDto.content,
+//            likes = tripDto.likes!!,
+//            views = tripDto.views!!,
+//            location = tripDto.location,
+//            startedAt = tripDto.startedAt,
+//            endAt = tripDto.endAt,
+//            latitude =tripDto.latitude,
+//            longitude = tripDto.longitude,
+//            hashtagInfo = tripDto.hashtag,
+//            hidden = tripDto.hidden,
+//            createdAt = tripDto.createdAt,
+//            updatedAt = tripDto.updatedAt,
+//            deletedAt = tripDto.deletedAt,
+//            tripLikes = tripDto.tripLikes,
+////            tripViews = tripDto.tripViews,
+//            images = tripDto.images
+//        )
+//    }
 
     fun fromTrip(trip: Trip, includeEmail: Boolean = true): TripDto {
 
         val user = userService.findUserByEmail(trip.email)
         val isLiked = trip.tripLikes.contains(trip.email)  // 사용자의 email 정보를 바로 사용
+        val hashtags = mutableSetOf<String>()
+
+        trip.hashtagInfo?.let { hashtagInfo ->
+            hashtags.addAll(hashtagInfo.keys)
+//            hashtagInfo.etc?.let { etcValues: Set<String> ->
+//                hashtags.addAll(etcValues)
+//            }
+        }
+
 
         return if (includeEmail) {
             TripDto(
@@ -166,7 +181,9 @@ class TripService(
                 location = trip.location,
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
-                hashtag = trip.hashtag,
+                latitude =trip.latitude,
+                longitude = trip.longitude,
+                hashtag = hashtags,
                 hidden = trip.hidden,
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
@@ -189,7 +206,9 @@ class TripService(
                 location = trip.location,
                 startedAt = trip.startedAt,
                 endAt = trip.endAt,
-                hashtag = trip.hashtag,
+                latitude =trip.latitude,
+                longitude = trip.longitude,
+                hashtag = hashtags,
                 hidden = trip.hidden,
                 createdAt = trip.createdAt,
                 updatedAt = trip.updatedAt,
