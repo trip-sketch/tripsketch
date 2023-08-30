@@ -63,6 +63,12 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
+    @GetMapping("/nickname/category")
+    fun getTripCategoryByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
+        val findTrips = tripService.getTripCategoryByNickname(nickname)
+        return ResponseEntity.ok(findTrips)
+    }
+
 //    @GetMapping("/nickname")
 //    fun getTripByNickname(
 //        @RequestParam nickname: String,
