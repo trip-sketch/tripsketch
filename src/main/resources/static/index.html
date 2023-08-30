@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      .wrap {
+        margin: 0 auto;
+        max-width: 640px;
+        background-color: rgba(0, 0, 0, 0.4);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .popup {
+        background-color: #fff;
+        width: 60%;
+        height: 130px;
+        border-radius: 5px;
+        font-size: 18px;
+      }
+
+      .loadingMark {
+        width: 60px;
+        height: 60px;
+      }
+
+      .loader {
+        height: 20px;
+        width: 160px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+      .loader_dot {
+        animation-name: loader;
+        animation-timing-function: ease-in-out;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        height: 12px;
+        width: 12px;
+        border-radius: 100%;
+        position: absolute;
+      }
+      .loader_dot:first-child {
+        background-color: #60beeb;
+        opacity: 0.05;
+        animation-delay: 0.5s;
+      }
+      .loader_dot:nth-child(2) {
+        background-color: #60beeb;
+        opacity: 0.2;
+        animation-delay: 0.4s;
+      }
+      .loader_dot:nth-child(3) {
+        background-color: #60beeb;
+        opacity: 0.4;
+        animation-delay: 0.3s;
+      }
+      .loader_dot:nth-child(4) {
+        background-color: #60beeb;
+        opacity: 0.6;
+        animation-delay: 0.2s;
+      }
+      .loader_dot:nth-child(5) {
+        background-color: #60beeb;
+        opacity: 0.8;
+        animation-delay: 0.1s;
+      }
+      .loader_dott:nth-child(6) {
+        background-color: transparent;
+        border-radius: 0;
+        animation-delay: 0s;
+      }
+
+      .loader_dot:nth-child(6) > img {
+        width: 25px;
+        transform: translateY(-6px);
+      }
+
+      @keyframes loader {
+        0% {
+          transform: translateX(0);
+        }
+        55% {
+          transform: translateX(140px);
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateX(140px);
+          opacity: 0;
+        }
+      }
+
+      .text {
+        text-align: center;
+        margin-top: 17px;
+        font-size: 14px;
+      }
+
+      .highlight {
+        display: inline;
+        box-shadow: inset 0 -10px 0 #dbedff;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="popup">
+        <div class="loadingMark">
+          <div class="loader">
+            <div class="loader_dot"></div>
+            <div class="loader_dot"></div>
+            <div class="loader_dot"></div>
+            <div class="loader_dot"></div>
+            <div class="loader_dot"></div>
+            <div class="loader_dot">
+              <img src="https://objectstorage.ap-osaka-1.oraclecloud.com/p/9ACBoDicl1iWGQHm-hdwn3UdKKDFfhc5lsVjGmVnhPvKOkwQkM6KVdEIdp5is70i/n/ax6izwmsuv9c/b/image-tripsketch/o/icon.png" alt="비행기"/>
+            </div>
+          </div>
+        </div>
+        <div class="text"><span class="highlight">로그인 중입니다.</div>
+      </div>
+    </div>
+  </body>
+</html>
+

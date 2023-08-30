@@ -3,6 +3,7 @@ package kr.kro.tripsketch.controllers
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
+import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("api/oauth/kakao")
 class OauthController(
-    private val authService: AuthService
+    private val authService: AuthService, private val resourceLoader: ResourceLoader,
 ) {
 
     @GetMapping("/callback")
@@ -24,41 +25,12 @@ class OauthController(
             set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
         }
 
-        // 로그인 성공 페이지 HTML
-        val responseBody = """
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Login Successful</title>
-                <style>
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        display: flex; 
-                        justify-content: center; 
-                        align-items: center; 
-                        height: 100vh; 
-                        background-color: #f4f4f4;
-                    }
-                    .message {
-                        padding: 20px;
-                        background-color: #4caf50;
-                        color: white;
-                        border-radius: 5px;
-                    }                
-                </style>
-            </head>
-            <body>
-                <div class="message">
-                    로그인이 성공적으로 완료되었습니다!~
-                </div>
-            </body>
-            </html>
-        """.trimIndent()
+        val resource = resourceLoader.getResource("classpath:/static/index.html")
+        val responseBody = resource.inputStream.bufferedReader().readText()
 
         return ResponseEntity.ok().headers(headers).body(responseBody)
     }
+
 
     @PostMapping("/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
