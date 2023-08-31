@@ -133,7 +133,7 @@ class TripService(
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
 //        val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
-        val findTrip = tripRepository.findById(tripUpdateDto.id!!).orElseThrow {
+        val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
         }
         if (findTrip.email == email) {
@@ -145,7 +145,7 @@ class TripService(
                 endAt = tripUpdateDto.endAt ?: endAt
                 hashtag = tripUpdateDto.hashtag
                 public = tripUpdateDto.public
-                updatedAt = LocalDateTime.now()
+//                updatedAt = LocalDateTime.now()
                 images = tripUpdateDto.images
             }
             val updatedTrip = tripRepository.save(findTrip)

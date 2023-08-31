@@ -19,8 +19,8 @@ data class Trip(
     var public: Boolean? = true,        // 게시글 전체공개 또는 비공개 여부
     var hidden: Boolean = false,        // 게시글 삭제 여부
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    var updatedAt: LocalDateTime? = null,
-    var deletedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = LocalDateTime.now(),
+    var deletedAt: LocalDateTime? = LocalDateTime.now(),
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList()
