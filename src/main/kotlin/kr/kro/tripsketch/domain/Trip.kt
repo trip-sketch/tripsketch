@@ -13,8 +13,8 @@ data class Trip(
     var likes: Int = 0,
     var views: Int = 0,
     var location: String? = null,
-    var startedAt: LocalDateTime = LocalDateTime.now(),
-    var endAt: LocalDateTime = LocalDateTime.now(),
+    var startedAt: LocalDateTime? = LocalDateTime.now(),
+    var endAt: LocalDateTime? = LocalDateTime.now(),
     var hashtag: Set<String>? = setOf(),
     var public: Boolean? = true,        // 게시글 전체공개 또는 비공개 여부
     var hidden: Boolean = false,        // 게시글 삭제 여부
