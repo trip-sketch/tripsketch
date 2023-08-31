@@ -24,14 +24,13 @@ class TripService(
             title = tripCreateDto.title,
             content = tripCreateDto.content,
             location = tripCreateDto.location,
-            startedAt = LocalDateTime.now(),
-            endAt = LocalDateTime.now(),
+            startedAt = tripCreateDto.startedAt,
+            endAt = tripCreateDto.endAt,
             hashtag = tripCreateDto.hashtag,
             public = tripCreateDto.public,
             images = tripCreateDto.images
         )
         val createdTrip = tripRepository.save(newTrip)
-
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
 //        val followerEmails = followRepository.findByFollowing(email)
         val followers = followRepository.findByFollowing(email)
@@ -138,20 +137,19 @@ class TripService(
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
         }
         if (findTrip.email == email) {
-            val updateTrip = Trip(
-                email = email,
-                title = tripUpdateDto.title,
-                content = tripUpdateDto.content,
-                location = tripUpdateDto.location,
-                startedAt = LocalDateTime.now(),
-                endAt = LocalDateTime.now(),
-                hashtag = tripUpdateDto.hashtag,
-                public = tripUpdateDto.public,
-                updatedAt = LocalDateTime.now(),
+            findTrip.apply {
+                title = tripUpdateDto.title
+                content = tripUpdateDto.content
+                location = tripUpdateDto.location
+                startedAt = tripUpdateDto.startedAt ?: startedAt
+                endAt = tripUpdateDto.endAt ?: endAt
+                hashtag = tripUpdateDto.hashtag
+                public = tripUpdateDto.public
+                updatedAt = LocalDateTime.now()
                 images = tripUpdateDto.images
-            )
-            val updatedTrip = tripRepository.save(updateTrip)
-            return fromTrip(updatedTrip, "",false)
+            }
+            val updatedTrip = tripRepository.save(findTrip)
+            return fromTrip(updatedTrip, "", false)
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }
@@ -208,8 +206,8 @@ class TripService(
                 likes = trip.likes,
                 views = trip.views,
                 location = trip.location,
-                startedAt = trip.startedAt,
-                endAt = trip.endAt,
+                startedAt = trip.startedAt!!,
+                endAt = trip.endAt!!,
                 hashtag = trip.hashtag,
                 public = trip.public ?: true,
                 hidden = trip.hidden,
@@ -231,8 +229,8 @@ class TripService(
                 likes = trip.likes,
                 views = trip.views,
                 location = trip.location,
-                startedAt = trip.startedAt,
-                endAt = trip.endAt,
+                startedAt = trip.startedAt!!,
+                endAt = trip.endAt!!,
                 hashtag = trip.hashtag,
                 public = trip.public ?: true,
                 hidden = trip.hidden,
