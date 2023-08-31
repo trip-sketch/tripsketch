@@ -83,7 +83,10 @@ dependencies {
     // 오라클 SDK
     implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.23.1"))
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.23.1")
-    implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey:3.23.1")
+    implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey:3.23.2")
+    implementation("org.glassfish.jersey.core:jersey-client:2.32")
+    implementation("org.glassfish.jersey.inject:jersey-hk2:2.32")
+    implementation("org.glassfish.jersey.core:jersey-common:2.32")
 
     //테스트 프레임워크
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
