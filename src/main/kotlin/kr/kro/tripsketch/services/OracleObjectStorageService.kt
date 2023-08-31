@@ -32,6 +32,9 @@ class OracleObjectStorageService {
     @Value("\${ORACLE_NAMESPACE}")
     private lateinit var namespaceName: String
 
+    @Value("\${ORACLE_REGION}")
+    private lateinit var ociConfigRegion: String
+
     private fun getProvider(): SimpleAuthenticationDetailsProvider {
         val decodedKey = Base64.getDecoder().decode(ociConfigKeyfile)
         val privateKeySupplier = Supplier<InputStream> { ByteArrayInputStream(decodedKey) }
@@ -41,6 +44,7 @@ class OracleObjectStorageService {
             .userId(ociConfigUser)
             .fingerprint(ociConfigFingerprint)
             .privateKeySupplier(privateKeySupplier)
+            .region("ap-osaka-1")
             .build()
     }
 
