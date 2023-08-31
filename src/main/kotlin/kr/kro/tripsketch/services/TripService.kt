@@ -80,10 +80,12 @@ class TripService(
             }
         }
 
-        val sortedTrips = trips.sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
+        val sortedTrips = trips.sortedByDescending { it.createdAt }
+            .sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
 
         return sortedTrips.map { fromTrip(it, "", false) }.toSet()
     }
+
 
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
