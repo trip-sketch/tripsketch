@@ -69,7 +69,7 @@ class TripService(
     }
 
     /** 나라 기준으로 많은 순으로 카테고라이징*/
-    fun getTripCategoryByNickname(nickname: String): Set<TripDto> {
+    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
         val user = userService.findUserByNickname(nickname)
         val trips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
 
@@ -80,10 +80,15 @@ class TripService(
             }
         }
 
-        val sortedTrips = trips.sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
+        val sortedTrips = trips.sortedByDescending { it.createdAt }
+            .sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
 
-        return sortedTrips.map { fromTrip(it, "", false) }.toSet()
+        val categorizedTrips = sortedTrips.map { fromTrip(it, "", false) }.toSet()
+
+        return Pair(countryFrequencyMap, categorizedTrips)
     }
+
+
 
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
