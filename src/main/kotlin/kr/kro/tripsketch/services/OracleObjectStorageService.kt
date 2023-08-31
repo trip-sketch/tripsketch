@@ -32,6 +32,9 @@ class OracleObjectStorageService {
     @Value("\${ORACLE_NAMESPACE}")
     private lateinit var namespaceName: String
 
+    @Value("\${OCI_CONFIG_REGION}")
+    private lateinit var ociConfigRegion: String
+
     private fun getProvider(): SimpleAuthenticationDetailsProvider {
         val decodedKey = Base64.getDecoder().decode(ociConfigKeyfile)
         val privateKeySupplier = Supplier<InputStream> { ByteArrayInputStream(decodedKey) }
@@ -47,6 +50,7 @@ class OracleObjectStorageService {
     private val client: ObjectStorageClient by lazy {
         // Builder 인스턴스 생성
         val builder = ObjectStorageClient.builder()
+            .region(ociConfigRegion)  // Set the region here
 
         // Builder를 사용하여 ObjectStorageClient 인스턴스를 생성합니다.
         builder.build(getProvider())
