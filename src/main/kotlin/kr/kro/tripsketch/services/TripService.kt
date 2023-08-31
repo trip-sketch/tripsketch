@@ -79,10 +79,10 @@ class TripService(
                 countryFrequencyMap[country] = countryFrequencyMap.getOrDefault(country, 0) + 1
             }
         }
-
+        // 최신순
         val sortedTrips = trips.sortedByDescending { it.createdAt }
             .sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
-
+        // 카테고리 순
         val categorizedTrips = sortedTrips.map { fromTrip(it, "", false) }.toSet()
 
         return Pair(countryFrequencyMap, categorizedTrips)
