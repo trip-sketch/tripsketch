@@ -26,7 +26,7 @@ class FollowService(
             val followerNickname = follower?.nickname ?: "Unknown user"
             val followerProfileUrl = follower?.profileImageUrl
             notificationService.sendPushNotification(
-                listOf(followingEmail),
+                listOf(followerEmail),
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",
                 nickname = followerNickname,
