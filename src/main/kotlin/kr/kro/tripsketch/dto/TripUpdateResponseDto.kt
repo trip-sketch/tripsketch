@@ -19,8 +19,8 @@ data class TripUpdateResponseDto(
     var hashtagInfo: HashtagInfo? = null,
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도
-    var public: Boolean,
-    var hidden: Boolean = false,
+    var isPublic: Boolean,
+    var isHidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
