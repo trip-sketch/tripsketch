@@ -5,9 +5,9 @@ import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
-import kr.kro.tripsketch.repositories.UserRepository
 import kr.kro.tripsketch.repositories.TripRepository
-import org.bson.types.ObjectId // ObjectId를 사용하기 위한 import
+import kr.kro.tripsketch.repositories.UserRepository
+import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -56,7 +56,7 @@ class CommentService(
     // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
     fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
 
-        val findTrip = tripRepository.findByIdAndHiddenIsFalse(commentCreateDto.tripId)
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         val comment = Comment(
@@ -87,7 +87,7 @@ class CommentService(
         commentChildrenCreateDto: CommentChildrenCreateDto
     ): CommentDto {
 
-        val findTrip = tripRepository.findByIdAndHiddenIsFalse(commentChildrenCreateDto.tripId)
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentChildrenCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 

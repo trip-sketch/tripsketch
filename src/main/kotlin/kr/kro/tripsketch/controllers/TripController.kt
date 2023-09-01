@@ -27,8 +27,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(createdTrip)
     }
 
-
-    // trip 게시글 전체 조회 (public, hidden 값 상관없이)
+    // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val email = req.getAttribute("userEmail") as String
@@ -63,24 +62,29 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
-    @GetMapping("/nickname/category")
-    fun getTripCategoryByNickname(@RequestParam nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
-        val findTrips = tripService.getTripCategoryByNickname(nickname)
-        return ResponseEntity.ok(findTrips)
+    // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/categories")
+    fun getTripsCategorizedByCountry(@PathVariable("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-//    @GetMapping("/nickname")
-//    fun getTripByNickname(
-//        @RequestParam nickname: String,
-//        pageable: Pageable
-//    ): ResponseEntity<Page<TripDto>> {
-////        val findTrips = tripService.getTripByNickname(nickname)
-////        return ResponseEntity.ok(findTrips)
-//
-//        val findTrips = tripService.getTripByNickname(nickname, pageable)
-//        println(findTrips)
-//        return ResponseEntity.ok(findTrips)
-//    }
+
+    // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/country/{country}")
+    fun getTripsInCountry(@PathVariable("nickname") nickname: String, @PathVariable("country") country: String): ResponseEntity<Set<TripDto>> {
+        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
+    }
+
+
+    // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/country-frequencies")
+    fun getCountryFrequencies(@PathVariable("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
+        val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
+        return ResponseEntity.ok(countryFrequencyMap)
+    }
+
 
     @GetMapping("/{id}")
     fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
@@ -108,7 +112,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
         val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
-            if (!findTrip.hidden) {
+            if (!findTrip.isHidden) {
                 ResponseEntity.ok(findTrip)
             } else {
                 ResponseEntity.notFound().build()
