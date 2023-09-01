@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.dto
 
+import kr.kro.tripsketch.domain.HashtagInfo
 import java.time.LocalDateTime
 
 data class TripUpdateDto(
@@ -9,7 +10,9 @@ data class TripUpdateDto(
     var location: String? = null,
     var startedAt: LocalDateTime? = LocalDateTime.now(),
     var endAt: LocalDateTime? = LocalDateTime.now(),
-    var hashtag: Set<String>? = setOf(),
-    var public: Boolean? = true,
+    var latitude: Double? = null,
+    var longitude: Double? = null,
+    var hashtagInfo: HashtagInfo? = null,
+    var isPublic: Boolean? = true,
     var images: List<String>? = emptyList()
 )

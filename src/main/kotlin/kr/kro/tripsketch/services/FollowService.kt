@@ -22,12 +22,15 @@ class FollowService(
         }
         if (!followRepository.existsByFollowerAndFollowing(followerEmail, followingEmail)) {
             followRepository.save(Follow(follower = followerEmail, following = followingEmail))
-            val followerNickname = userService.findUserByEmail(followerEmail)?.nickname ?: "Unknown user"
+            val follower = userService.findUserByEmail(followerEmail)
+            val followerNickname = follower?.nickname ?: "Unknown user"
+            val followerProfileUrl = follower?.profileImageUrl
             notificationService.sendPushNotification(
-                listOf(followingEmail), // 리스트 형태로 전달
+                listOf(followingEmail),
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",
-                nickname = followerNickname  // 팔로워의 닉네임을 데이터로 전달
+                nickname = followerNickname,
+                profileUrl = followerProfileUrl
             )
         } else {
             throw IllegalArgumentException("이미 구독 중입니다.")

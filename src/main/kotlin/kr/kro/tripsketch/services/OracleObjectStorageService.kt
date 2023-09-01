@@ -1,62 +1,78 @@
 package kr.kro.tripsketch.services
 
-import org.springframework.stereotype.Service
-import com.oracle.bmc.ConfigFileReader
+import java.io.InputStream
+import com.oracle.bmc.auth.SimpleAuthenticationDetailsProvider
 import com.oracle.bmc.objectstorage.ObjectStorageClient
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
-import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
-import com.oracle.bmc.objectstorage.requests.GetObjectRequest
-import com.oracle.bmc.objectstorage.responses.GetObjectResponse
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import java.io.InputStream
+import java.util.*
+import java.io.ByteArrayInputStream
+import java.util.function.Supplier
 
 @Service
 class OracleObjectStorageService {
 
-    data class GetObjectResponse(val objectUrl: String?)
+    @Value("\${OCI_CONFIG_TENANCY}")
+    private lateinit var ociConfigTenancy: String
 
-    fun uploadImageAndGetUrl(bucketName: String, file: MultipartFile): String {
-        // OCI SDK 설정
-        val oracleTenancy = "ORACLE_TENANCY"
-        val oracleBaseUrl = "ORACLE_BASEURL"
-        val configFile = ConfigFileReader.parse("~/.oci/config")
-        val authDetailsProvider = ConfigFileAuthenticationDetailsProvider(configFile)
+    @Value("\${OCI_CONFIG_USER}")
+    private lateinit var ociConfigUser: String
 
-        // Object Storage 클라이언트 생성
-        val objectStorageClient = ObjectStorageClient.builder()
-            .build(authDetailsProvider)
+    @Value("\${OCI_CONFIG_FINGERPRINT}")
+    private lateinit var ociConfigFingerprint: String
 
-        try {
-            // 파일 업로드
-            val objectName: String = file.originalFilename ?: "example.txt"
-            val objectData = String(file.bytes)
-            val putObjectRequest = PutObjectRequest.builder()
-                .namespaceName(configFile.get(oracleTenancy))
-                .bucketName(bucketName)
-                .objectName(objectName)
-                .putObjectBody(objectData.byteInputStream())
-                .build()
-            objectStorageClient.putObject(putObjectRequest)
+    @Value("\${OCI_CONFIG_KEYFILE}")
+    private lateinit var ociConfigKeyfile: String
 
-            // 파일 URL 생성
-//            val namespaceName = System.getenv("ORACLE_NAMESPACE")
-//            val getObjectRequest = GetObjectRequest.builder()
-//                .namespaceName(namespaceName)
-//                .bucketName(bucketName)
-//                .objectName(objectName)
-//                .build()
+    @Value("\${ORACLE_BASEURL}")
+    private lateinit var oracleBaseURL: String
 
-            val bucketUrl = oracleBaseUrl // 버킷 URL
-            val objectUrl = "$bucketUrl/$objectName" // URL 조합
+    @Value("\${ORACLE_NAMESPACE}")
+    private lateinit var namespaceName: String
 
-            System.out.println(objectUrl)
+    @Value("\${OCI_CONFIG_REGION}")
+    private lateinit var ociConfigRegion: String
 
-            return objectUrl
+    private fun getProvider(): SimpleAuthenticationDetailsProvider {
+        val decodedKey = Base64.getDecoder().decode(ociConfigKeyfile)
+        val privateKeySupplier = Supplier<InputStream> { ByteArrayInputStream(decodedKey) }
 
-        } finally {
-            // 연결 종료
-            objectStorageClient.close()
+        return SimpleAuthenticationDetailsProvider.builder()
+            .tenantId(ociConfigTenancy)
+            .userId(ociConfigUser)
+            .fingerprint(ociConfigFingerprint)
+            .privateKeySupplier(privateKeySupplier)
+            .build()
+    }
+
+    private val client: ObjectStorageClient by lazy {
+        // Builder 인스턴스 생성
+        val builder = ObjectStorageClient.builder()
+            .region(ociConfigRegion)  // Set the region here
+
+        // Builder를 사용하여 ObjectStorageClient 인스턴스를 생성합니다.
+        builder.build(getProvider())
+    }
+
+
+    fun uploadImageAndGetUrl(bucketName: String, file: MultipartFile): Pair<String?, String?> {
+        val objectName = file.originalFilename!!
+
+        val request = PutObjectRequest.builder()
+            .bucketName(bucketName)
+            .namespaceName(namespaceName)
+            .objectName(objectName)
+            .putObjectBody(file.inputStream)
+            .build()
+
+        return try {
+            val response = client.putObject(request)
+            Pair("$oracleBaseURL$objectName", null) // First is URL, second is error
+        } catch (e: Exception) {
+            Pair(null, e.message) // In case of an error, return the error message
         }
     }
 }
+

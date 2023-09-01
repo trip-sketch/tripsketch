@@ -23,11 +23,12 @@ class NotificationService(
         commentId: String? = null,
         parentId: String? = null,
         tripId: String? = null,
-        nickname: String? = null
+        nickname: String? = null,
+        profileUrl: String? = null
     ): Response {
         val tokens = emails.mapNotNull { getUserToken(it) }
         return if (tokens.isNotEmpty()) {
-            sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname)
+            sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
             Response.Builder()
                 .code(400)  // 예: 400번 코드로 설정
@@ -50,16 +51,18 @@ class NotificationService(
         tripId: String? = null,
         nickname: String? = null,
         sound: String? = null,
-        badge: Int? = null
+        badge: Int? = null,
+        profileUrl: String? = null
     ): Response {
         val jsonArray = JSONArray()
 
         pushTokens.forEach { token ->
             val dataJson = JSONObject().apply {
                 commentId?.let { put("commentId", it) }
-                parentId?.let { put("parentId", it) }  // parentId 추가
+                parentId?.let { put("parentId", it) }
                 tripId?.let { put("tripId", it) }
                 nickname?.let { put("nickname", it) }
+                profileUrl?.let { put("profileUrl", it) }
             }
 
             val json = JSONObject()
