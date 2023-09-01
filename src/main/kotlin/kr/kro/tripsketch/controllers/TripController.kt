@@ -7,6 +7,7 @@ import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
+
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -63,11 +64,29 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
-    @GetMapping("/nickname/category")
-    fun getTripCategoryByNickname(@RequestParam nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
-        val findTrips = tripService.getTripCategoryByNickname(nickname)
-        return ResponseEntity.ok(findTrips)
+    // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/categories")
+    fun getTripsCategorizedByCountry(@PathVariable("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
+
+
+    // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/country/{country}")
+    fun getTripsInCountry(@PathVariable("nickname") nickname: String, @PathVariable("country") country: String): ResponseEntity<Set<TripDto>> {
+        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
+    }
+
+
+    // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
+    @GetMapping("/trips/{nickname}/country-frequencies")
+    fun getCountryFrequencies(@PathVariable("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
+        val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
+        return ResponseEntity.ok(countryFrequencyMap)
+    }
+
 
 //    @GetMapping("/nickname")
 //    fun getTripByNickname(
