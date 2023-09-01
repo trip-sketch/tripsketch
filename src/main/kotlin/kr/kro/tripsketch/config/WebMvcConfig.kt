@@ -55,7 +55,7 @@ class WebMvcConfig(
                 "/api/trip/nickname",
                 "/api/trip/guest/**",
                 "/api/geocode",
-                "/api/user/uploadImage"
+                "/api/user/upload"
             )
     }
 }

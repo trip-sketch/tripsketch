@@ -17,3 +17,4 @@ enum class ErrorCode(val httpStatus: HttpStatus) {
 class UnauthorizedException(message: String) : CustomException(ErrorCode.UNAUTHORIZED, message)
 class ForbiddenException(message: String) : CustomException(ErrorCode.FORBIDDEN, message)
 class BadRequestException(message: String) : CustomException(ErrorCode.BAD_REQUEST, message)
+class EntityNotFoundException(message: String) : RuntimeException(message)

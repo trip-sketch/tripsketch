@@ -7,7 +7,6 @@ import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
-
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -28,8 +27,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(createdTrip)
     }
 
-
-    // trip 게시글 전체 조회 (public, hidden 값 상관없이)
+    // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val email = req.getAttribute("userEmail") as String
@@ -88,19 +86,6 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
 
-//    @GetMapping("/nickname")
-//    fun getTripByNickname(
-//        @RequestParam nickname: String,
-//        pageable: Pageable
-//    ): ResponseEntity<Page<TripDto>> {
-////        val findTrips = tripService.getTripByNickname(nickname)
-////        return ResponseEntity.ok(findTrips)
-//
-//        val findTrips = tripService.getTripByNickname(nickname, pageable)
-//        println(findTrips)
-//        return ResponseEntity.ok(findTrips)
-//    }
-
     @GetMapping("/{id}")
     fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
         val email = req.getAttribute("userEmail") as String
@@ -127,7 +112,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
         val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
-            if (!findTrip.hidden) {
+            if (!findTrip.isHidden) {
                 ResponseEntity.ok(findTrip)
             } else {
                 ResponseEntity.notFound().build()
