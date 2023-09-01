@@ -9,8 +9,6 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
-import kr.kro.tripsketch.services.OracleObjectStorageService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -18,11 +16,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import kr.kro.tripsketch.dto.UploadFileRequest
+import kr.kro.tripsketch.services.S3Service
+import software.amazon.awssdk.services.s3.model.S3Exception
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val notificationService: NotificationService, private val oracleObjectStorageService: OracleObjectStorageService) {
+class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -100,17 +99,16 @@ class UserController(private val userService: UserService, private val notificat
     }
 
 
-    @PostMapping("/uploadImage", consumes = ["multipart/form-data"])
-    fun uploadImage(
-        @RequestParam("file") uploadFile: MultipartFile,
-        @RequestParam("bucketName") bucketName: String
-    ): ResponseEntity<String> {
-        val (imageUrl, error) = oracleObjectStorageService.uploadImageAndGetUrl(bucketName, uploadFile)
-
-        return if (error == null) {
-            ResponseEntity.ok(imageUrl!!)
-        } else {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
+    @PostMapping("/upload", consumes = ["multipart/form-data"])
+    fun uploadFile(@RequestParam("dir", required = false, defaultValue = "") dir: String,
+                   @RequestParam("file") file: MultipartFile): ResponseEntity<Any> {
+        return try {
+            val (key, response) = s3Service.uploadFile(dir, file)
+            ResponseEntity.ok(mapOf("key" to key, "awsResponse" to response))
+        } catch (e: S3Exception) {
+            ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
         }
     }
 
