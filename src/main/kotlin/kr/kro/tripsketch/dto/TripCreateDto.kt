@@ -9,9 +9,9 @@ data class TripCreateDto(
     var location: String? = null,
     var startedAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now(),
-    val latitude: Double? = null,
-    val longitude: Double? = null,
+    var latitude: Double? = null,
+    var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
-    var public: Boolean? = true,
+    var isPublic: Boolean? = true,
     var images: List<String>? = emptyList()
 )
