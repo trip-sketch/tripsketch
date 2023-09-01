@@ -11,11 +11,13 @@ data class TripDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime = LocalDateTime.now(),
-    var endAt: LocalDateTime = LocalDateTime.now(),
+    var startedAt: LocalDateTime,
+    var endAt: LocalDateTime,
     var hashtag: Set<String>? = setOf(),
-    var public: Boolean,
-    var hidden: Boolean = false,
+    var latitude: Double? = null, // 위도
+    var longitude: Double? = null, // 경도
+    var isPublic: Boolean,
+    var isHidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,

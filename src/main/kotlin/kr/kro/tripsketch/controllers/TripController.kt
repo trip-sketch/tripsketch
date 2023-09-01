@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
+import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.services.JwtService
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 
@@ -25,8 +27,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(createdTrip)
     }
 
-
-    // trip 게시글 전체 조회 (public, hidden 값 상관없이)
+    // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val email = req.getAttribute("userEmail") as String
@@ -61,18 +62,11 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
-//    @GetMapping("/nickname")
-//    fun getTripByNickname(
-//        @RequestParam nickname: String,
-//        pageable: Pageable
-//    ): ResponseEntity<Page<TripDto>> {
-////        val findTrips = tripService.getTripByNickname(nickname)
-////        return ResponseEntity.ok(findTrips)
-//
-//        val findTrips = tripService.getTripByNickname(nickname, pageable)
-//        println(findTrips)
-//        return ResponseEntity.ok(findTrips)
-//    }
+    @GetMapping("/nickname/category")
+    fun getTripCategoryByNickname(@RequestParam nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+        val findTrips = tripService.getTripCategoryByNickname(nickname)
+        return ResponseEntity.ok(findTrips)
+    }
 
     @GetMapping("/{id}")
     fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
@@ -85,11 +79,22 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
     }
 
+    @GetMapping("modify/{id}")
+    fun getTripByEmailAndIdToUpdate(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripUpdateResponseDto> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrip = tripService.getTripByEmailAndIdToUpdate(email, id)
+        return if (findTrip != null) {
+            ResponseEntity.ok(findTrip)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
     @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
         val findTrip = tripService.getTripById(id)
         return if (findTrip != null) {
-            if (!findTrip.hidden) {
+            if (!findTrip.isHidden) {
                 ResponseEntity.ok(findTrip)
             } else {
                 ResponseEntity.notFound().build()
@@ -103,7 +108,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @RequestBody tripUpdateDto: TripUpdateDto)
+        @Validated @RequestBody tripUpdateDto: TripUpdateDto)
     : ResponseEntity<Any> {
         return try {
             val email = req.getAttribute("userEmail") as String
