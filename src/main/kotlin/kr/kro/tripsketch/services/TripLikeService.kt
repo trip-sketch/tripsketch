@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class TripLikeService(
-    private val tripRepository: TripRepository
+    private val tripRepository: TripRepository,
+    private val notificationService: NotificationService
 ) {
     fun likeTrip(email: String, tripId: String) {
         val findTrip = tripRepository.findById(tripId).orElse(null)
