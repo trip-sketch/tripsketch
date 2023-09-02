@@ -104,6 +104,23 @@ class TripController(private val tripService: TripService, private val jwtServic
         }
     }
 
+    // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+//    @GetMapping("/list/following")
+//    fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
+//        return try {
+//            val email = req.getAttribute("userEmail") as String
+//            val findTrips = tripService.getAllTripsByUser(email)
+//            if (findTrip != null) {
+//                val findTrip =
+//            }
+//        } catch (ex: EntityNotFoundException) {
+//            ResponseEntity.notFound().bodyㅌ("구독한 사용자가 없습니다.")
+//        } catch (ex: IllegalAccessException) {
+//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
+//        }
+//    }
+
     @PatchMapping("/{id}")
     fun updateTrip(
         req: HttpServletRequest,
@@ -115,7 +132,6 @@ class TripController(private val tripService: TripService, private val jwtServic
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
                 val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
-//                ResponseEntity.ok(updatedTrip)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
