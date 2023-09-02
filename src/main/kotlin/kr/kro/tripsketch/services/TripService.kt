@@ -60,7 +60,6 @@ class TripService(
     fun getAllTripsByUser(email: String): Set<TripDto> {
 //        val findTrips = tripRepository.findByIsHiddenIsFalse()
 //        return findTrips.map { fromTrip(it, email,false) }.toSet()
-
         val findTrips: Set<Trip> = if (email.isNotEmpty()) {
             // to-do : 매개변수 이메일과 findTrips 에서의 email 과 동일하다면 비공개 포함하여 보여줌 - findByIsHiddenIsFalse
             tripRepository.findTripByEmail(email) +
@@ -124,7 +123,6 @@ class TripService(
         return fromTripToUpdate(findTrip, email, false)
     }
 
-
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -133,11 +131,9 @@ class TripService(
 
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+    fun getListFollowingByUser(email: String): TripCardDto? {
 
-
-    // to-do : (마이페이지) 카테고리(hashtag) + 닉네임으로 조회
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-
+    }
 
     // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
@@ -145,6 +141,10 @@ class TripService(
 
 
     // to-do : (탐색 페이지) 검색어 + 등록일 기준 최신순으로 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+
+
+    // to-do : (마이페이지) 카테고리(hashtag) + 닉네임으로 조회
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 
 
