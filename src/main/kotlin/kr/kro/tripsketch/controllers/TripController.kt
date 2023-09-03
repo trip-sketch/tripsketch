@@ -63,27 +63,27 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/categories")
-    fun getTripsCategorizedByCountry(@PathVariable("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
-        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
-        return ResponseEntity.ok(sortedCountryFrequencyMap)
-    }
-
-
-    // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/country/{country}")
-    fun getTripsInCountry(@PathVariable("nickname") nickname: String, @PathVariable("country") country: String): ResponseEntity<Set<TripDto>> {
-        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
-        return ResponseEntity.ok(sortedCountryFrequencyMap)
-    }
-
-
-    // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/country-frequencies")
-    fun getCountryFrequencies(@PathVariable("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
-        val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
-        return ResponseEntity.ok(countryFrequencyMap)
-    }
+//    @GetMapping("/trips/{nickname}/categories")
+//    fun getTripsCategorizedByCountry(@PathVariable("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+//        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
+//        return ResponseEntity.ok(sortedCountryFrequencyMap)
+//    }
+//
+//
+//    // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
+//    @GetMapping("/trips/{nickname}/country/{country}")
+//    fun getTripsInCountry(@PathVariable("nickname") nickname: String, @PathVariable("country") country: String): ResponseEntity<Set<TripDto>> {
+//        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
+//        return ResponseEntity.ok(sortedCountryFrequencyMap)
+//    }
+//
+//
+//    // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
+//    @GetMapping("/trips/{nickname}/country-frequencies")
+//    fun getCountryFrequencies(@PathVariable("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
+//        val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
+//        return ResponseEntity.ok(countryFrequencyMap)
+//    }
 
 
     @GetMapping("/{id}")
