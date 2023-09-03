@@ -64,34 +64,42 @@ class FollowService(
         }
     }
 
-    fun getFollowings(followerNickname: String): List<ProfileDto> {
+    fun getFollowings(followerNickname: String, currentUserEmail: String?): List<ProfileDto> {
         val followerEmail = userService.findUserByNickname(followerNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        val followings = followRepository.findByFollower(followerEmail).map { follow ->
+
+        return followRepository.findByFollower(followerEmail).map { follow ->
             val user = userRepository.findByEmail(follow.following)
+            val isCurrentUserFollowing: Boolean? = currentUserEmail?.let {
+                followRepository.existsByFollowerAndFollowing(it, user?.email ?: "")
+            }
+
             ProfileDto(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
                 profileImageUrl = user?.profileImageUrl,
+                isFollowing = isCurrentUserFollowing
             )
         }
-
-        return followings
     }
 
-    fun getFollowers(followingNickname: String): List<ProfileDto> {
+    fun getFollowers(followingNickname: String, currentUserEmail: String?): List<ProfileDto> {
         val followingEmail = userService.findUserByNickname(followingNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
-        val followers = followRepository.findByFollowing(followingEmail).map { follow ->
+
+        return followRepository.findByFollowing(followingEmail).map { follow ->
             val user = userRepository.findByEmail(follow.follower)
+            val isCurrentUserFollowing: Boolean? = currentUserEmail?.let {
+                followRepository.existsByFollowerAndFollowing(it, user?.email ?: "")
+            }
+
             ProfileDto(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
                 profileImageUrl = user?.profileImageUrl,
+                isFollowing = isCurrentUserFollowing
             )
         }
-
-        return followers
     }
 
 }
