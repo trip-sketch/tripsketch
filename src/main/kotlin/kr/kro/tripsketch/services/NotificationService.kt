@@ -25,17 +25,17 @@ class NotificationService(
         tripId: String? = null,
         nickname: String? = null,
         profileUrl: String? = null
-    ): Response {
+    ): String {
         val tokens = emails.mapNotNull { getUserToken(it) }
-        return if (tokens.isNotEmpty()) {
+        val response = if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
-            Response.Builder()
-                .code(400)  // 예: 400번 코드로 설정
-                .message("No valid push tokens found for the given emails.")
-                .build()
+            return "No valid push tokens found for the given emails."
         }
+
+        return response.body?.string() ?: "No response body from Expo"
     }
+
 
     private fun getUserToken(email: String): String? {
         val user = userService.findUserByEmail(email)
@@ -50,8 +50,8 @@ class NotificationService(
         parentId: String? = null,
         tripId: String? = null,
         nickname: String? = null,
-        sound: String? = null,
-        badge: Int? = null,
+        sound: String? = "default",
+        badge: Int? = 1,
         profileUrl: String? = null
     ): Response {
         val jsonArray = JSONArray()
@@ -70,9 +70,11 @@ class NotificationService(
                 .put("title", title)
                 .put("body", message)
                 .put("data", dataJson)
+                .put("badge", badge)
 
-            sound?.let { json.put("sound", it) }
-            badge?.let { json.put("badge", it) }
+            if (sound != null && sound == "default") {
+                json.put("sound", sound)
+            }
 
             jsonArray.put(json)
         }

@@ -14,7 +14,7 @@ class FollowService(
     private val notificationService: NotificationService,
 ) {
 
-    fun follow(followerEmail: String, followingNickname: String) {
+    fun follow(followerEmail: String, followingNickname: String): String {
         val followingEmail = userService.findUserByNickname(followingNickname)?.email
             ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         if (followerEmail == followingEmail) {
@@ -25,7 +25,7 @@ class FollowService(
             val follower = userService.findUserByEmail(followerEmail)
             val followerNickname = follower?.nickname ?: "Unknown user"
             val followerProfileUrl = follower?.profileImageUrl
-            notificationService.sendPushNotification(
+            return notificationService.sendPushNotification(
                 listOf(followingEmail),
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",

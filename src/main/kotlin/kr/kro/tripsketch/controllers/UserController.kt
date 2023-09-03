@@ -79,7 +79,7 @@ class UserController(private val userService: UserService, private val notificat
 
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
-        val expoResponse = notificationService.sendPushNotification(
+        val expoResponseMessage = notificationService.sendPushNotification(
             listOf(notificationRequest.email),
             notificationRequest.title,
             notificationRequest.body,
@@ -89,14 +89,13 @@ class UserController(private val userService: UserService, private val notificat
             notificationRequest.nickname
         )
 
-        val status = HttpStatus.resolve(expoResponse.code)
-
-        return if (status?.is2xxSuccessful == true) {
-            ResponseEntity.ok(expoResponse.body?.string() ?: "Notification sent successfully!")
+        return if (expoResponseMessage == "Notification sent successfully!") {
+            ResponseEntity.ok(expoResponseMessage)
         } else {
-            ResponseEntity.status(status ?: HttpStatus.BAD_REQUEST).body(expoResponse.body?.string())
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(expoResponseMessage)
         }
     }
+
 
 
     @PostMapping("/upload", consumes = ["multipart/form-data"])
