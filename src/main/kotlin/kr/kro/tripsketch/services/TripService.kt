@@ -14,9 +14,7 @@ import java.time.LocalDateTime
 class TripService(
     private val tripRepository: TripRepository,
     private val followRepository: FollowRepository,
-    private val jwtService: JwtService,
     private val userService: UserService,
-    private val tripLikeService: TripLikeService,
     private val notificationService: NotificationService,
 ) {
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
@@ -35,9 +33,9 @@ class TripService(
         )
         val createdTrip = tripRepository.save(newTrip)
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
-        val followers = followRepository.findByFollowing(email)
-        val filteredFollowers = followers.filter { it.follower != email }
-        val followerEmails = filteredFollowers.map { it.follower }
+        val follower = followRepository.findByFollowing(email)
+        val filteredFollower = follower.filter { it.follower != email }
+        val followerEmails = filteredFollower.map { it.follower }
         val followingNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
         val followingProfileUrl = userService.findUserByEmail(email)?.profileImageUrl ?: ""
         notificationService.sendPushNotification(
@@ -74,6 +72,12 @@ class TripService(
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
+    fun getAllFollowingTripsByUser(email: String): Set<TripDto> {
+        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email)
+        return findTrips.map { fromTrip(it, email, false) }.toSet()
+
+    }
+
     fun getTripByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
         val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
@@ -84,7 +88,7 @@ class TripService(
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
         val user = userService.findUserByNickname(nickname)
         val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
-        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user.email)
         return findTrips.categorizeTripsByCountry()
     }
 
@@ -165,16 +169,6 @@ class TripService(
             .associateBy({ it.key }, { it.value })
     }
 
-
-
-//    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
-//        val user = userService.findUserByNickname(nickname)
-//        val findTrips = tripRepository.findTripByEmail(user!!.email, pageable)
-////        return findTrips.map { fromTrip(it, false) }.toSet()
-//        return findTrips.map { fromTrip(it, false) }.let { PageImpl(it.toList(), pageable, findTrips.totalElements) }
-//
-//    }
-
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -203,7 +197,14 @@ class TripService(
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 //    fun getListFollowingByUser(email: String): TripCardDto? {
+//        // 내가 팔로잉하는 사람들
+//        val following = followRepository.findByFollower(email)
+//        val filterdFollowing = following.filter { it.following != email }
+//        val filterdFollowingEmails = filterdFollowing.map { it.following }
 //
+//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse()
+//
+//        return fromTrip(findTrips, "", false)
 //    }
 
     // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
@@ -212,10 +213,6 @@ class TripService(
 
 
     // to-do : (탐색 페이지) 검색어 + 등록일 기준 최신순으로 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-
-
-    // to-do : (마이페이지) 카테고리(hashtag) + 닉네임으로 조회
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 
 

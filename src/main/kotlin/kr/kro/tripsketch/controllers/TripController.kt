@@ -133,16 +133,16 @@ class TripController(private val tripService: TripService, private val jwtServic
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 //    @GetMapping("/list/following")
 //    fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
+//        val email = req.getAttribute("userEmail") as String
+//        val findTrips = tripService.getAllFollowingTripsByUser(email)
 //        return try {
-//            val email = req.getAttribute("userEmail") as String
-//            val findTrips = tripService.getAllTripsByUser(email)
-//            if (findTrip != null) {
-//                val findTrip =
+//            if (findTrips.isNotEmpty()) {
+//                ResponseEntity.ok(findTrips)
+//            } else {
+//                ResponseEntity.notFound().build()
 //            }
-//        } catch (ex: EntityNotFoundException) {
-//            ResponseEntity.notFound().bodyㅌ("구독한 사용자가 없습니다.")
 //        } catch (ex: IllegalAccessException) {
-//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
+//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
 //        }
 //    }
 
