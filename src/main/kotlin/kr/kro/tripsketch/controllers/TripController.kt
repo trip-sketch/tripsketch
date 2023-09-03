@@ -42,6 +42,13 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(findTrips)
     }
 
+    @GetMapping("/trips/myTrips")
+    fun getAllMyTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllMyTripsByUser(email)
+        return ResponseEntity.ok(findTrips)
+    }
+
     @GetMapping("/guest/trips")
     fun getAllTripsByGuest(): ResponseEntity<Any> {
         return try {

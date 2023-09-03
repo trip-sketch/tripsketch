@@ -28,7 +28,6 @@ dependencies {
     // 코틀린 리플렉션 기능
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-
     // 스프링 MVC를 사용한 웹 애플리케이션, RESTful 애플리케이션을 만들기 위한 스타터
     // 기본적으로 내장 컨테이너로 Tomcat을 사용합니다.
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -95,9 +94,6 @@ dependencies {
 
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
-
-    // Spring Boot Starter for Spring Data JPA
-//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.withType<KotlinCompile> {
