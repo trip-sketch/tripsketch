@@ -69,6 +69,18 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
+    @GetMapping("/trips/{nickname}/categoriesWithPagination")
+    fun getTripsCategorizedByCountryWithPagination(
+        @PathVariable("nickname") nickname: String,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+    ): ResponseEntity<Map<String, Any>> {
+        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname, page, pageSize)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
+    }
+
+
+
 
     // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
     @GetMapping("/trips/{nickname}/country/{country}")
