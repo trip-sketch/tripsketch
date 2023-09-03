@@ -99,24 +99,7 @@ class TripService(
         val categorizedTrips = findTrips.categorizeTripsByCountry()
 
         // 페이지네이션 적용
-        val totalTrips = categorizedTrips.second.size
-        val startIndex = (page - 1) * pageSize
-        val endIndex = if (startIndex + pageSize < totalTrips) {
-            startIndex + pageSize
-        } else {
-            totalTrips
-        }
-
-        val paginatedTrips = categorizedTrips.second.toList().slice(startIndex until endIndex)
-
-        val result = mapOf(
-            "posts" to paginatedTrips,
-            "currentPage" to page,
-            "totalPage" to if (totalTrips % pageSize == 0) totalTrips / pageSize else (totalTrips / pageSize) + 1,
-            "postsPerPage" to pageSize
-        )
-
-        return result
+        return paginateTrips(categorizedTrips.second, page, pageSize)
     }
 
 
@@ -383,4 +366,26 @@ class TripService(
             images = trip.images
         )
     }
+}
+
+
+fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
+    val tripList = trips.toList()
+    val totalTrips = tripList.size
+    val startIndex = (page - 1) * pageSize
+    val endIndex = if (startIndex + pageSize < totalTrips) {
+        startIndex + pageSize
+    } else {
+        totalTrips
+    }
+
+    val paginatedTrips = tripList.slice(startIndex until endIndex)
+    val totalPage = if (tripList.isEmpty()) 0 else (totalTrips + pageSize - 1) / pageSize
+
+    return mapOf(
+        "posts" to paginatedTrips,
+        "currentPage" to page,
+        "totalPage" to totalPage,
+        "postsPerPage" to pageSize
+    )
 }
