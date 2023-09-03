@@ -88,19 +88,19 @@ class TripService(
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
         val user = userService.findUserByNickname(nickname)
         val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
         return findTrips.categorizeTripsByCountry()
     }
 
     fun getTripsInCountry(nickname: String , country:String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
         return findTrips.getTripsInCountry(country)
     }
 
     fun getCountryFrequencies(nickname: String): Map<String, Int> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
         return findTrips.sortTripsByCountryFrequency()
     }
 
