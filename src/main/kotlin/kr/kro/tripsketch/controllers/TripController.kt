@@ -63,15 +63,15 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/categories")
-    fun getTripsCategorizedByCountry(@PathVariable("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+    @GetMapping("/nickname/trips/categories")
+    fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    @GetMapping("/tripsWithPagination/{nickname}/categories")
+    @GetMapping("/nickname/tripsWithPagination/categories")
     fun getTripsCategorizedByCountryWithPagination(
-        @PathVariable("nickname") nickname: String,
+        @RequestParam("nickname") nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
     ): ResponseEntity<Map<String, Any>> {
@@ -80,18 +80,18 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/country/{country}")
+    @GetMapping("/nickname/trips/country/{country}")
     fun getTripsInCountry(
-        @PathVariable("nickname") nickname: String,
+        @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String
     ): ResponseEntity<Set<TripDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    @GetMapping("/tripsWithPagination/{nickname}/country/{country}")
+    @GetMapping("/nickname/tripsWithPagination/country/{country}")
     fun getTripsInCountryWithPagination(
-        @PathVariable("nickname") nickname: String,
+        @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
@@ -101,8 +101,8 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
-    @GetMapping("/trips/{nickname}/country-frequencies")
-    fun getCountryFrequencies(@PathVariable("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
+    @GetMapping("/nickname/trips/country-frequencies")
+    fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
         val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
         return ResponseEntity.ok(countryFrequencyMap)
     }
