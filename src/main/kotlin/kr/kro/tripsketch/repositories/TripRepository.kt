@@ -3,8 +3,6 @@ package kr.kro.tripsketch.repositories
 import kr.kro.tripsketch.domain.Trip
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
-//import org.springframework.data.jpa.repository.JpaRepository
-//import org.springframework.data.jpa.repository.Query
 
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
@@ -28,7 +26,9 @@ interface TripRepository : MongoRepository<Trip, String> {
     // isPublic 값이 true이고 isHidden 값이 false인 게시물 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(): Set<Trip>
 
-
     // email 조건이 맞고, isPublic 값이 true이고 isHidden 값이 false인 게시물 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(email: String): Set<Trip>
+
+    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email: String): Set<Trip>
+
 }
