@@ -85,24 +85,24 @@ class TripService(
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
-    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
-        val user = userService.findUserByNickname(nickname)
-        val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-        return findTrips.categorizeTripsByCountry()
-    }
-
-    fun getTripsInCountry(nickname: String , country:String): Set<TripDto> {
-        val user = userService.findUserByNickname(nickname)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-        return findTrips.getTripsInCountry(country)
-    }
-
-    fun getCountryFrequencies(nickname: String): Map<String, Int> {
-        val user = userService.findUserByNickname(nickname)
-        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-        return findTrips.sortTripsByCountryFrequency()
-    }
+//    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
+//        val user = userService.findUserByNickname(nickname)
+//        val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+//        return findTrips.categorizeTripsByCountry()
+//    }
+//
+//    fun getTripsInCountry(nickname: String , country:String): Set<TripDto> {
+//        val user = userService.findUserByNickname(nickname)
+//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+//        return findTrips.getTripsInCountry(country)
+//    }
+//
+//    fun getCountryFrequencies(nickname: String): Map<String, Int> {
+//        val user = userService.findUserByNickname(nickname)
+//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
+//        return findTrips.sortTripsByCountryFrequency()
+//    }
 
     /**
      * 여행 목록을 나라 기준으로 카테고리화하고 결과를 반환합니다.
