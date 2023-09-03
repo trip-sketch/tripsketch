@@ -126,7 +126,7 @@ class TripController(private val tripService: TripService, private val jwtServic
 //        } catch (ex: IllegalAccessException) {
 //            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
 //        }
-//    }ㅅ
+//    }
 
     @PatchMapping("/{id}")
     fun updateTrip(
