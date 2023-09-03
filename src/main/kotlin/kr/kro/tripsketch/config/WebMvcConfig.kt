@@ -35,6 +35,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 
 
+
 @Configuration
 class WebMvcConfig(
     private val jwtTokenInterceptor: JwtTokenInterceptor
@@ -48,16 +49,14 @@ class WebMvcConfig(
                 "/hello",
                 "/api/user/nickname",
                 "/api/user/send",
-                "/api/follow/followings",
-                "/api/follow/followers",
+                "/api/follow/guest/followings",
+                "/api/follow/guest/followers",
                 "/api/oauth/kakao/**",
                 "/api/comment/guest/**",
                 "/api/trip/nickname",
-                "/api/trip/nickname/category",
                 "/api/trip/guest/**",
                 "/api/geocode",
                 "/api/user/upload"
             )
     }
 }
-

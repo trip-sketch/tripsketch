@@ -80,25 +80,99 @@ class TripService(
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
-    /** 나라 기준으로 많은 순으로 카테고라이징*/
-    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
+    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
         val user = userService.findUserByNickname(nickname)
         val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        return findTrips.categorizeTripsByCountry()
+    }
 
+    fun getTripsInCountry(nickname: String , country:String): Set<TripDto> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        return findTrips.getTripsInCountry(country)
+    }
+
+    fun getCountryFrequencies(nickname: String): Map<String, Int> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        return findTrips.sortTripsByCountryFrequency()
+    }
+
+    /**
+     * 여행 목록을 나라 기준으로 카테고리화하고 결과를 반환합니다.
+     *
+     */
+    fun Set<Trip>.categorizeTripsByCountry(): Pair<Map<String, Int>, Set<TripDto>> {
+        // 나라별 여행 횟수를 계산하기 위한 맵
         val countryFrequencyMap = mutableMapOf<String, Int>()
-        for (trip in trips) {
+
+        // 각 여행을 반복하면서 나라별 횟수를 업데이트
+        for (trip in this) {
             trip.hashtagInfo?.country?.let { country ->
                 countryFrequencyMap[country] = countryFrequencyMap.getOrDefault(country, 0) + 1
             }
         }
-        // 최신순
-        val sortedTrips = trips.sortedByDescending { it.createdAt }
-            .sortedWith(compareByDescending { countryFrequencyMap[it.hashtagInfo?.country] })
-        // 카테고리 순
+
+        // 나라별 횟수를 내림차순으로 정렬한 맵
+        val sortedCountryFrequencyMap = countryFrequencyMap.entries
+            .sortedByDescending { it.value }
+            .associateBy({ it.key }, { it.value })
+
+        // 여행 목록을 최신순으로 정렬하고 나라별 횟수 순으로 다시 정렬하여 카테고리화
+        val sortedTrips = this.sortedByDescending { it.createdAt }
+            .sortedWith(compareByDescending { sortedCountryFrequencyMap[it.hashtagInfo?.country] })
+
+        // TripDto로 변환한 여행 목록을 Set으로 반환
         val categorizedTrips = sortedTrips.map { fromTrip(it, "", false) }.toSet()
 
-        return Pair(countryFrequencyMap, categorizedTrips)
+        return sortedCountryFrequencyMap to categorizedTrips
     }
+
+    /**
+     * 특정 나라의 여행 목록을 반환합니다.
+     *
+     * @param targetCountry 검색할 나라의 이름
+     * @return 해당 나라의 여행 목록
+     */
+    fun Set<Trip>.getTripsInCountry(targetCountry: String): Set<TripDto> {
+        // 지정된 나라와 일치하는 여행만 필터링하고 TripDto로 변환하여 반환
+        return this.filter { trip ->
+            trip.hashtagInfo?.country == targetCountry
+        }.map { fromTrip(it, "", false) }.toSet()
+    }
+
+    /**
+     * 나라 기준으로 여행 횟수를 많은 순으로 정렬하여 반환합니다.
+     *
+     * @return 나라별 여행 횟수를 내림차순으로 정렬한 맵
+     */
+    fun Set<Trip>.sortTripsByCountryFrequency(): Map<String, Int> {
+        // 나라별 여행 횟수를 계산하기 위한 맵
+        val countryFrequencyMap = mutableMapOf<String, Int>()
+
+        // 각 여행을 반복하면서 나라별 횟수를 업데이트
+        for (trip in this) {
+            trip.hashtagInfo?.country?.let { country ->
+                countryFrequencyMap[country] = countryFrequencyMap.getOrDefault(country, 0) + 1
+            }
+        }
+
+        // 나라별 횟수를 내림차순으로 정렬한 맵을 반환
+        return countryFrequencyMap.entries
+            .sortedByDescending { it.value }
+            .associateBy({ it.key }, { it.value })
+    }
+
+
+
+//    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
+//        val user = userService.findUserByNickname(nickname)
+//        val findTrips = tripRepository.findTripByEmail(user!!.email, pageable)
+////        return findTrips.map { fromTrip(it, false) }.toSet()
+//        return findTrips.map { fromTrip(it, false) }.let { PageImpl(it.toList(), pageable, findTrips.totalElements) }
+//
+//    }
 
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)

@@ -49,15 +49,30 @@ class FollowController(
         return ResponseEntity.status(HttpStatus.OK).body("해당 사용자의 구독을 취소했습니다.")
     }
 
-    @GetMapping("/followings")
+    @GetMapping("/user/followings")
     @ApiResponse(responseCode = "200", description = "사용자의 구독 리스트를 반환합니다.")
-    fun getFollowings(@RequestParam nickname: String): List<ProfileDto> {
-        return followService.getFollowings(nickname)
+    fun getFollowings(req: HttpServletRequest, @RequestParam nickname: String): List<ProfileDto> {
+        val currentUserEmail = req.getAttribute("userEmail") as? String
+        return followService.getFollowings(nickname, currentUserEmail)
     }
 
-    @GetMapping("/followers")
+    @GetMapping("/user/followers")
     @ApiResponse(responseCode = "200", description = "사용자를 구독하는 사람의 리스트를 반환합니다.")
-    fun getFollowers(@RequestParam nickname: String): List<ProfileDto> {
-        return followService.getFollowers(nickname)
+    fun getFollowers(req: HttpServletRequest, @RequestParam nickname: String): List<ProfileDto> {
+        val currentUserEmail = req.getAttribute("userEmail") as? String
+        return followService.getFollowers(nickname, currentUserEmail)
     }
+
+    @GetMapping("/guest/followings")
+    @ApiResponse(responseCode = "200", description = "사용자의 구독 리스트를 반환합니다.")
+    fun getFollowingsByGuest(@RequestParam nickname: String): List<ProfileDto> {
+        return followService.getFollowings(nickname, null)
+    }
+
+    @GetMapping("/guest/followers")
+    @ApiResponse(responseCode = "200", description = "사용자를 구독하는 사람의 리스트를 반환합니다.")
+    fun getFollowersByGuest(@RequestParam nickname: String): List<ProfileDto> {
+        return followService.getFollowers(nickname, null)
+    }
+
 }
