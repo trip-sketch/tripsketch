@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 @Service
 class TripLikeService(
     private val tripRepository: TripRepository,
+    private val userService: UserService,
     private val notificationService: NotificationService
 ) {
     fun likeTrip(email: String, tripId: String) {
@@ -15,6 +16,23 @@ class TripLikeService(
             findTrip.tripLikes.add(email)
             findTrip.likes++
             tripRepository.save(findTrip)
+            val tripWriterEmail = findTrip.email
+            if (email != tripWriterEmail) {
+                val userNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
+                val userProfileUrl = userService.findUserByEmail(email)?.profileImageUrl ?: ""
+                notificationService.sendPushNotification(
+                    listOf(findTrip.email),
+                    "새로운 여행의 시작, 트립스케치",
+                    "$userNickname 님이 회원님의 글을 좋아합니다.",
+                    null,
+                    null,
+                    findTrip.id,
+                    userNickname,
+                    userProfileUrl
+                )
+            } else {
+                throw IllegalStateException("작성한 게시자 본인에게 알림이 가지 않습니다.")
+            }
         } else {
             throw IllegalStateException("이미 좋아요한 게시물입니다.")
         }
