@@ -103,12 +103,14 @@ class UserController(private val userService: UserService, private val notificat
                    @RequestParam("file") file: MultipartFile): ResponseEntity<Any> {
         return try {
             val (key, response) = s3Service.uploadFile(dir, file)
-            ResponseEntity.ok(mapOf("key" to key, "awsResponse" to response))
+            // eTag나 원하는 다른 정보만 반환
+            ResponseEntity.ok(mapOf("key" to key, "eTag" to response.eTag()))
         } catch (e: S3Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
         }
     }
+
 
 }
