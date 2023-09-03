@@ -95,6 +95,9 @@ dependencies {
 
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    // Spring Boot Starter for Spring Data JPA
+//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.withType<KotlinCompile> {
