@@ -39,7 +39,7 @@ class TripService(
         val filteredFollowers = followers.filter { it.follower != email }
         val followerEmails = filteredFollowers.map { it.follower }
         val followingNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
-
+        val followingProfileUrl = userService.findUserByEmail(email)?.profileImageUrl ?: ""
         notificationService.sendPushNotification(
             followerEmails,
             "새로운 여행의 시작, 트립스케치",
@@ -47,7 +47,8 @@ class TripService(
             null,
             null,
             createdTrip.id,
-            followingNickname
+            followingNickname,
+            followingProfileUrl
         )
         return fromTrip(createdTrip, email, false)
     }
