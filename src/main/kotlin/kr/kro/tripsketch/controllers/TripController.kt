@@ -69,7 +69,7 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    @GetMapping("/trips/{nickname}/categoriesWithPagination")
+    @GetMapping("/tripsWithPagination/{nickname}/categories")
     fun getTripsCategorizedByCountryWithPagination(
         @PathVariable("nickname") nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
@@ -79,16 +79,26 @@ class TripController(private val tripService: TripService, private val jwtServic
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-
-
-
     // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
     @GetMapping("/trips/{nickname}/country/{country}")
-    fun getTripsInCountry(@PathVariable("nickname") nickname: String, @PathVariable("country") country: String): ResponseEntity<Set<TripDto>> {
+    fun getTripsInCountry(
+        @PathVariable("nickname") nickname: String,
+        @PathVariable("country") country: String
+    ): ResponseEntity<Set<TripDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
+    @GetMapping("/tripsWithPagination/{nickname}/country/{country}")
+    fun getTripsInCountryWithPagination(
+        @PathVariable("nickname") nickname: String,
+        @PathVariable("country") country: String,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+    ): ResponseEntity<Map<String, Any>> {
+        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country, page, pageSize)
+        return ResponseEntity.ok(sortedCountryFrequencyMap)
+    }
 
     // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
     @GetMapping("/trips/{nickname}/country-frequencies")
@@ -96,7 +106,6 @@ class TripController(private val tripService: TripService, private val jwtServic
         val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
         return ResponseEntity.ok(countryFrequencyMap)
     }
-
 
     @GetMapping("/{id}")
     fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
@@ -110,7 +119,10 @@ class TripController(private val tripService: TripService, private val jwtServic
     }
 
     @GetMapping("modify/{id}")
-    fun getTripByEmailAndIdToUpdate(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripUpdateResponseDto> {
+    fun getTripByEmailAndIdToUpdate(
+        req: HttpServletRequest,
+        @PathVariable id: String
+    ): ResponseEntity<TripUpdateResponseDto> {
         val email = req.getAttribute("userEmail") as String
         val findTrip = tripService.getTripByEmailAndIdToUpdate(email, id)
         return if (findTrip != null) {
@@ -138,8 +150,9 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @RequestBody tripUpdateDto: TripUpdateDto)
-    : ResponseEntity<Any> {
+        @Validated @RequestBody tripUpdateDto: TripUpdateDto
+    )
+            : ResponseEntity<Any> {
         return try {
             val email = req.getAttribute("userEmail") as String
             val findTrip = tripService.getTripById(id)

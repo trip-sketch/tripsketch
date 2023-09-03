@@ -94,10 +94,8 @@ class TripService(
     fun getTripCategoryByNickname(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
         val user = userService.findUserByNickname(nickname)
         val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
-
         // 전체 여행 목록을 카테고리화
         val categorizedTrips = findTrips.categorizeTripsByCountry()
-
         // 페이지네이션 적용
         return paginateTrips(categorizedTrips.second, page, pageSize)
     }
@@ -109,6 +107,16 @@ class TripService(
         val getTripsInCountry = findTrips.getTripsInCountry(country)
         return findTrips.getTripsInCountry(country)
     }
+
+    fun getTripsInCountry(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        val tripsInCountry = findTrips.getTripsInCountry(country)
+
+        // 페이지네이션 적용
+        return paginateTrips(tripsInCountry, page, pageSize)
+    }
+
 
     fun getCountryFrequencies(nickname: String): Map<String, Int> {
         val user = userService.findUserByNickname(nickname)
