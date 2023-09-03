@@ -11,7 +11,6 @@ class TripLikeService(
     fun likeTrip(email: String, tripId: String) {
         val findTrip = tripRepository.findById(tripId).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-        println(findTrip)
         if (!findTrip.tripLikes.contains(email)) {
             findTrip.tripLikes.add(email)
             findTrip.likes++
