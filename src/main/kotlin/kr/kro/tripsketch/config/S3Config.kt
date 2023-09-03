@@ -27,7 +27,7 @@ class S3Config {
             .credentialsProvider {
                 AwsBasicCredentials.create(accessKey, secretKey)
             }
-            .endpointOverride(URI.create("https://ax6izwmsuv9c.compat.objectstorage.ap-osaka-1.oraclecloud.com"))
+            .endpointOverride(URI.create("https://compat.objectstorage.ap-osaka-1.oraclecloud.com"))
             .build()
     }
 }
