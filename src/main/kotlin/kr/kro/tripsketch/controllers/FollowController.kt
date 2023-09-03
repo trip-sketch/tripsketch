@@ -25,9 +25,10 @@ class FollowController(
     fun follow(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val email = req.getAttribute("userEmail") as String?
             ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
-        followService.follow(email, followDto.nickname)
-        return ResponseEntity.status(HttpStatus.OK).body("성공적으로 구독했습니다.")
+        val responseFromExpo = followService.follow(email, followDto.nickname)
+        return ResponseEntity.status(HttpStatus.OK).body(responseFromExpo)
     }
+
 
     @DeleteMapping
     @ApiResponse(responseCode = "200", description = "구독 취소되었습니다.")
