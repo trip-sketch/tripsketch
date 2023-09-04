@@ -3,8 +3,8 @@ package kr.kro.tripsketch.controllers
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.NotificationRequest
-import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
@@ -56,19 +56,24 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
-    @PatchMapping
+    @PatchMapping(consumes = ["multipart/form-data"])
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun updateUser(req: HttpServletRequest, @Validated @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
+    fun updateUser(req: HttpServletRequest,
+                   @Validated @ModelAttribute userUpdateDto: UserUpdateDto
+    ): ResponseEntity<UserDto> {
         val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+
         try {
-            val updatedUser = userService.updateUserByEmail(email, profileDto)
+            val updatedUser = userService.updateUserByEmail(email, userUpdateDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
         }
     }
+
+
 
     @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")

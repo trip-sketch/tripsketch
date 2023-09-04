@@ -6,6 +6,7 @@ import software.amazon.awssdk.core.sync.RequestBody
 import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -28,5 +29,14 @@ class S3Service(private val s3Client: S3Client) {
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
         return Pair(key, response)
+    }
+
+    fun deleteFile(key: String) {
+        val deleteObjectRequest = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build()
+
+        s3Client.deleteObject(deleteObjectRequest)
     }
 }
