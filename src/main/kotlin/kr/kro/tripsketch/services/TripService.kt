@@ -85,24 +85,44 @@ class TripService(
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
-//    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>>{
-//        val user = userService.findUserByNickname(nickname)
-//        val trips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
-//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-//        return findTrips.categorizeTripsByCountry()
-//    }
-//
-//    fun getTripsInCountry(nickname: String , country:String): Set<TripDto> {
-//        val user = userService.findUserByNickname(nickname)
-//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-//        return findTrips.getTripsInCountry(country)
-//    }
-//
-//    fun getCountryFrequencies(nickname: String): Map<String, Int> {
-//        val user = userService.findUserByNickname(nickname)
-//        val findTrips = tripRepository.findTripByEmailAndHiddenIsFalse(user!!.email)
-//        return findTrips.sortTripsByCountryFrequency()
-//    }
+    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        return findTrips.categorizeTripsByCountry()
+    }
+
+    fun getTripCategoryByNickname(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        // 전체 여행 목록을 카테고리화
+        val categorizedTrips = findTrips.categorizeTripsByCountry()
+        // 페이지네이션 적용
+        return paginateTrips(categorizedTrips.second, page, pageSize)
+    }
+
+
+    fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        val getTripsInCountry = findTrips.getTripsInCountry(country)
+        return findTrips.getTripsInCountry(country)
+    }
+
+    fun getTripsInCountry(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        val tripsInCountry = findTrips.getTripsInCountry(country)
+
+        // 페이지네이션 적용
+        return paginateTrips(tripsInCountry, page, pageSize)
+    }
+
+
+    fun getCountryFrequencies(nickname: String): Map<String, Int> {
+        val user = userService.findUserByNickname(nickname)
+        val findTrips = tripRepository.findTripByEmailAndIsHiddenIsFalse(user!!.email)
+        return findTrips.sortTripsByCountryFrequency()
+    }
 
     /**
      * 여행 목록을 나라 기준으로 카테고리화하고 결과를 반환합니다.
@@ -142,10 +162,13 @@ class TripService(
      */
     fun Set<Trip>.getTripsInCountry(targetCountry: String): Set<TripDto> {
         // 지정된 나라와 일치하는 여행만 필터링하고 TripDto로 변환하여 반환
-        return this.filter { trip ->
+        val filteredTrips = this.filter { trip ->
             trip.hashtagInfo?.country == targetCountry
-        }.map { fromTrip(it, "", false) }.toSet()
+        }
+
+        return filteredTrips.map { fromTrip(it, "", false) }.toSet()
     }
+
 
     /**
      * 나라 기준으로 여행 횟수를 많은 순으로 정렬하여 반환합니다.
@@ -168,7 +191,6 @@ class TripService(
             .sortedByDescending { it.value }
             .associateBy({ it.key }, { it.value })
     }
-
 
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
@@ -352,4 +374,26 @@ class TripService(
             images = trip.images
         )
     }
+}
+
+
+fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
+    val tripList = trips.toList()
+    val totalTrips = tripList.size
+    val startIndex = (page - 1) * pageSize
+    val endIndex = if (startIndex + pageSize < totalTrips) {
+        startIndex + pageSize
+    } else {
+        totalTrips
+    }
+
+    val paginatedTrips = tripList.slice(startIndex until endIndex)
+    val totalPage = if (tripList.isEmpty()) 0 else (totalTrips + pageSize - 1) / pageSize
+
+    return mapOf(
+        "posts" to paginatedTrips,
+        "currentPage" to page,
+        "totalPage" to totalPage,
+        "postsPerPage" to pageSize
+    )
 }
