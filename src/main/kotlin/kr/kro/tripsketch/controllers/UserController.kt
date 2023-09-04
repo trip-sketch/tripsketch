@@ -84,7 +84,7 @@ class UserController(private val userService: UserService, private val notificat
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
         val expoResponseMessage = notificationService.sendPushNotification(
-            listOf(notificationRequest.email),
+            setOf(notificationRequest.email),
             notificationRequest.title,
             notificationRequest.body,
             notificationRequest.commentId,
@@ -99,7 +99,6 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(expoResponseMessage)
         }
     }
-
 
 
     @PostMapping("/upload", consumes = ["multipart/form-data"])
