@@ -84,7 +84,7 @@ class UserController(private val userService: UserService, private val notificat
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
         val expoResponseMessage = notificationService.sendPushNotification(
-            setOf(notificationRequest.email),
+            listOf(notificationRequest.email),
             notificationRequest.title,
             notificationRequest.body,
             notificationRequest.commentId,
