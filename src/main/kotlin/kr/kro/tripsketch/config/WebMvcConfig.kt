@@ -53,10 +53,10 @@ class WebMvcConfig(
                 "/api/follow/guest/followers",
                 "/api/oauth/kakao/**",
                 "/api/comment/guest/**",
-                "/api/trip/nickname",
+                "/api/trip/nickname/**",
                 "/api/trip/guest/**",
                 "/api/geocode",
-                "/api/user/upload"
+                "/api/user/upload",
             )
     }
 }

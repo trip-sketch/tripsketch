@@ -3,8 +3,8 @@ package kr.kro.tripsketch.controllers
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.NotificationRequest
-import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
@@ -56,19 +56,23 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
-    @PatchMapping
+    @PatchMapping(consumes = ["multipart/form-data"])
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun updateUser(req: HttpServletRequest, @Validated @RequestBody profileDto: ProfileDto): ResponseEntity<UserDto> {
+    fun updateUser(req: HttpServletRequest,
+                   @Validated @ModelAttribute userUpdateDto: UserUpdateDto
+    ): ResponseEntity<UserDto> {
         val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+
         try {
-            val updatedUser = userService.updateUserByEmail(email, profileDto)
+            val updatedUser = userService.updateUserByEmail(email, userUpdateDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
         }
     }
+    
 
     @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
@@ -79,7 +83,7 @@ class UserController(private val userService: UserService, private val notificat
 
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
-        val expoResponse = notificationService.sendPushNotification(
+        val expoResponseMessage = notificationService.sendPushNotification(
             listOf(notificationRequest.email),
             notificationRequest.title,
             notificationRequest.body,
@@ -89,12 +93,10 @@ class UserController(private val userService: UserService, private val notificat
             notificationRequest.nickname
         )
 
-        val status = HttpStatus.resolve(expoResponse.code)
-
-        return if (status?.is2xxSuccessful == true) {
-            ResponseEntity.ok(expoResponse.body?.string() ?: "Notification sent successfully!")
+        return if (expoResponseMessage == "Notification sent successfully!") {
+            ResponseEntity.ok(expoResponseMessage)
         } else {
-            ResponseEntity.status(status ?: HttpStatus.BAD_REQUEST).body(expoResponse.body?.string())
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(expoResponseMessage)
         }
     }
 
@@ -104,12 +106,14 @@ class UserController(private val userService: UserService, private val notificat
                    @RequestParam("file") file: MultipartFile): ResponseEntity<Any> {
         return try {
             val (key, response) = s3Service.uploadFile(dir, file)
-            ResponseEntity.ok(mapOf("key" to key, "awsResponse" to response))
+            // eTag나 원하는 다른 정보만 반환
+            ResponseEntity.ok(mapOf("key" to key, "eTag" to response.eTag()))
         } catch (e: S3Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
         }
     }
+
 
 }

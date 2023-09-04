@@ -3,6 +3,7 @@ package kr.kro.tripsketch.services
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
+import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -16,6 +17,7 @@ class UserService(
     private val followRepository: FollowRepository,
     private val jwtService: JwtService,
     private val nicknameService: NickNameService,
+    private val imageService: ImageService,
 ) {
 
     fun registerOrUpdateUser(email: String): User {
@@ -73,21 +75,29 @@ class UserService(
         return userRepository.save(user)
     }
 
-    fun updateUserByEmail(email: String, profileDto: ProfileDto): User {
+    fun updateUserByEmail(email: String, userUpdateDto: UserUpdateDto): User {
         val user = userRepository.findByEmail(email) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
-        profileDto.nickname?.let {
+        userUpdateDto.nickname?.let {
             if (it != user.nickname && isNicknameExist(it)) {
                 throw BadRequestException("이미 사용중인 닉네임입니다.")
             }
             user.nickname = it
         }
 
-        profileDto.profileImageUrl?.let {
-            user.profileImageUrl = it
+        userUpdateDto.profileImageUrl?.let { newImage ->
+            val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+            if (user.profileImageUrl != defaultImageUrl) {
+                user.profileImageUrl?.let { oldImageUrl ->
+                    imageService.deleteImage(oldImageUrl)
+                }
+            }
+
+            val newImageUrl = imageService.uploadImage("tripsketch/trip-user", newImage)
+            user.profileImageUrl = newImageUrl
         }
 
-        profileDto.introduction?.let {
+        userUpdateDto.introduction?.let {
             user.introduction = it
         }
 

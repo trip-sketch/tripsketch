@@ -6,20 +6,13 @@ import software.amazon.awssdk.core.sync.RequestBody
 import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.net.ssl.X509TrustManager
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
 
 @Service
 class S3Service(private val s3Client: S3Client) {
-
-    init {
-        disableSslVerification()
-    }
 
     @Value("\${aws.bucketName}")
     lateinit var bucketName: String
@@ -38,15 +31,12 @@ class S3Service(private val s3Client: S3Client) {
         return Pair(key, response)
     }
 
-    private fun disableSslVerification() {
-        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-            override fun getAcceptedIssuers(): Array<X509Certificate?> = arrayOfNulls(0)
-            override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {}
-            override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) {}
-        })
+    fun deleteFile(key: String) {
+        val deleteObjectRequest = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build()
 
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-        SSLContext.setDefault(sslContext)
+        s3Client.deleteObject(deleteObjectRequest)
     }
 }
