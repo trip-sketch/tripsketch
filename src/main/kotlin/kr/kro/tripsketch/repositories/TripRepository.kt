@@ -83,4 +83,5 @@ interface TripRepository : MongoRepository<Trip, String> {
             "}"
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
+
 }

@@ -1,5 +1,8 @@
 package kr.kro.tripsketch.domain
 
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import org.hibernate.validator.constraints.Length
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -8,9 +11,17 @@ import java.time.LocalDateTime
 @Document(collection = "trips")
 data class Trip(
     @Id val id: String? = null,
+    @field:Email(message = "올바른 이메일 형식이어야 합니다.")
+    @field:NotBlank(message = "이메일은 비워둘 수 없습니다.")
     var email: String,
-    @TextIndexed var title: String,
-    @TextIndexed var content: String,
+    @field:NotBlank(message = "제목을 입력하세요.")
+    @field:Length(min = 5, max = 100, message = "텍스트 길이는 5자 이상 50자이내여야 합니다.")
+    @TextIndexed
+    var title: String,
+    @field:NotBlank(message = "내용을 입력하세요.")
+    @field:Length(min = 5, max = 100, message = "텍스트 길이가 5자 이상이어야 합니다.")
+    @TextIndexed
+    var content: String,
     var likes: Int = 0,
     var views: Int = 0,
     var location: String? = null,
