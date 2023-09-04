@@ -20,7 +20,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     @PostMapping
     fun createTrip(
         req: HttpServletRequest,
-        @RequestBody tripCreateDto: TripCreateDto
+        @Validated @RequestBody tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
         val email = req.getAttribute("userEmail") as String
         val createdTrip = tripService.createTrip(email, tripCreateDto)
