@@ -173,11 +173,12 @@ class TripController(private val tripService: TripService, private val jwtServic
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
         req: HttpServletRequest,
-        @RequestParam keyword: String
+        @RequestParam keyword: String,
+        @RequestParam sorting: Int
     ): ResponseEntity<List<TripDto>> {
         return try {
             val email = req.getAttribute("userEmail") as String
-            val findTrips = tripService.getSearchTripsByKeyword(email, keyword)
+            val findTrips = tripService.getSearchTripsByKeyword(email, keyword, sorting)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
         }  catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()

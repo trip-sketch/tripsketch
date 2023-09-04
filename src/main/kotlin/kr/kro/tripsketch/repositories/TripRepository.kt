@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.repositories
 
 import kr.kro.tripsketch.domain.Trip
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
@@ -70,4 +71,14 @@ interface TripRepository : MongoRepository<Trip, String> {
             "}"
     )
     fun findTripsByKeyword(keyword: String): List<Trip>
+
+
+    @Query("{" +
+            "\$or: [" +
+            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
+            "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
+            "]" +
+            "}"
+    )
+    fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
 }
