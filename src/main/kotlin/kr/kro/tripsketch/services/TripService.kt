@@ -73,11 +73,11 @@ class TripService(
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
-    fun getAllFollowingTripsByUser(email: String): Set<TripDto> {
-        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email)
-        return findTrips.map { fromTrip(it, email, false) }.toSet()
-
-    }
+//    fun getAllFollowingTripsByUser(email: String): Set<TripDto> {
+//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email)
+//        return findTrips.map { fromTrip(it, email, false) }.toSet()
+//
+//    }
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
