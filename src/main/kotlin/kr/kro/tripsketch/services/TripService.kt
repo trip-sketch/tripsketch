@@ -7,6 +7,7 @@ import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -253,9 +254,15 @@ class TripService(
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 
 
-    fun getSearchTripsByKeyword(email: String, keyword: String): List<TripDto> {
+    // to-do : 쿼리스트링으로 sort 에 대한 조건을 받을 수 있을까? -> ex. 최신순(1)/오래된순(-1), 인기순(2)
+    fun getSearchTripsByKeyword(email: String, keyword: String, sorting: Int): List<TripDto> {
         // 검색 기준: 제목, 글 내용, 위치(나라, 도시이름 등) (cf. 닉네임은 getTripByNickname)
-        val findTrips = tripRepository.findTripsByKeyword(keyword)
+        val sort: Sort = when (sorting) {
+            1 -> Sort.by(Sort.Order.desc("createdAt")) // 최신순으로 정렬
+            -1 -> Sort.by(Sort.Order.asc("createdAt")) // 오래된순으로 정렬
+            else -> Sort.unsorted() // 정렬하지 않음
+        }
+        val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
         if (findTrips != null) {
             val tripDtoList = mutableListOf<TripDto>()
             findTrips.forEach { trip ->
