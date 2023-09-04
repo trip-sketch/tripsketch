@@ -1,8 +1,10 @@
 package kr.kro.tripsketch.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ProfileDto(
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
     val nickname: String?,
