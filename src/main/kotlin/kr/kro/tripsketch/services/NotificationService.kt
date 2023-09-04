@@ -17,7 +17,7 @@ class NotificationService(
     private val client = OkHttpClient()
 
     fun sendPushNotification(
-        emails: Set<String>,
+        emails: List<String>,
         title: String,
         body: String,
         commentId: String? = null,
