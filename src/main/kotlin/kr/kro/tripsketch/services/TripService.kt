@@ -256,16 +256,15 @@ class TripService(
     fun getSearchTripsByKeyword(email: String, keyword: String): List<TripDto> {
         // 검색 기준: 제목, 글 내용, 위치(나라, 도시이름 등) (cf. 닉네임은 getTripByNickname)
         val findTrips = tripRepository.findTripsByKeyword(keyword)
-//        if (findTrips != null) {
-//            return fromTrip(findTrips, email, false)
-//        }  else {
-//            throw IllegalAccessException("수정할 권한이 없습니다.")
-//        }
-        val tripDtoList = mutableListOf<TripDto>()
-        findTrips.forEach { trip ->
-            tripDtoList.add(fromTrip(trip, email, false))
+        if (findTrips != null) {
+            val tripDtoList = mutableListOf<TripDto>()
+            findTrips.forEach { trip ->
+                tripDtoList.add(fromTrip(trip, email, false))
+            }
+            return tripDtoList
+        } else {
+            throw IllegalAccessException("조회되는 게시물이 없습니다.")
         }
-        return tripDtoList
     }
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
