@@ -72,8 +72,7 @@ class UserController(private val userService: UserService, private val notificat
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
         }
     }
-
-
+    
 
     @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
@@ -100,7 +99,6 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(expoResponseMessage)
         }
     }
-
 
 
     @PostMapping("/upload", consumes = ["multipart/form-data"])

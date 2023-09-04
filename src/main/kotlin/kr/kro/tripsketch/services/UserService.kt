@@ -86,11 +86,14 @@ class UserService(
         }
 
         userUpdateDto.profileImageUrl?.let { newImage ->
-            user.profileImageUrl?.let { oldImageUrl ->
-                imageService.deleteImage(oldImageUrl)
+            val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+            if (user.profileImageUrl != defaultImageUrl) {
+                user.profileImageUrl?.let { oldImageUrl ->
+                    imageService.deleteImage(oldImageUrl)
+                }
             }
 
-            val newImageUrl = imageService.uploadImage("trip-user", newImage)
+            val newImageUrl = imageService.uploadImage("tripsketch/trip-user", newImage)
             user.profileImageUrl = newImageUrl
         }
 
@@ -100,7 +103,6 @@ class UserService(
 
         return userRepository.save(user)
     }
-
 
 
     fun isNicknameExist(nickname: String): Boolean {

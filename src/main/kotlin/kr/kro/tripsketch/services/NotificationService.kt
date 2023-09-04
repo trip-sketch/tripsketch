@@ -26,7 +26,7 @@ class NotificationService(
         nickname: String? = null,
         profileUrl: String? = null
     ): String {
-        val tokens = emails.mapNotNull { getUserToken(it) }
+        val tokens = emails.mapNotNull { getUserToken(it) }.toSet()
         val response = if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
@@ -36,14 +36,13 @@ class NotificationService(
         return response.body?.string() ?: "No response body from Expo"
     }
 
-
     private fun getUserToken(email: String): String? {
         val user = userService.findUserByEmail(email)
         return user?.expoPushToken
     }
 
     private fun sendExpoPushNotification(
-        pushTokens: List<String>,
+        pushTokens: Set<String>,
         title: String,
         message: String,
         commentId: String? = null,
