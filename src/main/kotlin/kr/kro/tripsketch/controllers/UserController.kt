@@ -66,7 +66,7 @@ class UserController(private val userService: UserService, private val notificat
         val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
 
         try {
-            val updatedUser = userService.updateUserByEmail(email, userUpdateDto)
+            val updatedUser = userService.updateUser(email, userUpdateDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
@@ -105,9 +105,8 @@ class UserController(private val userService: UserService, private val notificat
     fun uploadFile(@RequestParam("dir", required = false, defaultValue = "") dir: String,
                    @RequestParam("file") file: MultipartFile): ResponseEntity<Any> {
         return try {
-            val (key, response) = s3Service.uploadFile(dir, file)
-            // eTag나 원하는 다른 정보만 반환
-            ResponseEntity.ok(mapOf("key" to key, "eTag" to response.eTag()))
+            val (url, response) = s3Service.uploadFile(dir, file)
+            ResponseEntity.ok(mapOf("url" to url, "eTag" to response.eTag()))
         } catch (e: S3Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
         } catch (e: Exception) {
