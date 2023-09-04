@@ -1,18 +1,19 @@
 package kr.kro.tripsketch.services
 
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.core.sync.RequestBody
 import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
+import software.amazon.awssdk.services.s3.model.*
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-class S3Service(private val s3Client: S3Client) {
+class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presigner) {
 
     @Value("\${aws.bucketName}")
     lateinit var bucketName: String
@@ -24,12 +25,32 @@ class S3Service(private val s3Client: S3Client) {
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(key)
+            .acl(ObjectCannedACL.PUBLIC_READ)
             .build()
 
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
-        return Pair(key, response)
+        // Generate a presigned URL for the uploaded object
+        val presignedUrl = getPresignedUrl(bucketName, key, Duration.ofHours(1))
+
+        return Pair(presignedUrl, response)
     }
+
+    fun getPresignedUrl(bucket: String, key: String, expiration: Duration): String {
+        val getRequest = GetObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build()
+
+        val presignedGetObjectRequest = s3Presigner.presignGetObject(
+            GetObjectPresignRequest.builder()
+                .signatureDuration(expiration)
+                .getObjectRequest(getRequest)
+                .build())
+
+        return presignedGetObjectRequest.url().toString()
+    }
+
 
     fun deleteFile(key: String) {
         val deleteObjectRequest = DeleteObjectRequest.builder()
