@@ -245,16 +245,8 @@ class TripService(
         return findTripDtos
     }
 
-    // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-    // 인기있는 게시물은 어떻게 따지나? (기준 - 조회수, 좋아요 갯수, comment 갯수 있음)
-
-
-    // to-do : (탐색 페이지) 검색어 + 등록일 기준 최신순으로 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-
-
     // to-do : 쿼리스트링으로 sort 에 대한 조건을 받을 수 있을까? -> ex. 최신순(1)/오래된순(-1), 인기순(2)
+    // to-do : 구독유무에 따라 위로 올리는 순? 아니면 구독한 내용만 따로 받아올 수도 있겠다.
     fun getSearchTripsByKeyword(email: String, keyword: String, sorting: Int): List<TripDto> {
         // 검색 기준: 제목, 글 내용, 위치(나라, 도시이름 등) (cf. 닉네임은 getTripByNickname)
         val sort: Sort = when (sorting) {
