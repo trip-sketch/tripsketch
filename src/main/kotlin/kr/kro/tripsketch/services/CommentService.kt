@@ -97,7 +97,9 @@ class CommentService(
             ?: // 적절한 에러 처리 로직 추가
             throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
-        val mentionedUser = userRepository.findByNickname(commentChildrenCreateDto.replyToNickname)
+        val mentionedUser =
+            userRepository.findByNickname(commentChildrenCreateDto.replyToNickname) ?: // 적절한 에러 처리 로직 추가
+            throw IllegalArgumentException("해당 이메일의 언급 된 사용자 존재하지 않습니다.")
 
         val childComment = Comment(
             id = ObjectId().toString(), // 새로운 ObjectId 생성
@@ -105,16 +107,32 @@ class CommentService(
             tripId = commentChildrenCreateDto.tripId,
             parentId = parentId,
             content = commentChildrenCreateDto.content,
-            replyToEmail = mentionedUser!!.email,
+            replyToEmail = mentionedUser.email,
         )
 
         parentComment.children.add(childComment)
         val createdComment = commentRepository.save(parentComment)
 
         val tripEmail = findTrip.email
-        if (tripEmail != email && parentComment.userEmail !=email && mentionedUser.email!=email)
+        // 알림 적용
+        val notificationRecipients = mutableListOf<String>()
+
+        if (tripEmail != email) {
+            notificationRecipients.add(tripEmail)
+        }
+
+        if (parentComment.userEmail != email) {
+            notificationRecipients.add(parentComment.userEmail)
+        }
+
+        if (mentionedUser.email != email) {
+            notificationRecipients.add(mentionedUser.email)
+        }
+
+        println("$notificationRecipients : notificationRecipients")
+        if (notificationRecipients.isNotEmpty()) {
             notificationService.sendPushNotification(
-                listOf(tripEmail, parentComment.userEmail, mentionedUser.email),
+                notificationRecipients,
                 "새로운 여행의 시작, 트립스케치",
                 "${commenter.nickname} 님이 댓글을 남겼습니다. ",
                 nickname = commenter.nickname,
@@ -123,17 +141,9 @@ class CommentService(
                 parentId = childComment.parentId,
                 commentId = childComment.id
             )
-        else if (tripEmail != email && mentionedUser.email!=email)
-            notificationService.sendPushNotification(
-                listOf(tripEmail, mentionedUser.email),
-                "새로운 여행의 시작, 트립스케치",
-                "${commenter.nickname} 님이 댓글을 남겼습니다. ",
-                nickname = commenter.nickname,
-                profileUrl = commenter.profileImageUrl,
-                tripId = childComment.tripId,
-                parentId = childComment.parentId,
-                commentId = childComment.id
-            )
+        }
+
+
 
 
         return fromComment(createdComment, userRepository)
@@ -281,7 +291,7 @@ class CommentService(
             if (email != childComment.userEmail) {
                 // 알림 적용
                 notificationService.sendPushNotification(
-                    listOf( childComment.userEmail),
+                    listOf(childComment.userEmail),
                     "새로운 여행의 시작, 트립스케치",
                     "${commenter.nickname} 님이 님이 댓글에 좋아요.",
                     nickname = commenter.nickname,
