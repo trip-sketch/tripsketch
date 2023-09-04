@@ -196,16 +196,30 @@ class TripService(
 
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-//    fun getListFollowingByUser(email: String): TripCardDto? {
-//        // 내가 팔로잉하는 사람들
-//        val following = followRepository.findByFollower(email)
-//        val filterdFollowing = following.filter { it.following != email }
-//        val filterdFollowingEmails = filterdFollowing.map { it.following }
-//
-//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse()
-//
-//        return fromTrip(findTrips, "", false)
-//    }
+    fun getListFollowingByUser(email: String): List<TripDto> {
+        // 내가 팔로잉하는 사람들
+        val following = followRepository.findByFollower(email).toSet()
+        println(following)
+        val filteredFollowing = following.filter { it.following != email && it.following.isNotEmpty() }
+        println(filteredFollowing)
+        val filteredFollowingEmails = filteredFollowing.map { it.following }.toSet()
+        println(filteredFollowingEmails)
+
+//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(filterdFollowingEmails)
+//        println(findTrips)
+
+        // 만약 filteredFollowingEmails가 빈 집합이라면 빈 리스트 반환
+        if (filteredFollowingEmails.isEmpty()) {
+            return emptyList()
+        }
+
+        val findTrips = tripRepository.findListFollowingByUser(filteredFollowingEmails)
+        println(findTrips)
+
+        val findTripDtos = findTrips.map { trip -> fromTrip(trip, email, false) }
+        println(findTripDtos)
+        return findTripDtos
+    }
 
     // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.

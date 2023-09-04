@@ -2,8 +2,9 @@ package kr.kro.tripsketch.repositories
 
 import kr.kro.tripsketch.domain.Trip
 import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.repository.query.Param
+import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
+
 
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
@@ -25,12 +26,39 @@ interface TripRepository : MongoRepository<Trip, String> {
     fun findTripByEmailAndIsHiddenIsFalse(email: String): Set<Trip>
 
     // isPublic 값이 true이고 isHidden 값이 false인 게시물 조회
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalse(): Set<Trip>
-    fun findByIsPublicIsTrueAndIsHiddenIsFalse(@Param("email") email: String = ""): Set<Trip>
+    fun findByIsPublicIsTrueAndIsHiddenIsFalse(email: String = ""): Set<Trip>
+
+//    @Query("SELECT t FROM Trip t WHERE t.isPublic = true AND t.isHidden = false AND t.email IN :emails")
+//    fun findByIsPublicIsTrueAndIsHiddenIsFalse(@Param("email") emails: Set<String>): Set<Trip>
 
     // email 조건이 맞고, isPublic 값이 true이고 isHidden 값이 false인 게시물 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(email: String): Set<Trip>
+    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(emails: Set<String>): Set<Trip>
 
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email: String): Set<Trip>
 
+    @Query("" +
+            "SELECT " +
+            "   title " +
+            "   , content " +
+            "   , likes " +
+            "   , views " +
+            "   , location " +
+            "   , startedAt " +
+            "   , endAt " +
+            "   , hashtagInfo " +
+            "   , createdAt " +
+            "   , images[0] " +
+            "FROM " +
+            "   trips" +
+            "WHERE " +
+            "   isPublic = true " +
+            "   AND isHidden = false " +
+            "   AND email IN :emailSet " +
+            "GROUP BY " +
+            "   emailSet " +
+            "ORDER BY " +
+            "   createdAt DESC "
+    )
+    fun findListFollowingByUser(emailSet: Set<String>): Set<Trip>
 }
