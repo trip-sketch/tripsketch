@@ -67,7 +67,8 @@ interface TripRepository : MongoRepository<Trip, String> {
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
-            "]" +
+            "]," +
+            "'isPublic': true, 'isHidden': false" +
             "}"
     )
     fun findTripsByKeyword(keyword: String): List<Trip>
@@ -77,7 +78,8 @@ interface TripRepository : MongoRepository<Trip, String> {
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
-            "]" +
+            "]," +
+            "'isPublic': true, 'isHidden': false" +
             "}"
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
