@@ -14,9 +14,7 @@ import java.time.LocalDateTime
 class TripService(
     private val tripRepository: TripRepository,
     private val followRepository: FollowRepository,
-    private val jwtService: JwtService,
     private val userService: UserService,
-    private val tripLikeService: TripLikeService,
     private val notificationService: NotificationService,
 ) {
     fun createTrip(email: String, tripCreateDto: TripCreateDto): TripDto {
@@ -35,9 +33,9 @@ class TripService(
         )
         val createdTrip = tripRepository.save(newTrip)
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
-        val followers = followRepository.findByFollowing(email)
-        val filteredFollowers = followers.filter { it.follower != email }
-        val followerEmails = filteredFollowers.map { it.follower }
+        val follower = followRepository.findByFollowing(email)
+        val filteredFollower = follower.filter { it.follower != email }
+        val followerEmails = filteredFollower.map { it.follower }
         val followingNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
         val followingProfileUrl = userService.findUserByEmail(email)?.profileImageUrl ?: ""
         notificationService.sendPushNotification(
@@ -72,6 +70,12 @@ class TripService(
         val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse()
             ?: throw IllegalArgumentException("작성된 게시글이 존재하지 않습니다.")
         return findTrips.map { fromTrip(it, "", false) }.toSet()
+    }
+
+    fun getAllFollowingTripsByUser(email: String): Set<TripDto> {
+        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email)
+        return findTrips.map { fromTrip(it, email, false) }.toSet()
+
     }
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
@@ -188,15 +192,6 @@ class TripService(
             .associateBy({ it.key }, { it.value })
     }
 
-
-//    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
-//        val user = userService.findUserByNickname(nickname)
-//        val findTrips = tripRepository.findTripByEmail(user!!.email, pageable)
-////        return findTrips.map { fromTrip(it, false) }.toSet()
-//        return findTrips.map { fromTrip(it, false) }.let { PageImpl(it.toList(), pageable, findTrips.totalElements) }
-//
-//    }
-
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -224,9 +219,30 @@ class TripService(
 
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-//    fun getListFollowingByUser(email: String): TripCardDto? {
-//
-//    }
+    fun getListFollowingByUser(email: String): List<TripDto> {
+        // 내가 팔로잉하는 사람들
+        val following = followRepository.findByFollower(email).toSet()
+        println(following)
+        val filteredFollowing = following.filter { it.following != email && it.following.isNotEmpty() }
+        println(filteredFollowing)
+        val filteredFollowingEmails = filteredFollowing.map { it.following }.toSet()
+        println(filteredFollowingEmails)
+
+//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(filterdFollowingEmails)
+//        println(findTrips)
+
+        // 만약 filteredFollowingEmails가 빈 집합이라면 빈 리스트 반환
+        if (filteredFollowingEmails.isEmpty()) {
+            return emptyList()
+        }
+
+        val findTrips = tripRepository.findListFollowingByUser(filteredFollowingEmails)
+        println(findTrips)
+
+        val findTripDtos = findTrips.map { trip -> fromTrip(trip, email, false) }
+        println(findTripDtos)
+        return findTripDtos
+    }
 
     // to-do : (메인, 탐색 페이지) 검색어 +  요즘 인기있는 게시물 조회(구독과 상관없이 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
@@ -237,9 +253,20 @@ class TripService(
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 
 
-    // to-do : (마이페이지) 카테고리(hashtag) + 닉네임으로 조회
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
-
+    fun getSearchTripsByKeyword(email: String, keyword: String): List<TripDto> {
+        // 검색 기준: 제목, 글 내용, 위치(나라, 도시이름 등) (cf. 닉네임은 getTripByNickname)
+        val findTrips = tripRepository.findTripsByKeyword(keyword)
+//        if (findTrips != null) {
+//            return fromTrip(findTrips, email, false)
+//        }  else {
+//            throw IllegalAccessException("수정할 권한이 없습니다.")
+//        }
+        val tripDtoList = mutableListOf<TripDto>()
+        findTrips.forEach { trip ->
+            tripDtoList.add(fromTrip(trip, email, false))
+        }
+        return tripDtoList
+    }
 
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
