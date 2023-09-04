@@ -61,4 +61,13 @@ interface TripRepository : MongoRepository<Trip, String> {
             "   createdAt DESC "
     )
     fun findListFollowingByUser(emailSet: Set<String>): Set<Trip>
+
+    @Query("{" +
+            "\$or: [" +
+            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
+            "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
+            "]" +
+            "}"
+    )
+    fun findTripsByKeyword(keyword: String): List<Trip>
 }

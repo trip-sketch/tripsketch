@@ -230,6 +230,21 @@ class TripService(
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
 
 
+    fun getSearchTripsByKeyword(email: String, keyword: String): List<TripDto> {
+        // 검색 기준: 제목, 글 내용, 위치(나라, 도시이름 등) (cf. 닉네임은 getTripByNickname)
+        val findTrips = tripRepository.findTripsByKeyword(keyword)
+//        if (findTrips != null) {
+//            return fromTrip(findTrips, email, false)
+//        }  else {
+//            throw IllegalAccessException("수정할 권한이 없습니다.")
+//        }
+        val tripDtoList = mutableListOf<TripDto>()
+        findTrips.forEach { trip ->
+            tripDtoList.add(fromTrip(trip, email, false))
+        }
+        return tripDtoList
+    }
+
     fun updateTrip(email: String, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")

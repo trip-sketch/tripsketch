@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.domain
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -8,8 +9,8 @@ import java.time.LocalDateTime
 data class Trip(
     @Id val id: String? = null,
     var email: String,
-    var title: String,
-    var content: String,
+    @TextIndexed var title: String,
+    @TextIndexed var content: String,
     var likes: Int = 0,
     var views: Int = 0,
     var location: String? = null,
