@@ -107,9 +107,8 @@ class TripService(
 
     fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
+        val findTrips = user?.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
-        val getTripsInCountry = findTrips.getTripsInCountry(country)
         return findTrips.getTripsInCountry(country)
     }
 
