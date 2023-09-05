@@ -15,7 +15,7 @@ data class Comment(
     @field:NotBlank(message = "User email must not be blank")
     @field:Email(message = "Invalid email format")
     @Indexed(unique = true)
-    val userEmail: String,
+    val userId: String? = null,
 
     @field:NotBlank(message = "User tripId must not be blank")
     @Indexed(unique = true)
