@@ -36,9 +36,10 @@ class TripService(
         )
         val createdTrip = tripRepository.save(newTrip)
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
-        val followers = followRepository.findByFollowing(email)
-        val filteredFollowers = followers.filter { it.follower != email }
+        val followers = followRepository.findByFollowing(user.id)
+        val filteredFollowers = followers.filter { it.follower != user.id }
         val followerEmails = filteredFollowers.map { it.follower }
+
         val followingNickname = userService.findUserByEmail(email)?.nickname ?: "Unknown user"
 
         notificationService.sendPushNotification(
