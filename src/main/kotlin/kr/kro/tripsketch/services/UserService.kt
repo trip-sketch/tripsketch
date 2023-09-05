@@ -98,6 +98,9 @@ class UserService(
     }
 
 
+    fun saveOrUpdate(user: User): User {
+        return userRepository.save(user)
+    }
 
     fun isNicknameExist(nickname: String): Boolean {
         return userRepository.existsByNickname(nickname)

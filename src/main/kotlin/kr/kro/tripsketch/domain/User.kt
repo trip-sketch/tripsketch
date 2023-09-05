@@ -2,7 +2,6 @@ package kr.kro.tripsketch.domain
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
 import org.jetbrains.annotations.NotNull
@@ -40,4 +39,8 @@ data class User(
     var kakaoRefreshToken: String? = null,     // 카카오로부터 발급받은 refreshToken
     var ourRefreshToken: String? = null,    // 서비스 자체에서 발급한 refreshToken
     var expoPushToken: String? = null, // Notification을 위한 Expo Notification Token
-)
+) {
+    fun updateLastLogin() {
+        this.updatedAt = LocalDateTime.now()
+    }
+}
