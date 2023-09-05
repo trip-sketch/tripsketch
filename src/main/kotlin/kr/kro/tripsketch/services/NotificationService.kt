@@ -17,7 +17,7 @@ class NotificationService(
     private val client = OkHttpClient()
 
     fun sendPushNotification(
-        emails: List<String>,
+        ids: List<String>,
         title: String,
         body: String,
         commentId: String? = null,
@@ -26,7 +26,7 @@ class NotificationService(
         nickname: String? = null,
         profileUrl: String? = null
     ): String {
-        val tokens = emails.mapNotNull { getUserToken(it) }.toSet()
+        val tokens = ids.mapNotNull { getUserToken(it) }.toSet()
         val response = if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
@@ -36,10 +36,11 @@ class NotificationService(
         return response.body?.string() ?: "No response body from Expo"
     }
 
-    private fun getUserToken(email: String): String? {
-        val user = userService.findUserByEmail(email)
+    private fun getUserToken(id: String): String? {
+        val user = userService.findUserById(id)
         return user?.expoPushToken
     }
+
 
     private fun sendExpoPushNotification(
         pushTokens: Set<String>,
