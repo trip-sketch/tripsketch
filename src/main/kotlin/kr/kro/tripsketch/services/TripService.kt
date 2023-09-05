@@ -173,10 +173,18 @@ class TripService(
             trip.hashtagInfo?.country == targetCountry
         }
 
-        return filteredTrips.map { fromTrip(it, "", false) }.toSet()
+        // 최신순으로 정렬
+        val sortedTrips = filteredTrips.sortedByDescending { it.createdAt }
+
+        return sortedTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
 
+    /**
+     * 나라 기준으로 여행 횟수를 많은 순으로 정렬하여 반환합니다.
+     *
+     * @return 나라별 여행 횟수를 내림차순으로 정렬한 맵
+     */
     /**
      * 나라 기준으로 여행 횟수를 많은 순으로 정렬하여 반환합니다.
      *
@@ -186,18 +194,23 @@ class TripService(
         // 나라별 여행 횟수를 계산하기 위한 맵
         val countryFrequencyMap = mutableMapOf<String, Int>()
 
+        // 최신순으로 정렬
+        val sortedTrips = this.sortedByDescending { it.createdAt }
+
         // 각 여행을 반복하면서 나라별 횟수를 업데이트
-        for (trip in this) {
+        for (trip in sortedTrips) {
             trip.hashtagInfo?.country?.let { country ->
                 countryFrequencyMap[country] = countryFrequencyMap.getOrDefault(country, 0) + 1
             }
         }
 
-        // 나라별 횟수를 내림차순으로 정렬한 맵을 반환
+        // 나라별 횟수를 내림차순으로 정렬한 맵
+
         return countryFrequencyMap.entries
             .sortedByDescending { it.value }
             .associateBy({ it.key }, { it.value })
     }
+
 
 
 //    fun getTripByNickname(nickname: String, pageable: Pageable): Page<TripDto> {
