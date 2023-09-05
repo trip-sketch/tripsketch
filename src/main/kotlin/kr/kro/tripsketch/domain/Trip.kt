@@ -11,9 +11,8 @@ import java.time.LocalDateTime
 @Document(collection = "trips")
 data class Trip(
     @Id val id: String? = null,
-    @field:Email(message = "올바른 이메일 형식이어야 합니다.")
-    @field:NotBlank(message = "이메일은 비워둘 수 없습니다.")
-    var email: String,
+    @field:NotBlank(message = "userId 는 필수 항목입니다.")
+    var userId: String,
     @field:NotBlank(message = "제목을 입력하세요.")
     @field:Length(min = 5, max = 100, message = "텍스트 길이는 5자 이상 50자이내여야 합니다.")
     @TextIndexed

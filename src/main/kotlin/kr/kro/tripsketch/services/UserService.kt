@@ -10,12 +10,12 @@ import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
-    private val jwtService: JwtService,
     private val nicknameService: NickNameService,
     private val imageService: ImageService,
 ) {
@@ -39,43 +39,30 @@ class UserService(
         return user
     }
 
+    fun getUserIdByEmail(email: String): String {
+        val user = findUserByEmail(email)
+        return user?.id ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+    }
 
     fun findUserByEmail(email: String): User? {
         return userRepository.findByEmail(email)
     }
 
+
     fun findUserByNickname(nickname: String): User? {
         return userRepository.findByNickname(nickname)
+    }
+
+    fun findUserById(id: String): User? {
+        return userRepository.findById(id).orElse(null)
     }
 
     fun getAllUsers(pageable: Pageable): Page<User> {
         return userRepository.findAll(pageable)
     }
 
-    // 사용자 업데이트
-    fun updateUser(token: String, profileDto: ProfileDto): User {
-        val email = jwtService.getEmailFromToken(token)
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
-        profileDto.nickname?.let {
-            if (it != user.nickname && isNicknameExist(it)) {  // <-- 닉네임이 기존 닉네임과 다르며, 중복인지 검사
-                throw BadRequestException("이미 사용중인 닉네임입니다.")
-            }
-            user.nickname = it
-        }
-
-        profileDto.profileImageUrl?.let {
-            user.profileImageUrl = it
-        }
-
-        profileDto.introduction?.let {
-            user.introduction = it
-        }
-
-        return userRepository.save(user)
-    }
-
-    fun updateUserByEmail(email: String, userUpdateDto: UserUpdateDto): User {
+    fun updateUser(email: String, userUpdateDto: UserUpdateDto): User {
         val user = userRepository.findByEmail(email) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
         userUpdateDto.nickname?.let {
@@ -85,15 +72,21 @@ class UserService(
             user.nickname = it
         }
 
-        userUpdateDto.profileImageUrl?.let { newImage ->
+        userUpdateDto.profileImageUrl?.let { newImageFile ->
             val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+
             if (user.profileImageUrl != defaultImageUrl) {
                 user.profileImageUrl?.let { oldImageUrl ->
-                    imageService.deleteImage(oldImageUrl)
+                    try {
+                        imageService.deleteImage(oldImageUrl)  // `ImageService`의 `deleteImage` 함수를 사용하여 URL을 삭제합니다.
+                    } catch (e: Exception) {
+                        // 오류 로깅
+                        println("이미지 삭제에 실패했습니다. URL: $oldImageUrl, 오류: ${e.message}")
+                    }
                 }
             }
 
-            val newImageUrl = imageService.uploadImage("tripsketch/trip-user", newImage)
+            val newImageUrl = imageService.uploadImage("tripsketch/trip-user", newImageFile)
             user.profileImageUrl = newImageUrl
         }
 
@@ -104,6 +97,10 @@ class UserService(
         return userRepository.save(user)
     }
 
+
+    fun saveOrUpdate(user: User): User {
+        return userRepository.save(user)
+    }
 
     fun isNicknameExist(nickname: String): Boolean {
         return userRepository.existsByNickname(nickname)
