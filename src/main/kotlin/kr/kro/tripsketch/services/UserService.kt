@@ -10,6 +10,7 @@ import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class UserService(
@@ -38,13 +39,22 @@ class UserService(
         return user
     }
 
+    fun getUserIdByEmail(email: String): String {
+        val user = findUserByEmail(email)
+        return user?.id ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+    }
 
     fun findUserByEmail(email: String): User? {
         return userRepository.findByEmail(email)
     }
 
+
     fun findUserByNickname(nickname: String): User? {
         return userRepository.findByNickname(nickname)
+    }
+
+    fun findUserById(id: String): User? {
+        return userRepository.findById(id).orElse(null)
     }
 
     fun getAllUsers(pageable: Pageable): Page<User> {
