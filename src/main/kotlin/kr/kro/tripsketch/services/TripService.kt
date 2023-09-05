@@ -224,10 +224,13 @@ class TripService(
         // 내가 팔로잉하는 사람들
         val following = followRepository.findByFollower(email).toSet()
         println(following)
+        println("-----------------------------------------------")
         val filteredFollowing = following.filter { it.following != email && it.following.isNotEmpty() }
         println(filteredFollowing)
+        println("-----------------------------------------------")
         val filteredFollowingEmails = filteredFollowing.map { it.following }.toSet()
         println(filteredFollowingEmails)
+        println("-----------------------------------------------")
 
 //        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(filterdFollowingEmails)
 //        println(findTrips)
@@ -239,9 +242,11 @@ class TripService(
 
         val findTrips = tripRepository.findListFollowingByUser(filteredFollowingEmails)
         println(findTrips)
+        println("-----------------------------------------------")
 
         val findTripDtos = findTrips.map { trip -> fromTrip(trip, email, false) }
         println(findTripDtos)
+        println("-----------------------------------------------")
         return findTripDtos
     }
 
@@ -255,11 +260,16 @@ class TripService(
             else -> Sort.unsorted() // 정렬하지 않음
         }
         val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+        println("-----------------------------------------------")
+        println(findTrips)
+        println("-----------------------------------------------")
         if (findTrips != null) {
             val tripDtoList = mutableListOf<TripDto>()
             findTrips.forEach { trip ->
                 tripDtoList.add(fromTrip(trip, email, false))
             }
+            println(tripDtoList)
+            println("-----------------------------------------------")
             return tripDtoList
         } else {
             throw IllegalAccessException("조회되는 게시물이 없습니다.")
