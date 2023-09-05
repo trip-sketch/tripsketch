@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Document(collection = "trips")
 data class Trip(
     @Id val id: String? = null,
-    var email: String,
+    var userId: String,
     var title: String,
     var content: String,
     var likes: Int = 0,
