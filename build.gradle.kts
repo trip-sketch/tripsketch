@@ -95,6 +95,12 @@ dependencies {
 
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    //
+    implementation("com.google.api-client:google-api-client:1.31.5")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.31.5")
+    implementation("com.google.apis:google-api-services-gmail:v1-rev20210802-1.32.1")
+
 }
 
 tasks.withType<KotlinCompile> {
