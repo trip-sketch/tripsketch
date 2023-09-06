@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.dto
 
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
@@ -8,9 +7,8 @@ import java.time.LocalDateTime
 
 data class TripDto(
     var id: String? = null,
-    @field:Email(message = "올바른 이메일 형식이어야 합니다.")
-    @field:NotBlank(message = "이메일은 비워둘 수 없습니다.")
-    var email: String?,
+    @field:NotBlank(message = "userId 는 필수 항목입니다.")
+    var userId: String,
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
     var nickname: String?,
     @field:NotBlank(message = "제목을 입력하세요.")
