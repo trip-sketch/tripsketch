@@ -258,6 +258,14 @@ class TripService(
         return fromTrip(findTrip, "", false)
     }
 
+    fun getTripIsPublicById(id: String): TripDto? {
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        if (findTrip.isPublic == false){
+            throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        }
+        return fromTrip(findTrip, "", false)
+    }
 
     // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.

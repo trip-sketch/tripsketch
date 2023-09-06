@@ -141,7 +141,7 @@ class TripController(private val tripService: TripService, private val jwtServic
 
     @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
-        val findTrip = tripService.getTripById(id)
+        val findTrip = tripService.getTripIsPublicById(id)
         return if (findTrip != null) {
             if (!findTrip.isHidden) {
                 ResponseEntity.ok(findTrip)
