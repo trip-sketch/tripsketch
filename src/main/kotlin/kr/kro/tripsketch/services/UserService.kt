@@ -21,8 +21,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
-    private val imageService: ImageService,
-    private val emailService: EmailService,
+    private val imageService: ImageService
+//    private val emailService: EmailService,
 ) {
 
     fun registerOrUpdateUser(email: String): User {
@@ -147,9 +147,9 @@ class UserService(
         val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
 
         val deletionDate = LocalDateTime.now().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
-        usersToNotify.forEach { user ->
-            emailService.sendDeletionWarningEmail(user.email, deletionDate)
-        }
+//        usersToNotify.forEach { user ->
+//            emailService.sendDeletionWarningEmail(user.email, deletionDate)
+//        }
     }
 
     @Scheduled(cron = "0 30 15 * * ?")
