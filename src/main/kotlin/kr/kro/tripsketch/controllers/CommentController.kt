@@ -23,8 +23,8 @@ class CommentController(private val commentService: CommentService) {
     }
 
     @GetMapping("/guest/{tripId}")
-    fun getCommentByTripId(@PathVariable tripId: String): List<CommentDto> {
-        return commentService.getCommentByTripId(tripId)
+    fun getCommentsByTripId(@PathVariable tripId: String): List<CommentDto> {
+        return commentService.getCommentsByTripId(tripId)
     }
 
     @GetMapping("/user/{tripId}")

@@ -26,10 +26,29 @@ class CommentService(
         return commentRepository.findAll(pageable).map { fromComment(it, userService) }
     }
 
-    fun getCommentByTripId(tripId: String): List<CommentDto> {
+    fun getCommentsByTripId(tripId: String): List<CommentDto> {
         val comments = commentRepository.findAllByTripId(tripId)
         return comments.map { fromComment(it, userService) }
     }
+
+//    fun getCommentsByUserId(userId: String): List<CommentDto> {
+//        return commentRepository.findAllByUserId(userId).map { fromComment(it, userService) }
+//    }
+//
+//    fun getActiveComments(): List<CommentDto> {
+//        return commentRepository.findAllByIsDeletedFalse().map { fromComment(it, userService) }
+//    }
+//
+//    fun getLikedCommentsByUserId(userId: String): List<CommentDto> {
+//        return commentRepository.findAllByLikedByContains(userId).map { fromComment(it, userService) }
+//    }
+//
+//    fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
+//        return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
+//    }
+
+
+
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
     fun getIsLikedByTokenForTrip(email: String, tripId: String): List<CommentDto> {
