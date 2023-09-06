@@ -7,9 +7,12 @@ import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -17,7 +20,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
-    private val imageService: ImageService,
+    private val imageService: ImageService
 ) {
 
     fun registerOrUpdateUser(email: String): User {
@@ -136,7 +139,42 @@ class UserService(
         return Pair(followersCount, followingCount)
     }
 
-    fun toDto(user: User, includeEmail: Boolean = true): UserDto {
+//    @Scheduled(cron = "0 0 12 * * ?")  // 매일 정오에 실행
+//    fun notifyInactiveUsers() {
+//        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
+//        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
+//
+//        usersToNotify.forEach { user ->
+//            emailService.sendDeletionWarningEmail(user.email)
+//        }
+//    }
+
+    @Scheduled(cron = "0 30 15 * * ?")
+    fun softDeleteInactiveUsers() {
+        val cutoffDateForDeletion = LocalDateTime.now().minusMonths(12)
+        val usersToDelete = userRepository.findUsersByUpdatedAtBefore(cutoffDateForDeletion)
+
+        val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+
+        usersToDelete.forEach { user ->
+            softDeleteUser(user, defaultImageUrl)
+        }
+    }
+
+    fun softDeleteUser(user: User, defaultImageUrl: String) {
+        user.email = "${UUID.randomUUID()}@delete.com"
+        user.profileImageUrl = defaultImageUrl
+        user.kakaoRefreshToken = "DELETED"
+        user.ourRefreshToken = "DELETED"
+        user.expoPushToken = "DELETED"
+
+        userRepository.save(user)
+
+        println("User with ID ${user.id} has been soft deleted.")  // 출력 코드 추가
+    }
+
+
+    fun toDto(user: User, includeEmail: Boolean = true, isAdmin: Boolean? = null): UserDto {
         val (followersCount, followingCount) = getUserFollowInfo(user.email)
 
         return if (includeEmail) {
@@ -146,7 +184,8 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = isAdmin
             )
         } else {
             UserDto(
@@ -155,8 +194,12 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = null // 관리자 여부를 노출하지 않음
             )
         }
     }
+
 }
+
+

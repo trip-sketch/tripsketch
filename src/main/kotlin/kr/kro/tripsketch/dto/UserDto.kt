@@ -23,5 +23,7 @@ data class UserDto(
     val profileImageUrl: String?,
 
     val followersCount: Long? = null,
-    val followingCount: Long? = null
+    val followingCount: Long? = null,
+
+    val isAdmin: Boolean?,
 )

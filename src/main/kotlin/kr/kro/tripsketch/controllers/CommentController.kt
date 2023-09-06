@@ -23,8 +23,8 @@ class CommentController(private val commentService: CommentService) {
     }
 
     @GetMapping("/guest/{tripId}")
-    fun getCommentByTripId(@PathVariable tripId: String): List<CommentDto> {
-        return commentService.getCommentByTripId(tripId)
+    fun getCommentsByTripId(@PathVariable tripId: String): List<CommentDto> {
+        return commentService.getCommentsByTripId(tripId)
     }
 
     @GetMapping("/user/{tripId}")
@@ -78,7 +78,7 @@ class CommentController(private val commentService: CommentService) {
     fun deleteComment(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
         commentService.deleteComment(email, id)
-        return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
+        return ResponseEntity.status(200).body("성공적으로 댓글이 삭제 되었습니다.")
     }
 
     @DeleteMapping("/{parentId}/{id}")
@@ -89,7 +89,7 @@ class CommentController(private val commentService: CommentService) {
     ): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
         commentService.deleteChildrenComment(email, parentId, id)
-        return ResponseEntity.status(200).body("성공적으로 삭제 되었습니다.")
+        return ResponseEntity.status(200).body("성공적으로 댓글이 삭제 되었습니다.")
     }
 
     @PatchMapping("/{id}/like")
