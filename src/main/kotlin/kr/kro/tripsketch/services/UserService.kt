@@ -174,8 +174,7 @@ class UserService(
     }
 
 
-
-    fun toDto(user: User, includeEmail: Boolean = true): UserDto {
+    fun toDto(user: User, includeEmail: Boolean = true, isAdmin: Boolean? = null): UserDto {
         val (followersCount, followingCount) = getUserFollowInfo(user.email)
 
         return if (includeEmail) {
@@ -185,7 +184,8 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = isAdmin
             )
         } else {
             UserDto(
@@ -194,8 +194,12 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = null // 관리자 여부를 노출하지 않음
             )
         }
     }
+
 }
+
+
