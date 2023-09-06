@@ -171,6 +171,9 @@ class CommentService(
         if (comment.userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
+        if (comment.isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 수정 할 수 없습니다.")
+        }
         val updatedTime = LocalDateTime.now()
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
@@ -202,6 +205,10 @@ class CommentService(
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
 
+        if (parentComment.children[childCommentIndex].isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 수정 할 수 없습니다.")
+        }
+
         val updatedTime = LocalDateTime.now()
         val updatedChildComment = parentComment.children[childCommentIndex].copy(
             content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
@@ -218,7 +225,7 @@ class CommentService(
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         if (comment.isDeleted) {
-            throw BadRequestException("이미 삭제 된 댓글 입니다.")
+            throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         if (comment.userId != commenter.id) {
@@ -242,7 +249,7 @@ class CommentService(
         }
 
         if (parentComment.children[childCommentIndex].isDeleted) {
-            throw BadRequestException("이미 삭제 된 댓글 입니다.")
+            throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
 
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
@@ -264,6 +271,9 @@ class CommentService(
         val userId = commenter.id
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
+        if (comment.isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 좋아요 할 수 없습니다.")
+        }
         if (comment.likedBy.contains(userId)) {
             comment.likedBy.remove(userId) // 이미 좋아요를 누른 경우 좋아요 취소
             comment.numberOfLikes -= 1
@@ -299,6 +309,9 @@ class CommentService(
         val childCommentIndex = parentComment.children.indexOfFirst { it.id == id }
         if (childCommentIndex == -1) {
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children에 존재하지 않습니다.")
+        }
+        if (parentComment.children[childCommentIndex].isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 좋아요 할 수 없습니다.")
         }
 
         val childComment = parentComment.children[childCommentIndex]
