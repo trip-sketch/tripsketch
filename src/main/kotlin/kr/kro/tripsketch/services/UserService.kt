@@ -149,7 +149,7 @@ class UserService(
 //        }
 //    }
 
-    @Scheduled(cron = "0 10 0 * * ?", zone="Asia/Seoul")
+    @Scheduled(cron = "0 30 15 * * ?")
     fun softDeleteInactiveUsers() {
         val cutoffDateForDeletion = LocalDateTime.now().minusMonths(12)
         val usersToDelete = userRepository.findUsersByUpdatedAtBefore(cutoffDateForDeletion)
@@ -163,14 +163,16 @@ class UserService(
 
     fun softDeleteUser(user: User, defaultImageUrl: String) {
         user.email = "${UUID.randomUUID()}@delete.com"
-        user.introduction = "삭제처리된 계정입니다."
         user.profileImageUrl = defaultImageUrl
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
 
         userRepository.save(user)
+
+        println("User with ID ${user.id} has been soft deleted.")  // 출력 코드 추가
     }
+
 
 
     fun toDto(user: User, includeEmail: Boolean = true): UserDto {
