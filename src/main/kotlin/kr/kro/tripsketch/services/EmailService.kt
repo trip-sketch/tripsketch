@@ -1,39 +1,34 @@
-//package kr.kro.tripsketch.services
-//
-//import com.google.api.services.gmail.Gmail
-//import com.google.api.services.gmail.model.Message
-//import org.apache.commons.codec.binary.Base64
-//import org.springframework.stereotype.Service
-//import java.util.Properties
-//import javax.mail.Message.RecipientType
-//import javax.mail.Session
-//import javax.mail.internet.InternetAddress
-//import javax.mail.internet.MimeMessage
-//
-//@Service
-//class EmailService(private val gmail: Gmail) {
-//
-//    fun sendDeletionWarningEmail(email: String) {
-//        val emailContent = createEmail(email, "youremail@gmail.com", "Deletion Warning", "Your content will be deleted soon!")
-//        sendMessage(emailContent)
-//    }
-//
-//    private fun createEmail(to: String, from: String, subject: String, bodyText: String): MimeMessage {
-//        val props = Properties()
-//        val session = Session.getDefaultInstance(props, null)
-//
-//        val email = MimeMessage(session)
-//        email.setFrom(InternetAddress(from))
-//        email.addRecipient(RecipientType.TO, InternetAddress(to))
-//        email.subject = subject
-//        email.setText(bodyText)
-//        return email
-//    }
-//
-//    private fun sendMessage(emailContent: MimeMessage): Message {
-//        val bytes = Base64.encodeBase64URLSafeString(emailContent.toByteArray())
-//        val message = Message()
-//        message.raw = bytes
-//        return gmail.users().messages().send("me", message).execute()
-//    }
-//}
+package kr.kro.tripsketch.services
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ResourceLoader
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.stereotype.Service
+
+@Service
+class EmailService(
+    private val resourceLoader: ResourceLoader,
+    @Autowired private val emailSender: JavaMailSender
+) {
+
+    fun sendDeletionWarningEmail(to: String, deletionDate: String) {
+        val bodyText = getHtmlContentWithDeletionDate(deletionDate)
+        sendEmail(to, "[트립스케치] 장기 미사용 계정 삭제 안내", bodyText)
+    }
+
+    private fun sendEmail(to: String, subject: String, body: String) {
+        val message = SimpleMailMessage()
+        message.setTo(to)
+        message.setSubject(subject)
+        message.setText(body)
+        emailSender.send(message)
+    }
+
+    private fun getHtmlContentWithDeletionDate(deletionDate: String): String {
+        val resource = resourceLoader.getResource("classpath:/static/email.html")
+        val htmlTemplate = resource.inputStream.reader().use { it.readText() }
+        // {{deletionDate}} 부분을 실제 삭제 예정 날짜로 대체합니다.
+        return htmlTemplate.replace("{{deletionDate}}", deletionDate)
+    }
+}

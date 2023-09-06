@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
@@ -20,7 +21,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val emailService: EmailService,
 ) {
 
     fun registerOrUpdateUser(email: String): User {
@@ -139,15 +141,16 @@ class UserService(
         return Pair(followersCount, followingCount)
     }
 
-//    @Scheduled(cron = "0 0 12 * * ?")  // 매일 정오에 실행
-//    fun notifyInactiveUsers() {
-//        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
-//        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
-//
-//        usersToNotify.forEach { user ->
-//            emailService.sendDeletionWarningEmail(user.email)
-//        }
-//    }
+    @Scheduled(cron = "0 0 15 * * ?")
+    fun notifyInactiveUsers() {
+        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
+        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
+
+        val deletionDate = LocalDateTime.now().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
+        usersToNotify.forEach { user ->
+            emailService.sendDeletionWarningEmail(user.email, deletionDate)
+        }
+    }
 
     @Scheduled(cron = "0 30 15 * * ?")
     fun softDeleteInactiveUsers() {
