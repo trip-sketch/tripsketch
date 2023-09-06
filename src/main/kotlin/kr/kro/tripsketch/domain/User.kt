@@ -17,7 +17,7 @@ data class User(
     @Indexed(unique = true)
     @field:Email(message = "이메일 형식이어야 합니다.")
     @field:NotBlank
-    val email: String,
+    var email: String,
 
     @Indexed(unique = true)
     @field:NotBlank(message = "닉네임을 입력해주세요.")

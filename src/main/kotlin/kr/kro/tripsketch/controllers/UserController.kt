@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import kr.kro.tripsketch.services.S3Service
+import kr.kro.tripsketch.utils.EnvLoader
 import software.amazon.awssdk.services.s3.model.S3Exception
 
 @RestController
@@ -36,8 +37,14 @@ class UserController(private val userService: UserService, private val notificat
 
         userService.storeUserPushToken(email, token)
 
+        // 관리자 이메일 리스트를 환경 변수에서 가져오기
+        val adminEmails = EnvLoader.getProperty("ADMIN_EMAILS")?.split(",") ?: listOf()
+
+        // 사용자 이메일이 관리자 이메일 리스트에 있는지 확인
+        val isAdmin = email in adminEmails
+
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, true)) // 이메일 포함
+            ResponseEntity.ok(userService.toDto(user, true, isAdmin)) // 관리자 여부 추가
         } else {
             ResponseEntity.notFound().build()
         }
@@ -50,7 +57,7 @@ class UserController(private val userService: UserService, private val notificat
     fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, false)) // 이메일 미포함
+            ResponseEntity.ok(userService.toDto(user, false)) // 이메일 미포함, 관리자 여부 미포함
         } else {
             ResponseEntity.notFound().build()
         }
