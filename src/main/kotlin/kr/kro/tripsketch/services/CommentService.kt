@@ -48,15 +48,12 @@ class CommentService(
 //    }
 
 
-
-
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
     fun getIsLikedByTokenForTrip(email: String, tripId: String): List<CommentDto> {
         val updatedComments = isLikedByTokenForComments(email, tripId)
 
         return updatedComments.map { fromComment(it, userService) }
     }
-
 
     private fun isLikedByTokenForComments(userEmail: String, tripId: String): List<Comment> {
         val comments = commentRepository.findAllByTripId(tripId)
@@ -120,6 +117,10 @@ class CommentService(
             userRepository.findByNickname(commentChildrenCreateDto.replyToNickname)
                 ?: throw IllegalArgumentException("해당 이메일의 언급 된 사용자 존재하지 않습니다.")
 
+        if (mentionedUser.email.endsWith("@delete.com")) {
+            throw BadRequestException("해당 이메일의 언급 된 사용자는 없습니다.")
+        }
+
         val childComment = Comment(
             id = ObjectId().toString(), // 새로운 ObjectId 생성
             userId = commenter.id,
@@ -160,10 +161,6 @@ class CommentService(
                 commentId = childComment.id
             )
         }
-
-
-
-
         return fromComment(createdComment, userService)
     }
 
