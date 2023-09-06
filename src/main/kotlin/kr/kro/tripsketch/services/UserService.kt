@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
@@ -21,6 +22,7 @@ class UserService(
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
     private val imageService: ImageService
+//    private val emailService: EmailService,
 ) {
 
     fun registerOrUpdateUser(email: String): User {
@@ -139,15 +141,16 @@ class UserService(
         return Pair(followersCount, followingCount)
     }
 
-//    @Scheduled(cron = "0 0 12 * * ?")  // 매일 정오에 실행
-//    fun notifyInactiveUsers() {
-//        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
-//        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
-//
+    @Scheduled(cron = "0 0 15 * * ?")
+    fun notifyInactiveUsers() {
+        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
+        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
+
+        val deletionDate = LocalDateTime.now().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
 //        usersToNotify.forEach { user ->
-//            emailService.sendDeletionWarningEmail(user.email)
+//            emailService.sendDeletionWarningEmail(user.email, deletionDate)
 //        }
-//    }
+    }
 
     @Scheduled(cron = "0 30 15 * * ?")
     fun softDeleteInactiveUsers() {
@@ -174,8 +177,7 @@ class UserService(
     }
 
 
-
-    fun toDto(user: User, includeEmail: Boolean = true): UserDto {
+    fun toDto(user: User, includeEmail: Boolean = true, isAdmin: Boolean? = null): UserDto {
         val (followersCount, followingCount) = getUserFollowInfo(user.email)
 
         return if (includeEmail) {
@@ -185,7 +187,8 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = isAdmin
             )
         } else {
             UserDto(
@@ -194,8 +197,12 @@ class UserService(
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
-                followingCount = followingCount
+                followingCount = followingCount,
+                isAdmin = null // 관리자 여부를 노출하지 않음
             )
         }
     }
+
 }
+
+

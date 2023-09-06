@@ -20,7 +20,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     @PostMapping
     fun createTrip(
         req: HttpServletRequest,
-        @RequestBody tripCreateDto: TripCreateDto
+        @Validated @RequestBody tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
         val email = req.getAttribute("userEmail") as String
         val createdTrip = tripService.createTrip(email, tripCreateDto)
@@ -39,6 +39,13 @@ class TripController(private val tripService: TripService, private val jwtServic
     fun getAllTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
         val email = req.getAttribute("userEmail") as String
         val findTrips = tripService.getAllTripsByUser(email)
+        return ResponseEntity.ok(findTrips)
+    }
+
+    @GetMapping("/trips/myTrips")
+    fun getAllMyTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getAllMyTripsByUser(email)
         return ResponseEntity.ok(findTrips)
     }
 
@@ -134,7 +141,7 @@ class TripController(private val tripService: TripService, private val jwtServic
 
     @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
-        val findTrip = tripService.getTripById(id)
+        val findTrip = tripService.getTripIsPublicById(id)
         return if (findTrip != null) {
             if (!findTrip.isHidden) {
                 ResponseEntity.ok(findTrip)
@@ -142,6 +149,38 @@ class TripController(private val tripService: TripService, private val jwtServic
                 ResponseEntity.notFound().build()
             }
         } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
+    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
+    @GetMapping("/list/following")
+    fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
+        val email = req.getAttribute("userEmail") as String
+        val findTrips = tripService.getListFollowingByUser(email)
+        return try {
+            if (findTrips.isNotEmpty()) {
+                ResponseEntity.ok(findTrips)
+            } else {
+                ResponseEntity.notFound().build()
+            }
+        } catch (ex: IllegalAccessException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
+        }
+    }
+
+    @GetMapping("/search")
+    fun getSearchTripsByKeyword(
+        req: HttpServletRequest,
+        @RequestParam keyword: String,
+        @RequestParam sorting: Int
+    ): ResponseEntity<List<TripDto>> {
+        return try {
+            val email = req.getAttribute("userEmail") as String
+            val findTrips = tripService.getSearchTripsByKeyword(email, keyword, sorting)
+            ResponseEntity.status(HttpStatus.OK).body(findTrips)
+        }  catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
         }
     }
@@ -158,7 +197,6 @@ class TripController(private val tripService: TripService, private val jwtServic
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
                 val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
-//                ResponseEntity.ok(updatedTrip)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
