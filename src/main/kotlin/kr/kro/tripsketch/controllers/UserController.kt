@@ -125,12 +125,15 @@ class UserController(private val userService: UserService, private val notificat
 
     @PostMapping("/uploads", consumes = ["multipart/form-data"])
     fun uploadFiles(
-        @RequestParam("dir", required = false, defaultValue = "") dir: String,
+        @RequestParam("dir", required = false, defaultValue = "") dir: String?,
         @RequestParam("files") files: Array<MultipartFile>
     ): ResponseEntity<Any> {
+
+        val directory = dir ?: ""
+
         return try {
             val results = files.map { file ->
-                val (url, response) = s3Service.uploadFile(dir, file)
+                val (url, response) = s3Service.uploadFile(directory, file)
                 mapOf("url" to url, "eTag" to response.eTag())
             }
             ResponseEntity.ok(results)
@@ -140,6 +143,8 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
         }
     }
+
+
 
 
     @GetMapping("/email")
