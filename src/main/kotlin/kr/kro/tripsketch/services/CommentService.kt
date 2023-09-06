@@ -171,6 +171,9 @@ class CommentService(
         if (comment.userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
         }
+        if (comment.isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 수정 할 수 없습니다.")
+        }
         val updatedTime = LocalDateTime.now()
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
@@ -200,6 +203,10 @@ class CommentService(
 
         if (parentComment.children[childCommentIndex].userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
+        }
+
+        if (parentComment.children[childCommentIndex].isDeleted) {
+            throw ForbiddenException("삭제 된 댓글은 수정 할 수 없습니다.")
         }
 
         val updatedTime = LocalDateTime.now()
