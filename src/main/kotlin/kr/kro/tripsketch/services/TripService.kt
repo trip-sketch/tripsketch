@@ -111,7 +111,6 @@ class TripService(
         return paginateTrips(categorizedTrips.second, page, pageSize)
     }
 
-
     fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
         val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -127,7 +126,6 @@ class TripService(
         // 페이지네이션 적용
         return paginateTrips(tripsInCountry, page, pageSize)
     }
-
 
     fun getCountryFrequencies(nickname: String): Map<String, Int> {
         val user = userService.findUserByNickname(nickname)
@@ -179,7 +177,6 @@ class TripService(
 
         return filteredTrips.map { fromTrip(it, "", false) }.toSet()
     }
-
 
     /**
      * 나라 기준으로 여행 횟수를 많은 순으로 정렬하여 반환합니다.
