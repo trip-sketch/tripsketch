@@ -163,7 +163,6 @@ class UserService(
 
     fun softDeleteUser(user: User, defaultImageUrl: String) {
         user.email = "${UUID.randomUUID()}@delete.com"
-        user.introduction = "삭제처리된 계정입니다."
         user.profileImageUrl = defaultImageUrl
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
