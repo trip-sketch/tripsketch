@@ -1,11 +1,7 @@
 package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.TripCreateDto
-import kr.kro.tripsketch.dto.TripDto
-import kr.kro.tripsketch.dto.TripUpdateDto
-import kr.kro.tripsketch.dto.TripUpdateResponseDto
-import kr.kro.tripsketch.services.JwtService
+import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/trip")
-class TripController(private val tripService: TripService, private val jwtService: JwtService) {
+class TripController(private val tripService: TripService) {
 
     @PostMapping
     fun createTrip(
@@ -109,7 +105,7 @@ class TripController(private val tripService: TripService, private val jwtServic
 
     // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
     @GetMapping("/nickname/trips/country-frequencies")
-    fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<Map<String, Int>> {
+    fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<List<CountryInfoDto>> {
         val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
         return ResponseEntity.ok(countryFrequencyMap)
     }
