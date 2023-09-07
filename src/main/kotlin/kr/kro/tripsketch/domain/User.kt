@@ -15,7 +15,6 @@ data class User(
     @Id val id: String? = null,
 
     @Indexed(unique = true)
-    @field:Email(message = "이메일 형식이어야 합니다.")
     @field:NotBlank
     var email: String,
 
