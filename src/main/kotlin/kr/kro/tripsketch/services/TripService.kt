@@ -283,9 +283,6 @@ class TripService(
         println(filteredFollowingEmails)
         println("-----------------------------------------------")
 
-//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(filterdFollowingEmails)
-//        println(findTrips)
-
         // 만약 filteredFollowingEmails가 빈 집합이라면 빈 리스트 반환
         if (filteredFollowingEmails.isEmpty()) {
             return emptyList()
@@ -313,16 +310,12 @@ class TripService(
             else -> Sort.unsorted() // 정렬하지 않음
         }
         val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-        println("-----------------------------------------------")
-        println(findTrips)
-        println("-----------------------------------------------")
         if (findTrips != null) {
             val tripDtoList = mutableListOf<TripDto>()
             findTrips.forEach { trip ->
                 tripDtoList.add(fromTrip(trip, userId, false))
             }
             println(tripDtoList)
-            println("-----------------------------------------------")
             return tripDtoList
         } else {
             throw IllegalAccessException("조회되는 게시물이 없습니다.")
@@ -334,7 +327,6 @@ class TripService(
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
         }
-//        val user = userService.findUserByEmail(email)?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
         val userId = userRepository.findByEmail(email)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         if (findTrip.userId == userId) {
@@ -362,7 +354,6 @@ class TripService(
         val findTrip = tripRepository.findById(id).orElseThrow {
             EntityNotFoundException("삭제할 게시글이 존재하지 않습니다.")
         }
-//        val user = userService.findUserByEmail(email)?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
         val userId = userRepository.findByEmail(email)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         if (findTrip.userId == userId) {    //'findTrip.userId == user.id' 조건은 항상 false입니다 ?
@@ -398,8 +389,6 @@ class TripService(
         return if (includeUserId) {
             TripDto(
                 id = trip.id,
-//                email = tripUser.email,
-                userId = tripUser.id!!,
                 nickname = tripUser.nickname,
                 title = trip.title,
                 content = trip.content,
@@ -423,8 +412,6 @@ class TripService(
         } else {
             TripDto(
                 id = trip.id,
-//                email = null,
-                userId = "",
                 nickname = tripUser.nickname,
                 title = trip.title,
                 content = trip.content,
@@ -462,7 +449,6 @@ class TripService(
 
         return TripUpdateResponseDto(
             id = trip.id,
-            email = user.email,
             nickname = user.nickname,
             title = trip.title,
             content = trip.content,
