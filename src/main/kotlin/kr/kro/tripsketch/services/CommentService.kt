@@ -396,25 +396,26 @@ class CommentService(
 
     companion object {
         fun fromComment(comment: Comment, userService: UserService): CommentDto {
-            val commenter = comment.userId?.let { userService.findUserById(it) }
-                ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
-            val mentionedUser = comment.replyToUserId?.let { userService.findUserById(it) }
 
-            val commenterProfile = commenter.let {
+            val commenter = comment.userId?.let { userService.findUserById(it) }
+
+            val commenterProfile = commenter?.let {
                 UserProfileDto(
                     email = it.email,
                     nickname = it.nickname,
-                    introduction = it.introduction,
-                    profileImageUrl = it.profileImageUrl
+                    introduction = it.introduction ?: "",
+                    profileImageUrl = it.profileImageUrl ?: ""
                 )
             }
+
+            val mentionedUser = comment.replyToUserId?.let { userService.findUserById(it) }
 
             val mentionedUserNickname = mentionedUser?.nickname
 
             return CommentDto(
                 id = comment.id,
-                userNickName = commenterProfile.nickname ?: "", // 사용자가 없을 경우 대비
-                userProfileUrl = commenterProfile.profileImageUrl ?: "", // 사용자가 없을 경우 대비
+                userNickName = commenterProfile?.nickname ?: "알 수 없는 사용자", // 사용자가 없을 경우 대비
+                userProfileUrl = commenterProfile?.profileImageUrl ?: "", // 사용자가 없을 경우 대비
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
