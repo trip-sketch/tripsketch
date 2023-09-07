@@ -20,34 +20,28 @@ interface TripRepository : MongoRepository<Trip, String> {
     fun findByIsHiddenIsFalse(): Set<Trip>
 
     // 로그인 사용자가 작성한 게시글 조회 (userId 사용)
-//    fun findByIsHiddenIsFalseAndEmail(email: String): Set<Trip>
     fun findByIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
 
     // trip id가 일치하는 게시글 조회
     fun findByIdAndIsHiddenIsFalse(id: String): Trip?
 
     // 로그인 사용자 외 작성자가 작성한 게시글 조회
-//    fun findTripByEmailAndIsHiddenIsFalse(email: String): Set<Trip>
     fun findByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
 
-    // email과 isHidden 값이 false인 게시물 조회
+    // isHidden 값이 false인 게시물 조회
     fun findTripByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
 
+    // 유저 아이디로 공개 + 삭제x 인 글들 조회
+    fun findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(userId: String): Set<Trip>
+
+
     // 전체공개 게시글 조회
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalse(email: String = ""): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(userId: String = ""): Set<Trip>
 
 
-//    @Query("SELECT t FROM Trip t WHERE t.isPublic = true AND t.isHidden = false AND t.email IN :emails")
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalse(@Param("email") emails: Set<String>): Set<Trip>
-
-    // email 조건이 맞으면서 전체공개인 게시글 조회
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(email: String): Set<Trip>
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(emails: Set<String>): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
 
-//    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
 
