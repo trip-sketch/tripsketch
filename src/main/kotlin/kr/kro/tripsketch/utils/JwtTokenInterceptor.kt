@@ -16,6 +16,10 @@ class JwtTokenInterceptor(
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+
+        if (request.requestURI.startsWith("/api/oauth/kakao/callback")) {
+            return true
+        }
         // Kakao OAuth 링크에 대한 요청인 경우 client_id 파라미터가 존재하는지만 확인합니다.
         if (request.requestURI.startsWith("/oauth/authorize") && request.getParameter("client_id") != null) {
             return true
