@@ -20,8 +20,8 @@ class AuthService(
 
         val email = kakaoOAuthService.getEmailFromKakao(accessToken) ?: return null
 
-        val kakaoId = kakaoOAuthService.getIdFromKakao(accessToken)
-        println("Kakao User ID: $kakaoId")
+//        val kakaoId = kakaoOAuthService.getIdFromKakao(accessToken)
+//        println("Kakao User ID: $kakaoId")
 
         val user = userService.registerOrUpdateUser(email)
 
