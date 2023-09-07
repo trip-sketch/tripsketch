@@ -333,7 +333,7 @@ class CommentService(
                 notificationService.sendPushNotification(
                     listOf(comment.userId!!),
                     "새로운 여행의 시작, 트립스케치",
-                    "${commenter.nickname} 님이 댓글에 좋아요.",
+                    "${commenter.nickname} 님이 회원님의 댓글을 좋아합니다.",
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = comment.tripId,
@@ -380,7 +380,7 @@ class CommentService(
                 notificationService.sendPushNotification(
                     listOf(childComment.userId!!),
                     "새로운 여행의 시작, 트립스케치",
-                    "${commenter.nickname} 님이 님이 댓글에 좋아요.",
+                    "${commenter.nickname} 님이 회원님의 댓글을 좋아합니다.",
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = childComment.tripId,
