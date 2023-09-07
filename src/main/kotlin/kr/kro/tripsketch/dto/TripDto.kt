@@ -7,8 +7,6 @@ import java.time.LocalDateTime
 
 data class TripDto(
     var id: String? = null,
-    @field:NotBlank(message = "userId 는 필수 항목입니다.")
-    var userId: String,
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
     var nickname: String?,
     @field:NotBlank(message = "제목을 입력하세요.")
