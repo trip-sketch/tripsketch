@@ -33,6 +33,9 @@ interface TripRepository : MongoRepository<Trip, String> {
     // email과 isHidden 값이 false인 게시물 조회
     fun findTripByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
 
+    fun findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(userId: String): Set<Trip>
+
+
     // 전체공개 게시글 조회
 //    fun findByIsPublicIsTrueAndIsHiddenIsFalse(email: String = ""): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(userId: String = ""): Set<Trip>
