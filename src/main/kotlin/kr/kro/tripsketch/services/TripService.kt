@@ -5,7 +5,7 @@ import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
-import kr.kro.tripsketch.dto.CountryInfoDto
+import kr.kro.tripsketch.dto.TripCountryFrequencyDto
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -148,7 +148,7 @@ class TripService(
     }
 
 
-    fun getCountryFrequencies(nickname: String): List<CountryInfoDto>{
+    fun getCountryFrequencies(nickname: String): List<TripCountryFrequencyDto>{
         val user = userService.findUserByNickname(nickname)
         val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -208,8 +208,8 @@ class TripService(
      *
      * @return 나라별 여행 횟수를 내림차순으로 정렬한 맵
      */
-    fun Set<Trip>.sortTripsByCountryFrequency(): List<CountryInfoDto> {
-        val countryInfoList = mutableListOf<CountryInfoDto>()
+    fun Set<Trip>.sortTripsByCountryFrequency(): List<TripCountryFrequencyDto> {
+        val countryInfoList = mutableListOf<TripCountryFrequencyDto>()
         // 나라별 여행 횟수를 계산하기 위한 맵
         val countryFrequencyMap = mutableMapOf<String, Int>()
 
@@ -229,7 +229,7 @@ class TripService(
 
         // CountryInfo 객체를 생성하여 리스트에 추가
         for (entry in sortedCountryFrequencyList) {
-            val countryInfo = CountryInfoDto(entry.key, entry.value)
+            val countryInfo = TripCountryFrequencyDto(entry.key, entry.value)
             countryInfoList.add(countryInfo)
         }
 
