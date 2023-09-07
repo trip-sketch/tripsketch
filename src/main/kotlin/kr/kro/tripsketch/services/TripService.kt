@@ -110,14 +110,14 @@ class TripService(
 
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user!!.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(it) }
+        val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.categorizeTripsByCountry()
     }
 
     fun getTripCategoryByNickname(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user!!.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(it) }
+        val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         // 전체 여행 목록을 카테고리화
         val categorizedTrips = findTrips.categorizeTripsByCountry()
@@ -128,14 +128,14 @@ class TripService(
 
     fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user?.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(it) }
+        val findTrips = user?.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.getTripsInCountry(country)
     }
 
     fun getTripsInCountry(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user!!.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(it) }
+        val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         val tripsInCountry = findTrips.getTripsInCountry(country)
 
@@ -146,7 +146,7 @@ class TripService(
 
     fun getCountryFrequencies(nickname: String): Map<String, Int> {
         val user = userService.findUserByNickname(nickname)
-        val findTrips = user!!.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(it) }
+        val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.sortTripsByCountryFrequency()
     }
