@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class TripUpdateResponseDto(
     var id: String? = null,
-    var email: String?,
     var nickname: String?,
     var title: String,
     var content: String,
