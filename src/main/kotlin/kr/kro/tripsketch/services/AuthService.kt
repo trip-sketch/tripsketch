@@ -21,7 +21,6 @@ class AuthService(
         val email = kakaoOAuthService.getEmailFromKakao(accessToken) ?: return null
         val user = userService.registerOrUpdateUser(email)
 
-        // Update last login time for user
         user.updateLastLogin()
         userService.saveOrUpdate(user)
 
