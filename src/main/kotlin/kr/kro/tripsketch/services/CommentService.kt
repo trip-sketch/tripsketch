@@ -135,7 +135,7 @@ class CommentService(
             tripId = commentChildrenCreateDto.tripId,
             parentId = parentId,
             content = commentChildrenCreateDto.content,
-            replyToEmail = mentionedUser.email,
+            replyToUserId = mentionedUser.id,
         )
 
         parentComment.children.add(childComment)
@@ -246,7 +246,7 @@ class CommentService(
         }
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
         if (comment.userId != commenter.id) {
@@ -255,7 +255,9 @@ class CommentService(
         // Soft delete 처리
         val deletedComment = comment.copy(
             content = "삭제 된 댓글입니다.",
-            isDeleted = true
+            isDeleted = true,
+            likedBy = mutableSetOf(),
+            numberOfLikes = 0
         )
         commentRepository.save(deletedComment)
     }
@@ -278,7 +280,7 @@ class CommentService(
 
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -288,7 +290,13 @@ class CommentService(
 
         // Soft delete 처리
         val deletedChildComment =
-            parentComment.children[childCommentIndex].copy(content = "삭제 된 댓글입니다.", isDeleted = true)
+            parentComment.children[childCommentIndex].copy(
+                content = "삭제 된 댓글입니다.",
+                isDeleted = true,
+                likedBy = mutableSetOf(),
+                numberOfLikes = 0,
+                replyToUserId = "",
+            )
         parentComment.children[childCommentIndex] = deletedChildComment
         commentRepository.save(parentComment)
     }
@@ -305,7 +313,7 @@ class CommentService(
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -342,11 +350,11 @@ class CommentService(
 
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
-        val findTrip= tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -390,7 +398,7 @@ class CommentService(
         fun fromComment(comment: Comment, userService: UserService): CommentDto {
             val commenter = comment.userId?.let { userService.findUserById(it) }
                 ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
-            val mentionedUser = comment.replyToEmail?.let { userService.findUserByEmail(it) }
+            val mentionedUser = comment.replyToUserId?.let { userService.findUserById(it) }
 
             val commenterProfile = commenter.let {
                 UserProfileDto(
