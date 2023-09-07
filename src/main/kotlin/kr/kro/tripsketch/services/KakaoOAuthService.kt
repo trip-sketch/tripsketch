@@ -79,6 +79,12 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         }
     }
 
+    fun getIdFromKakao(accessToken: String): String? {
+        val userInfo = getUserInfo(accessToken)
+        return userInfo?.get("id") as? String
+    }
+
+
     fun getEmailFromKakao(accessToken: String): String? {
         val userInfo = getUserInfo(accessToken)
         val kakaoAccountInfo = userInfo?.get("kakao_account") as? Map<*, *>

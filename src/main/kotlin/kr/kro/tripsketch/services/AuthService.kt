@@ -18,16 +18,16 @@ class AuthService(
             return null
         }
 
-        val email = kakaoOAuthService.getEmailFromKakao(accessToken) ?: return null
-        val user = userService.registerOrUpdateUser(email)
+        val id = kakaoOAuthService.getIdFromKakao(accessToken) ?: return null
+        val user = userService.registerOrUpdateUser(id)
 
         // Update last login time for user
         user.updateLastLogin()
         userService.saveOrUpdate(user)
 
         val tokenResponse = jwtService.createTokens(user)
-        userService.updateUserRefreshToken(email, tokenResponse.refreshToken)
-        userService.updateKakaoRefreshToken(email, refreshToken)
+        userService.updateUserRefreshToken(id, tokenResponse.refreshToken)
+        userService.updateKakaoRefreshToken(id, refreshToken)
 
         return tokenResponse
     }
