@@ -5,6 +5,7 @@ import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
+import kr.kro.tripsketch.dto.CountryInfoDto
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -76,7 +77,10 @@ class TripService(
     fun getAllTripsByUser(email: String): Set<TripDto> {
         val userId = userRepository.findByEmail(email)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId) + tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
+        val findTrips =
+            tripRepository.findByIsHiddenIsFalseAndUserId(userId) + tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(
+                userId
+            )
         return findTrips.map { fromTrip(it, userId, false) }.toSet()
     }
 
@@ -144,7 +148,7 @@ class TripService(
     }
 
 
-    fun getCountryFrequencies(nickname: String): Map<String, Int> {
+    fun getCountryFrequencies(nickname: String): List<CountryInfoDto>{
         val user = userService.findUserByNickname(nickname)
         val findTrips = user!!.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -204,7 +208,8 @@ class TripService(
      *
      * @return 나라별 여행 횟수를 내림차순으로 정렬한 맵
      */
-    fun Set<Trip>.sortTripsByCountryFrequency(): Map<String, Int> {
+    fun Set<Trip>.sortTripsByCountryFrequency(): List<CountryInfoDto> {
+        val countryInfoList = mutableListOf<CountryInfoDto>()
         // 나라별 여행 횟수를 계산하기 위한 맵
         val countryFrequencyMap = mutableMapOf<String, Int>()
 
@@ -218,11 +223,17 @@ class TripService(
             }
         }
 
-        // 나라별 횟수를 내림차순으로 정렬한 맵
-
-        return countryFrequencyMap.entries
+        // 나라별 횟수를 내림차순으로 정렬한 맵을 리스트로 변환
+        val sortedCountryFrequencyList = countryFrequencyMap.entries
             .sortedByDescending { it.value }
-            .associateBy({ it.key }, { it.value })
+
+        // CountryInfo 객체를 생성하여 리스트에 추가
+        for (entry in sortedCountryFrequencyList) {
+            val countryInfo = CountryInfoDto(entry.key, entry.value)
+            countryInfoList.add(countryInfo)
+        }
+
+        return countryInfoList
     }
 
     fun getTripByEmailAndId(email: String, id: String): TripDto? {
@@ -258,7 +269,7 @@ class TripService(
     fun getTripIsPublicById(id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        if (findTrip.isPublic == false){
+        if (findTrip.isPublic == false) {
             throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         }
         return fromTrip(findTrip, "", false)
