@@ -18,30 +18,30 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @Validated @RequestBody tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
-        val email = req.getAttribute("userEmail") as String
-        val createdTrip = tripService.createTrip(email, tripCreateDto)
+        val memberId = req.getAttribute("memberId") as Long
+        val createdTrip = tripService.createTrip(memberId, tripCreateDto)
         return ResponseEntity.ok(createdTrip)
     }
 
     // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrips = tripService.getAllTrips(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrips = tripService.getAllTrips(memberId)
         return ResponseEntity.ok(findTrips)
     }
 
     @GetMapping("/trips")
     fun getAllTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrips = tripService.getAllTripsByUser(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrips = tripService.getAllTripsByUser(memberId)
         return ResponseEntity.ok(findTrips)
     }
 
     @GetMapping("/trips/myTrips")
     fun getAllMyTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrips = tripService.getAllMyTripsByUser(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrips = tripService.getAllMyTripsByUser(memberId)
         return ResponseEntity.ok(findTrips)
     }
 
@@ -111,9 +111,9 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/{id}")
-    fun getTripByEmailAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripByEmailAndId(email, id)
+    fun getTripByMemberIdAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrip = tripService.getTripByMemberIdAndId(memberId, id)
         return if (findTrip != null) {
             ResponseEntity.ok(findTrip)
         } else {
@@ -122,12 +122,12 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("modify/{id}")
-    fun getTripByEmailAndIdToUpdate(
+    fun getTripByMemberIdAndIdToUpdate(
         req: HttpServletRequest,
         @PathVariable id: String
     ): ResponseEntity<TripUpdateResponseDto> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrip = tripService.getTripByEmailAndIdToUpdate(email, id)
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrip = tripService.getTripByMemberIdAndIdToUpdate(memberId, id)
         return if (findTrip != null) {
             ResponseEntity.ok(findTrip)
         } else {
@@ -153,8 +153,8 @@ class TripController(private val tripService: TripService) {
     // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
     @GetMapping("/list/following")
     fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
-        val email = req.getAttribute("userEmail") as String
-        val findTrips = tripService.getListFollowingByUser(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val findTrips = tripService.getListFollowingByUser(memberId)
         return try {
             if (findTrips.isNotEmpty()) {
                 ResponseEntity.ok(findTrips)
@@ -173,8 +173,8 @@ class TripController(private val tripService: TripService) {
         @RequestParam sorting: Int
     ): ResponseEntity<List<TripDto>> {
         return try {
-            val email = req.getAttribute("userEmail") as String
-            val findTrips = tripService.getSearchTripsByKeyword(email, keyword, sorting)
+            val memberId = req.getAttribute("memberId") as Long
+            val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
         }  catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
@@ -189,10 +189,10 @@ class TripController(private val tripService: TripService) {
     )
             : ResponseEntity<Any> {
         return try {
-            val email = req.getAttribute("userEmail") as String
+            val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
-                val updatedTrip = tripService.updateTrip(email, tripUpdateDto)
+                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
@@ -207,10 +207,10 @@ class TripController(private val tripService: TripService) {
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         return try {
-            val email = req.getAttribute("userEmail") as String
+            val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
-                tripService.deleteTripById(email, id)
+                tripService.deleteTripById(memberId, id)
                 ResponseEntity.ok("게시물이 삭제되었습니다.")
             } else {
                 ResponseEntity.notFound().build()

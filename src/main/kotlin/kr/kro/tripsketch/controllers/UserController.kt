@@ -35,16 +35,17 @@ class UserController(private val userService: UserService, private val notificat
         req: HttpServletRequest,
         @RequestParam token: String
     ): ResponseEntity<Any> {
-        val email = req.getAttribute("userEmail") as String
-        val user = userService.findUserByEmail(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val user = userService.findUserByMemberId(memberId)
 
-        userService.storeUserPushToken(email, token)
+        userService.storeUserPushToken(memberId, token)
 
         // 관리자 이메일 리스트를 환경 변수에서 가져오기
-        val adminEmails = EnvLoader.getProperty("ADMIN_EMAILS")?.split(",") ?: listOf()
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
-        // 사용자 이메일이 관리자 이메일 리스트에 있는지 확인
-        val isAdmin = email in adminEmails
+// 사용자 ID가 관리자 ID 리스트에 있는지 확인
+        val isAdmin = memberId in adminIds
 
         return if (user != null) {
             ResponseEntity.ok(userService.toDto(user, true, isAdmin)) // 관리자 여부 추가
@@ -73,10 +74,10 @@ class UserController(private val userService: UserService, private val notificat
     fun updateUser(req: HttpServletRequest,
                    @Validated @ModelAttribute userUpdateDto: UserUpdateDto
     ): ResponseEntity<UserDto> {
-        val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        val memberId = req.getAttribute("memberId") as Long? ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
 
         try {
-            val updatedUser = userService.updateUser(email, userUpdateDto)
+            val updatedUser = userService.updateUser(memberId, userUpdateDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
@@ -94,7 +95,7 @@ class UserController(private val userService: UserService, private val notificat
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
         val expoResponseMessage = notificationService.sendPushNotification(
-            listOf(notificationRequest.email),
+            listOf(notificationRequest.memberId),
             notificationRequest.title,
             notificationRequest.body,
             notificationRequest.commentId,

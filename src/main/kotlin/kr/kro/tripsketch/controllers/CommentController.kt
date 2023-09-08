@@ -32,8 +32,8 @@ class CommentController(private val commentService: CommentService) {
         req: HttpServletRequest,
         @PathVariable tripId: String
     ): List<CommentDto> {
-        val email = req.getAttribute("userEmail") as String
-        return commentService.getIsLikedByTokenForTrip(email, tripId)
+        val memberId = req.getAttribute("memberId") as Long
+        return commentService.getIsLikedByTokenForTrip(memberId, tripId)
     }
 
 
@@ -41,16 +41,16 @@ class CommentController(private val commentService: CommentService) {
     fun createComment(
         req: HttpServletRequest, @Validated @RequestBody commentCreateDto: CommentCreateDto
     ): CommentDto {
-        val email = req.getAttribute("userEmail") as String
-        return commentService.createComment(email, commentCreateDto)
+        val memberId = req.getAttribute("memberId") as Long
+        return commentService.createComment(memberId, commentCreateDto)
     }
 
     @PostMapping("/{parentId}")
     fun createChildrenComment(
         req: HttpServletRequest, @PathVariable parentId: String, @Validated @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto
     ): CommentDto {
-        val email = req.getAttribute("userEmail") as String
-        return commentService.createChildrenComment(email, parentId, commentChildrenCreateDto)
+        val memberId = req.getAttribute("memberId") as Long
+        return commentService.createChildrenComment(memberId, parentId, commentChildrenCreateDto)
     }
 
     @PatchMapping("/{id}")
@@ -59,8 +59,8 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable id: String,
         @Validated @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
-        val email = req.getAttribute("userEmail") as String
-        return commentService.updateComment(email, id, updatedComment)
+        val memberId = req.getAttribute("memberId") as Long
+        return commentService.updateComment(memberId, id, updatedComment)
     }
 
     @PatchMapping("/{parentId}/{id}")
@@ -70,14 +70,14 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable id: String,
         @Validated @RequestBody updatedComment: CommentUpdateDto
     ): CommentDto {
-        val email = req.getAttribute("userEmail") as String
-        return commentService.updateChildrenComment(email, parentId, id, updatedComment)
+        val memberId = req.getAttribute("memberId") as Long
+        return commentService.updateChildrenComment(memberId, parentId, id, updatedComment)
     }
 
     @DeleteMapping("/{id}")
     fun deleteComment(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
-        val email = req.getAttribute("userEmail") as String
-        commentService.deleteComment(email, id)
+        val memberId = req.getAttribute("memberId") as Long
+        commentService.deleteComment(memberId, id)
         return ResponseEntity.status(200).body("성공적으로 댓글이 삭제 되었습니다.")
     }
 
@@ -87,8 +87,8 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable parentId: String,
         @PathVariable id: String
     ): ResponseEntity<Any> {
-        val email = req.getAttribute("userEmail") as String
-        commentService.deleteChildrenComment(email, parentId, id)
+        val memberId = req.getAttribute("memberId") as Long
+        commentService.deleteChildrenComment(memberId, parentId, id)
         return ResponseEntity.status(200).body("성공적으로 댓글이 삭제 되었습니다.")
     }
 
@@ -99,8 +99,8 @@ class CommentController(private val commentService: CommentService) {
     ): ResponseEntity<Any> {
 
         return try {
-            val email = req.getAttribute("userEmail") as String
-            val updatedComment = commentService.toggleLikeComment(email, id)
+            val memberId = req.getAttribute("memberId") as Long
+            val updatedComment = commentService.toggleLikeComment(memberId, id)
             ResponseEntity.ok(updatedComment)
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(400).body(e.message)
@@ -115,8 +115,8 @@ class CommentController(private val commentService: CommentService) {
     ): ResponseEntity<Any> {
 
         return try {
-            val email = req.getAttribute("userEmail") as String
-            val updatedChildrenComment = commentService.toggleLikeChildrenComment(email, parentId, id)
+            val memberId = req.getAttribute("memberId") as Long
+            val updatedChildrenComment = commentService.toggleLikeChildrenComment(memberId, parentId, id)
             ResponseEntity.ok(updatedChildrenComment)
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(400).body(e.message)
