@@ -50,31 +50,7 @@ interface TripRepository : MongoRepository<Trip, String> {
 //    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndEmailNot(email: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
-
-    @Query("" +
-            "SELECT " +
-            "   title " +
-            "   , content " +
-            "   , likes " +
-            "   , views " +
-            "   , location " +
-            "   , startedAt " +
-            "   , endAt " +
-            "   , hashtagInfo " +
-            "   , createdAt " +
-            "   , images[0] " +
-            "FROM " +
-            "   trips" +
-            "WHERE " +
-            "   isPublic = true " +
-            "   AND isHidden = false " +
-            "   AND email IN :emailSet " +
-            "GROUP BY " +
-            "   emailSet " +
-            "ORDER BY " +
-            "   createdAt DESC "
-    )
-    fun findListFollowingByUser(emailSet: Set<String>): Set<Trip>
+    fun findTripsByUserId(사용자아이디들: List<String>): List<Trip>
 
     @Query("{" +
             "\$or: [" +
