@@ -105,7 +105,7 @@ class TripController(private val tripService: TripService) {
 
     // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
     @GetMapping("/nickname/trips/country-frequencies")
-    fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<List<CountryInfoDto>> {
+    fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<List<TripCountryFrequencyDto>> {
         val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
         return ResponseEntity.ok(countryFrequencyMap)
     }
