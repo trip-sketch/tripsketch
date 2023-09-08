@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+//import org.springframework.data.domain.Sort
+
 @Service
 class TripService(
     private val tripRepository: TripRepository,
@@ -272,33 +274,16 @@ class TripService(
     fun getListFollowingByUser(email: String): List<TripDto> {
         val userId = userRepository.findByEmail(email)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        // 내가 팔로잉하는 사람들
-        val following = followRepository.findByFollower(userId).toSet()
-        println(following)
-        println("-----------------------------------------------")
-        val filteredFollowing = following.filter { it.following != userId && it.following.isNotEmpty() }
-        println(filteredFollowing)
-        println("-----------------------------------------------")
-        val filteredFollowingEmails = filteredFollowing.map { it.following }.toSet()
-        println(filteredFollowingEmails)
-        println("-----------------------------------------------")
 
-//        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndEmail(filterdFollowingEmails)
-//        println(findTrips)
+        val followingUsers = followRepository.findByFollower(userId).map { it.following }
+//        val filteredFollowing = followingUsers.filter { it.following != userId && it.following.isNotEmpty() }
+//        if (following.isEmpty()) {
+//            return emptyList()
+//        }
 
-        // 만약 filteredFollowingEmails가 빈 집합이라면 빈 리스트 반환
-        if (filteredFollowingEmails.isEmpty()) {
-            return emptyList()
-        }
+        return tripRepository.findTripsByUserId(followingUsers).map { trip -> fromTrip(trip, userId, false) }
 
-        val findTrips = tripRepository.findListFollowingByUser(filteredFollowingEmails)
-        println(findTrips)
         println("-----------------------------------------------")
-
-        val findTripDtos = findTrips.map { trip -> fromTrip(trip, userId, false) }
-        println(findTripDtos)
-        println("-----------------------------------------------")
-        return findTripDtos
     }
 
     // to-do : 쿼리스트링으로 sort 에 대한 조건을 받을 수 있을까? -> ex. 최신순(1)/오래된순(-1), 인기순(2)
