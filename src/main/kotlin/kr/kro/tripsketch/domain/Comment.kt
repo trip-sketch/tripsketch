@@ -13,7 +13,6 @@ data class Comment(
     @Id val id: String? = null,
 
     @field:NotBlank(message = "User email must not be blank")
-    @field:Email(message = "Invalid email format")
     @Indexed(unique = true)
     val userId: String? = null,
 
