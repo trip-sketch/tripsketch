@@ -21,8 +21,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
-    private val imageService: ImageService
-//    private val emailService: EmailService,
+    private val imageService: ImageService,
 ) {
 
     fun registerOrUpdateUser(email: String): User {
