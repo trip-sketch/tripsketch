@@ -145,17 +145,4 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
-
-    @GetMapping("/email")
-    fun testEmailSending(@RequestParam email: String): String {
-        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-        return try {
-            emailService.sendDeletionWarningEmail(email, currentDate)
-            "Email sent successfully to $email with date $currentDate!"
-        } catch (e: Exception) {
-            "Failed to send email: ${e.message}"
-        }
-    }
-
 }
