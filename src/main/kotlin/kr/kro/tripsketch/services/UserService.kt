@@ -21,12 +21,11 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val nicknameService: NickNameService,
-    private val imageService: ImageService
-//    private val emailService: EmailService,
+    private val imageService: ImageService,
 ) {
 
-    fun registerOrUpdateUser(email: String): User {
-        var user = userRepository.findByEmail(email)
+    fun registerOrUpdateUser(memberId: Long): User {
+        var user = userRepository.findByMemberId(memberId)
         if (user == null) {
             var nickname: String
             do {
@@ -34,7 +33,7 @@ class UserService(
             } while (isNicknameExist(nickname))
 
             user = User(
-                email = email,
+                memberId = memberId,
                 nickname = nickname,
                 profileImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png",
                 introduction = "안녕하세요! 만나서 반갑습니다!"
@@ -44,13 +43,13 @@ class UserService(
         return user
     }
 
-    fun getUserIdByEmail(email: String): String {
-        val user = findUserByEmail(email)
+    fun getUserIdByMemberId(memberId: Long): String {
+        val user = findUserByMemberId(memberId)
         return user?.id ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
     }
 
-    fun findUserByEmail(email: String): User? {
-        return userRepository.findByEmail(email)
+    fun findUserByMemberId(memberId: Long): User? {
+        return userRepository.findByMemberId(memberId)
     }
 
 
@@ -67,8 +66,8 @@ class UserService(
     }
 
 
-    fun updateUser(email: String, userUpdateDto: UserUpdateDto): User {
-        val user = userRepository.findByEmail(email) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+    fun updateUser(memberId: Long, userUpdateDto: UserUpdateDto): User {
+        val user = userRepository.findByMemberId(memberId) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
         userUpdateDto.nickname?.let {
             if (it != user.nickname && isNicknameExist(it)) {
@@ -111,8 +110,8 @@ class UserService(
         return userRepository.existsByNickname(nickname)
     }
 
-    fun updateUserRefreshToken(email: String, ourRefreshToken: String): User {
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+    fun updateUserRefreshToken(memberId: Long, ourRefreshToken: String): User {
+        val user = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
         user.ourRefreshToken = ourRefreshToken
         return userRepository.save(user)
     }
@@ -121,35 +120,24 @@ class UserService(
         return userRepository.findByOurRefreshToken(ourRefreshToken)
     }
 
-    fun updateKakaoRefreshToken(email: String, kakaoRefreshToken: String): User {
-        val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
+    fun updateKakaoRefreshToken(memberId: Long, kakaoRefreshToken: String): User {
+        val user = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
         user.kakaoRefreshToken = kakaoRefreshToken
         return userRepository.save(user)
     }
 
-    fun storeUserPushToken(email: String, pushToken: String) {
-        val user = userRepository.findByEmail(email)
-            ?: throw IllegalArgumentException("User not found with email $email")
+    fun storeUserPushToken(memberId: Long, pushToken: String) {
+        val user = userRepository.findByMemberId(memberId)
+            ?: throw IllegalArgumentException("해당 유저의 멤버 아이디를 찾을 수 없습니다.")
         user.expoPushToken = pushToken
         userRepository.save(user)
     }
 
-    fun getUserFollowInfo(email: String): Pair<Long, Long> {
-        val followingCount = followRepository.countByFollower(email)
-        val followersCount = followRepository.countByFollowing(email)
+    fun getUserFollowInfo(id: String): Pair<Long, Long> {
+        val followingCount = followRepository.countByFollower(id)
+        val followersCount = followRepository.countByFollowing(id)
 
         return Pair(followersCount, followingCount)
-    }
-
-    @Scheduled(cron = "0 0 15 * * ?")
-    fun notifyInactiveUsers() {
-        val cutoffDateForNotification = LocalDateTime.now().minusMonths(11)
-        val usersToNotify = userRepository.findUsersByUpdatedAtBefore(cutoffDateForNotification)
-
-        val deletionDate = LocalDateTime.now().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
-//        usersToNotify.forEach { user ->
-//            emailService.sendDeletionWarningEmail(user.email, deletionDate)
-//        }
     }
 
     @Scheduled(cron = "0 30 15 * * ?")
@@ -165,7 +153,6 @@ class UserService(
     }
 
     fun softDeleteUser(user: User, defaultImageUrl: String) {
-        user.email = "${UUID.randomUUID()}@delete.com"
         user.profileImageUrl = defaultImageUrl
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
@@ -177,12 +164,11 @@ class UserService(
     }
 
 
-    fun toDto(user: User, includeEmail: Boolean = true, isAdmin: Boolean? = null): UserDto {
-        val (followersCount, followingCount) = getUserFollowInfo(user.email)
+    fun toDto(user: User, includeMemberID: Boolean = true, isAdmin: Boolean? = null): UserDto {
+        val (followersCount, followingCount) = getUserFollowInfo(user.id.toString())
 
-        return if (includeEmail) {
+        return if (includeMemberID) {
             UserDto(
-                email = user.email,
                 nickname = user.nickname,
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,
@@ -192,7 +178,6 @@ class UserService(
             )
         } else {
             UserDto(
-                email = null,
                 nickname = user.nickname,
                 introduction = user.introduction,
                 profileImageUrl = user.profileImageUrl,

@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class TripCardDto(
     var id: String? = null,
-    var email: String?,
+//    var email: String?,
     var nickname: String?,
     var title: String,
     var likes: Int?,

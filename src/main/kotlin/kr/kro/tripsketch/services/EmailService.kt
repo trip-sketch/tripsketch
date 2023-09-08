@@ -3,13 +3,13 @@ package kr.kro.tripsketch.services
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
 import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSender
+//import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 
 @Service
 class EmailService(
     private val resourceLoader: ResourceLoader,
-    @Autowired private val emailSender: JavaMailSender
+//    @Autowired private val emailSender: JavaMailSender
 ) {
 
     fun sendDeletionWarningEmail(to: String, deletionDate: String) {
@@ -22,7 +22,7 @@ class EmailService(
         message.setTo(to)
         message.setSubject(subject)
         message.setText(body)
-        emailSender.send(message)
+//        emailSender.send(message)
     }
 
     private fun getHtmlContentWithDeletionDate(deletionDate: String): String {

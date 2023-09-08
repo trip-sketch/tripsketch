@@ -13,7 +13,6 @@ data class Comment(
     @Id val id: String? = null,
 
     @field:NotBlank(message = "User email must not be blank")
-    @field:Email(message = "Invalid email format")
     @Indexed(unique = true)
     val userId: String? = null,
 
@@ -30,7 +29,7 @@ data class Comment(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val likedBy: MutableSet<String> = mutableSetOf(),
-    val replyToEmail: String? = null,
+    val replyToUserId: String? = null,
     val children: MutableList<Comment> = mutableListOf(),
     val isDeleted: Boolean = false,
     val isLiked: Boolean = false,
