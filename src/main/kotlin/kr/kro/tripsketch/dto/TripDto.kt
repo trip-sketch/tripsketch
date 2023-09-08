@@ -18,14 +18,14 @@ data class TripDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime,
-    var endAt: LocalDateTime,
+    var startedAt: LocalDateTime? = null,
+    var endAt: LocalDateTime? = null,
     var hashtag: Set<String>? = setOf(),
     var latitude: Double? = null, // 위도
     var longitude: Double? = null, // 경도
     var isPublic: Boolean,
     var isHidden: Boolean = false,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
     var tripLikes: MutableSet<String> = mutableSetOf(),
