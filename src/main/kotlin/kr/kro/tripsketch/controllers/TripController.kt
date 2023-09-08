@@ -158,6 +158,7 @@ class TripController(private val tripService: TripService, private val jwtServic
     @GetMapping("/list/following")
     fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
         val email = req.getAttribute("userEmail") as String
+        println(email)
         val findTrips = tripService.getListFollowingByUser(email)
         return try {
             if (findTrips.isNotEmpty()) {
