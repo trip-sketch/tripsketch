@@ -2,7 +2,6 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.*
-import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.TripRepository
