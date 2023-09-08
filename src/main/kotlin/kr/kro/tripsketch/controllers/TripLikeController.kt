@@ -21,10 +21,10 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         req: HttpServletRequest,
         @RequestBody tripIdDto: TripIdDto
     ): ResponseEntity<String> {
-        val email = req.getAttribute("userEmail") as String?
-            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        val memberId = req.getAttribute("memberId") as Long?
+            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
-            tripLikeService.likeTrip(email, tripIdDto.id)
+            tripLikeService.likeTrip(memberId, tripIdDto.id)
             ResponseEntity.status(HttpStatus.OK).body("해당 게시물을 '좋아요'하였습니다.")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()
@@ -36,10 +36,10 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         req: HttpServletRequest,
         @RequestBody tripIdDto: TripIdDto
     ): ResponseEntity<String> {
-        val email = req.getAttribute("userEmail") as String?
-            ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        val memberId = req.getAttribute("memberId") as Long?
+            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
-            tripLikeService.unlikeTrip(email, tripIdDto.id)
+            tripLikeService.unlikeTrip(memberId, tripIdDto.id)
             ResponseEntity.status(HttpStatus.OK).body("좋아요 취소")
         } catch (ex: EntityNotFoundException) {
             ResponseEntity.notFound().build()

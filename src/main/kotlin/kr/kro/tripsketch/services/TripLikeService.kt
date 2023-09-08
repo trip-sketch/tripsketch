@@ -11,8 +11,8 @@ class TripLikeService(
     private val userService: UserService,
     private val notificationService: NotificationService
 ) {
-    fun likeTrip(email: String, tripId: String) {
-        val userId = userRepository.findByEmail(email)?.id
+    fun likeTrip(memberId: Long, tripId: String) {
+        val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
         println(userId)
         val findTrip = tripRepository.findById(tripId).orElse(null)
@@ -50,8 +50,8 @@ class TripLikeService(
         }
     }
 
-    fun unlikeTrip(email: String, tripId: String)  {
-        val userId = userRepository.findByEmail(email)?.id
+    fun unlikeTrip(memberId: Long, tripId: String)  {
+        val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
         val findTrip = tripRepository.findById(tripId).orElseThrow {
             EntityNotFoundException("조회되는 게시물이 없습니다.")

@@ -16,7 +16,7 @@ data class User(
 
     @Indexed(unique = true)
     @field:NotBlank
-    var email: String,
+    var memberId: Long,
 
     @Indexed(unique = true)
     @field:NotBlank(message = "닉네임을 입력해주세요.")

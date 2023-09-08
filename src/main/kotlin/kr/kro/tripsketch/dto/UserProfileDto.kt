@@ -8,9 +8,6 @@ import org.hibernate.validator.constraints.Length
 
 
 data class UserProfileDto(
-    @field:NotBlank(message = "이메일은 비워둘 수 없습니다.")
-    val email: String?,
-
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
     val nickname: String?,
 

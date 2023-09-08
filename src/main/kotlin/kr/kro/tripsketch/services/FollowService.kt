@@ -14,12 +14,12 @@ class FollowService(
     private val notificationService: NotificationService,
 ) {
 
-    fun follow(followerEmail: String, followingNickname: String): String {
-        val followingId = userService.getUserIdByEmail(
-            userService.findUserByNickname(followingNickname)?.email
+    fun follow(followerMemberId: Long, followingNickname: String): String {
+        val followingId = userService.getUserIdByMemberId(
+            userService.findUserByNickname(followingNickname)?.memberId
                 ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         )
-        val followerId = userService.getUserIdByEmail(followerEmail)
+        val followerId = userService.getUserIdByMemberId(followerMemberId)
 
         if (followerId == followingId) {
             throw IllegalArgumentException("자신을 구독할 수 없습니다.")
@@ -27,8 +27,8 @@ class FollowService(
 
         if (!followRepository.existsByFollowerAndFollowing(followerId, followingId)) {
             followRepository.save(Follow(follower = followerId, following = followingId))
-            val follower = userService.findUserByEmail(followerEmail)
-            val followerNickname = follower?.nickname ?: "Unknown user"
+            val follower = userService.findUserByMemberId(followerMemberId)
+            val followerNickname = follower?.nickname ?: "알수없는 사용자r"
             val followerProfileUrl = follower?.profileImageUrl
             return notificationService.sendPushNotification(
                 listOf(followingId),
@@ -42,12 +42,12 @@ class FollowService(
         }
     }
 
-    fun unfollow(followerEmail: String, followingNickname: String) {
-        val followingId = userService.getUserIdByEmail(
-            userService.findUserByNickname(followingNickname)?.email
+    fun unfollow(followerMemberId: Long, followingNickname: String) {
+        val followingId = userService.getUserIdByMemberId(
+            userService.findUserByNickname(followingNickname)?.memberId
                 ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         )
-        val followerId = userService.getUserIdByEmail(followerEmail)
+        val followerId = userService.getUserIdByMemberId(followerMemberId)
 
         if (followerId == followingId) {
             throw IllegalArgumentException("자신을 구독 취소할 수 없습니다.")
@@ -60,12 +60,12 @@ class FollowService(
         }
     }
 
-    fun unfollowMe(followingEmail: String, followerNickname: String) {
-        val followerId = userService.getUserIdByEmail(
-            userService.findUserByNickname(followerNickname)?.email
+    fun unfollowMe(followingMemberId: Long, followerNickname: String) {
+        val followerId = userService.getUserIdByMemberId(
+            userService.findUserByNickname(followerNickname)?.memberId
                 ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         )
-        val followingId = userService.getUserIdByEmail(followingEmail)
+        val followingId = userService.getUserIdByMemberId(followingMemberId)
 
         if (followerId == followingId) {
             throw IllegalArgumentException("자신을 구독 취소할 수 없습니다.")
@@ -78,16 +78,16 @@ class FollowService(
         }
     }
 
-    fun getFollowings(followerNickname: String, currentUserEmail: String?): List<ProfileDto> {
-        val followerId = userService.getUserIdByEmail(
-            userService.findUserByNickname(followerNickname)?.email
+    fun getFollowings(followerNickname: String, currentUserMemberId: Long?): List<ProfileDto> {
+        val followerId = userService.getUserIdByMemberId(
+            userService.findUserByNickname(followerNickname)?.memberId
                 ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         )
 
         return followRepository.findByFollower(followerId).map { follow ->
             val user = userRepository.findById(follow.following).orElse(null)
-            val isCurrentUserFollowing: Boolean? = currentUserEmail?.let { email ->
-                val currentUserId = userService.getUserIdByEmail(email)
+            val isCurrentUserFollowing: Boolean? = currentUserMemberId?.let { memberId ->
+                val currentUserId = userService.getUserIdByMemberId(memberId)
                 followRepository.existsByFollowerAndFollowing(currentUserId, user?.id ?: "")
             }
 
@@ -100,16 +100,16 @@ class FollowService(
         }
     }
 
-    fun getFollowers(followingNickname: String, currentUserEmail: String?): List<ProfileDto> {
-        val followingId = userService.getUserIdByEmail(
-            userService.findUserByNickname(followingNickname)?.email
+    fun getFollowers(followingNickname: String, currentUserMemberId: Long?): List<ProfileDto> {
+        val followingId = userService.getUserIdByMemberId(
+            userService.findUserByNickname(followingNickname)?.memberId
                 ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
         )
 
         return followRepository.findByFollowing(followingId).map { follow ->
             val user = userRepository.findById(follow.follower).orElse(null)
-            val isCurrentUserFollowing: Boolean? = currentUserEmail?.let { email ->
-                val currentUserId = userService.getUserIdByEmail(email)
+            val isCurrentUserFollowing: Boolean? = currentUserMemberId?.let { memberId ->
+                val currentUserId = userService.getUserIdByMemberId(memberId)
                 followRepository.existsByFollowerAndFollowing(currentUserId, user?.id ?: "")
             }
 

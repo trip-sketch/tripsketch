@@ -21,14 +21,16 @@ class JwtService {
     private val refreshTokenValidityInMilliseconds: Long =
         EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
 
-
     fun createTokens(user: User): TokenResponse {
         val now = Date()
+
+        // memberId null 체크
+        user.memberId ?: throw UnauthorizedException("유저의 memberId가 없습니다.")
 
         // Access Token 생성
         val accessTokenValidity = Date(now.time + accessTokenValidityInMilliseconds)
         val accessToken = Jwts.builder()
-            .setSubject(user.email)
+            .setSubject(user.memberId.toString())
             .claim("nickname", user.nickname)
             .setIssuedAt(now)
             .setExpiration(accessTokenValidity)
@@ -38,7 +40,7 @@ class JwtService {
         // Refresh Token 생성
         val refreshTokenValidity = Date(now.time + refreshTokenValidityInMilliseconds)
         val refreshToken = Jwts.builder()
-            .setSubject(user.email)
+            .setSubject(user.memberId.toString())
             .setId(UUID.randomUUID().toString())
             .setIssuedAt(now)
             .setExpiration(refreshTokenValidity)
@@ -50,7 +52,8 @@ class JwtService {
 
     fun validateToken(token: String): Boolean {
         return try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
+            val claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body
+            claims.subject ?: throw UnauthorizedException("토큰에 memberId가 없습니다.")
             true
         } catch (e: ExpiredJwtException) {
             throw UnauthorizedException("토큰이 만료되었습니다.")
@@ -59,10 +62,12 @@ class JwtService {
         }
     }
 
-    fun getEmailFromToken(token: String): String {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
+    fun getMemberIdFromToken(token: String): Long {
+        val subject = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
+        subject?.let {
+            return it.toLong()
+        } ?: throw UnauthorizedException("토큰에 memberId가 없습니다.")
     }
-
 
     fun resolveToken(req: HttpServletRequest): String? {
         val bearerToken = req.getHeader("Authorization")
