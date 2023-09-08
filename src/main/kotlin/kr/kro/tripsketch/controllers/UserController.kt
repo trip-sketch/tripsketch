@@ -19,8 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.utils.EnvLoader
 import software.amazon.awssdk.services.s3.model.S3Exception
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+
 
 @RestController
 @RequestMapping("api/user")
