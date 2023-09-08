@@ -7,7 +7,6 @@ import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.EmailService
 import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
@@ -25,7 +24,7 @@ import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service, private val emailService: EmailService) {
+class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -146,16 +145,16 @@ class UserController(private val userService: UserService, private val notificat
     }
 
 
-    @GetMapping("/email")
-    fun testEmailSending(@RequestParam email: String): String {
-        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-        return try {
-            emailService.sendDeletionWarningEmail(email, currentDate)
-            "Email sent successfully to $email with date $currentDate!"
-        } catch (e: Exception) {
-            "Failed to send email: ${e.message}"
-        }
-    }
+//    @GetMapping("/email")
+//    fun testEmailSending(@RequestParam email: String): String {
+//        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+//
+//        return try {
+//            emailService.sendDeletionWarningEmail(email, currentDate)
+//            "Email sent successfully to $email with date $currentDate!"
+//        } catch (e: Exception) {
+//            "Failed to send email: ${e.message}"
+//        }
+//    }
 
 }
