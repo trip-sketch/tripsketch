@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 @Repository
 interface UserRepository : MongoRepository<User, String> {
-    fun findByEmail(email: String): User?
+    fun findByMemberId(memberId: Long): User?
     fun findByNickname(nickname: String): User?
     fun existsByNickname(nickname: String): Boolean
     fun findByOurRefreshToken(ourRefreshToken: String): User?

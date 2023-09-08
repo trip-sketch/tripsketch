@@ -7,7 +7,6 @@ import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.EmailService
 import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.data.domain.Page
@@ -20,12 +19,11 @@ import org.springframework.web.multipart.MultipartFile
 import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.utils.EnvLoader
 import software.amazon.awssdk.services.s3.model.S3Exception
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service, private val emailService: EmailService) {
+class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -35,16 +33,17 @@ class UserController(private val userService: UserService, private val notificat
         req: HttpServletRequest,
         @RequestParam token: String
     ): ResponseEntity<Any> {
-        val email = req.getAttribute("userEmail") as String
-        val user = userService.findUserByEmail(email)
+        val memberId = req.getAttribute("memberId") as Long
+        val user = userService.findUserByMemberId(memberId)
 
-        userService.storeUserPushToken(email, token)
+        userService.storeUserPushToken(memberId, token)
 
         // 관리자 이메일 리스트를 환경 변수에서 가져오기
-        val adminEmails = EnvLoader.getProperty("ADMIN_EMAILS")?.split(",") ?: listOf()
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
-        // 사용자 이메일이 관리자 이메일 리스트에 있는지 확인
-        val isAdmin = email in adminEmails
+// 사용자 ID가 관리자 ID 리스트에 있는지 확인
+        val isAdmin = memberId in adminIds
 
         return if (user != null) {
             ResponseEntity.ok(userService.toDto(user, true, isAdmin)) // 관리자 여부 추가
@@ -73,10 +72,10 @@ class UserController(private val userService: UserService, private val notificat
     fun updateUser(req: HttpServletRequest,
                    @Validated @ModelAttribute userUpdateDto: UserUpdateDto
     ): ResponseEntity<UserDto> {
-        val email = req.getAttribute("userEmail") as String? ?: throw UnauthorizedException("이메일이 존재하지 않습니다.")
+        val memberId = req.getAttribute("memberId") as Long? ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
 
         try {
-            val updatedUser = userService.updateUser(email, userUpdateDto)
+            val updatedUser = userService.updateUser(memberId, userUpdateDto)
             return ResponseEntity.ok(userService.toDto(updatedUser))
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
@@ -94,7 +93,7 @@ class UserController(private val userService: UserService, private val notificat
     @PostMapping("/send")
     fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
         val expoResponseMessage = notificationService.sendPushNotification(
-            listOf(notificationRequest.email),
+            listOf(notificationRequest.memberId),
             notificationRequest.title,
             notificationRequest.body,
             notificationRequest.commentId,
@@ -141,19 +140,6 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
-        }
-    }
-
-
-    @GetMapping("/email")
-    fun testEmailSending(@RequestParam email: String): String {
-        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-        return try {
-            emailService.sendDeletionWarningEmail(email, currentDate)
-            "Email sent successfully to $email with date $currentDate!"
-        } catch (e: Exception) {
-            "Failed to send email: ${e.message}"
         }
     }
 

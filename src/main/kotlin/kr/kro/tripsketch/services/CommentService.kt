@@ -2,7 +2,6 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.*
-import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.TripRepository
@@ -54,19 +53,19 @@ class CommentService(
 
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
-    fun getIsLikedByTokenForTrip(email: String, tripId: String): List<CommentDto> {
-        val updatedComments = isLikedByTokenForComments(email, tripId)
+    fun getIsLikedByTokenForTrip(memberId: Long, tripId: String): List<CommentDto> {
+        val updatedComments = isLikedByTokenForComments(memberId, tripId)
 
         return updatedComments.map { fromComment(it, userService) }
     }
 
-    private fun isLikedByTokenForComments(userEmail: String, tripId: String): List<Comment> {
+    private fun isLikedByTokenForComments(memberId: Long, tripId: String): List<Comment> {
         tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
         val comments = commentRepository.findAllByTripId(tripId)
         val commenter =
-            userService.findUserByEmail(userEmail) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+            userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         return comments.map { comment ->
             val isLiked = comment.likedBy.contains(commenter.id)
             val updatedComment = comment.copy(isLiked = isLiked)
@@ -80,10 +79,10 @@ class CommentService(
     }
 
     // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
-    fun createComment(email: String, commentCreateDto: CommentCreateDto): CommentDto {
+    fun createComment(memberId: Long, commentCreateDto: CommentCreateDto): CommentDto {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userService.findUserByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         val comment = Comment(
             userId = commenter.id,
             tripId = commentCreateDto.tripId,
@@ -107,14 +106,14 @@ class CommentService(
     }
 
     fun createChildrenComment(
-        email: String,
+        memberId: Long,
         parentId: String,
         commentChildrenCreateDto: CommentChildrenCreateDto
     ): CommentDto {
 
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentChildrenCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
 
         val parentComment: Comment = parentId.let {
             commentRepository.findById(it).orElse(null)
@@ -123,11 +122,11 @@ class CommentService(
 
         val mentionedUser =
             userRepository.findByNickname(commentChildrenCreateDto.replyToNickname)
-                ?: throw IllegalArgumentException("해당 이메일의 언급 된 사용자 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("해당 언급 된 사용자 존재하지 않습니다.")
 
-        if (mentionedUser.email.endsWith("@delete.com")) {
-            throw BadRequestException("해당 이메일의 언급 된 사용자는 없습니다.")
-        }
+//        if (mentionedUser.email.endsWith("@delete.com")) {
+//            throw BadRequestException("해당 언급 된 사용자는 없습니다.")
+//        }
 
         val childComment = Comment(
             id = ObjectId().toString(), // 새로운 ObjectId 생성
@@ -135,7 +134,7 @@ class CommentService(
             tripId = commentChildrenCreateDto.tripId,
             parentId = parentId,
             content = commentChildrenCreateDto.content,
-            replyToEmail = mentionedUser.email,
+            replyToUserId = mentionedUser.id,
         )
 
         parentComment.children.add(childComment)
@@ -172,13 +171,13 @@ class CommentService(
         return fromComment(createdComment, userService)
     }
 
-    fun updateComment(email: String, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
+    fun updateComment(memberId: Long, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
 
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (comment.userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
@@ -198,7 +197,7 @@ class CommentService(
     }
 
     fun updateChildrenComment(
-        email: String,
+        memberId: Long,
         parentId: String,
         id: String,
         commentUpdateDto: CommentUpdateDto
@@ -213,7 +212,7 @@ class CommentService(
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
 
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (parentComment.children[childCommentIndex].userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
@@ -235,7 +234,7 @@ class CommentService(
         return fromComment(savedParentComment, userService)
     }
 
-    fun deleteComment(email: String, id: String) {
+    fun deleteComment(memberId: Long, id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
@@ -244,9 +243,9 @@ class CommentService(
         if (comment.isDeleted) {
             throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
         if (comment.userId != commenter.id) {
@@ -255,12 +254,14 @@ class CommentService(
         // Soft delete 처리
         val deletedComment = comment.copy(
             content = "삭제 된 댓글입니다.",
-            isDeleted = true
+            isDeleted = true,
+            likedBy = mutableSetOf(),
+            numberOfLikes = 0
         )
         commentRepository.save(deletedComment)
     }
 
-    fun deleteChildrenComment(email: String, parentId: String, id: String) {
+    fun deleteChildrenComment(memberId: Long, parentId: String, id: String) {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
 
@@ -276,9 +277,9 @@ class CommentService(
             throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
 
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -288,14 +289,20 @@ class CommentService(
 
         // Soft delete 처리
         val deletedChildComment =
-            parentComment.children[childCommentIndex].copy(content = "삭제 된 댓글입니다.", isDeleted = true)
+            parentComment.children[childCommentIndex].copy(
+                content = "삭제 된 댓글입니다.",
+                isDeleted = true,
+                likedBy = mutableSetOf(),
+                numberOfLikes = 0,
+                replyToUserId = "",
+            )
         parentComment.children[childCommentIndex] = deletedChildComment
         commentRepository.save(parentComment)
     }
 
-    fun toggleLikeComment(email: String, id: String): CommentDto {
+    fun toggleLikeComment(memberId: Long, id: String): CommentDto {
 
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         val userId = commenter.id
 
@@ -305,7 +312,7 @@ class CommentService(
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -325,7 +332,7 @@ class CommentService(
                 notificationService.sendPushNotification(
                     listOf(comment.userId!!),
                     "새로운 여행의 시작, 트립스케치",
-                    "${commenter.nickname} 님이 댓글에 좋아요.",
+                    "${commenter.nickname} 님이 회원님의 댓글을 좋아합니다.",
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = comment.tripId,
@@ -338,15 +345,15 @@ class CommentService(
         return fromComment(savedComment, userService)
     }
 
-    fun toggleLikeChildrenComment(email: String, parentId: String, id: String): CommentDto {
+    fun toggleLikeChildrenComment(memberId: Long, parentId: String, id: String): CommentDto {
 
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
-        val findTrip= tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userRepository.findByEmail(email) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        if (findTrip.isPublic==false && findTrip.userId != commenter.id) {
+        if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
 
@@ -372,7 +379,7 @@ class CommentService(
                 notificationService.sendPushNotification(
                     listOf(childComment.userId!!),
                     "새로운 여행의 시작, 트립스케치",
-                    "${commenter.nickname} 님이 님이 댓글에 좋아요.",
+                    "${commenter.nickname} 님이 회원님의 댓글을 좋아합니다.",
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = childComment.tripId,
@@ -388,25 +395,25 @@ class CommentService(
 
     companion object {
         fun fromComment(comment: Comment, userService: UserService): CommentDto {
-            val commenter = comment.userId?.let { userService.findUserById(it) }
-                ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
-            val mentionedUser = comment.replyToEmail?.let { userService.findUserByEmail(it) }
 
-            val commenterProfile = commenter.let {
+            val commenter = comment.userId?.let { userService.findUserById(it) }
+
+            val commenterProfile = commenter?.let {
                 UserProfileDto(
-                    email = it.email,
                     nickname = it.nickname,
-                    introduction = it.introduction,
-                    profileImageUrl = it.profileImageUrl
+                    introduction = it.introduction ?: "",
+                    profileImageUrl = it.profileImageUrl ?: ""
                 )
             }
+
+            val mentionedUser = comment.replyToUserId?.let { userService.findUserById(it) }
 
             val mentionedUserNickname = mentionedUser?.nickname
 
             return CommentDto(
                 id = comment.id,
-                userNickName = commenterProfile.nickname ?: "", // 사용자가 없을 경우 대비
-                userProfileUrl = commenterProfile.profileImageUrl ?: "", // 사용자가 없을 경우 대비
+                userNickName = commenterProfile?.nickname ?: "알 수 없는 사용자", // 사용자가 없을 경우 대비
+                userProfileUrl = commenterProfile?.profileImageUrl ?: "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png", // 사용자가 없을 경우 대비
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,

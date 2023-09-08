@@ -15,9 +15,8 @@ data class User(
     @Id val id: String? = null,
 
     @Indexed(unique = true)
-    @field:Email(message = "이메일 형식이어야 합니다.")
     @field:NotBlank
-    var email: String,
+    var memberId: Long,
 
     @Indexed(unique = true)
     @field:NotBlank(message = "닉네임을 입력해주세요.")
@@ -27,7 +26,6 @@ data class User(
     @field:Size(max = 500, message = "500글자 이내로 가능합니다.")
     var introduction: String?,
 
-    @field:Length(min = 5, max = 500, message = "텍스트 길이는 5자 이상 500자 이하이어야 합니다.")
     var profileImageUrl: String?,
 
     @field:NotNull

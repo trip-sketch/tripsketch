@@ -1,7 +1,7 @@
 package kr.kro.tripsketch.dto
 
 data class NotificationRequest(
-    val email: String,
+    val memberId: String,
     val title: String,
     val body: String,
     val commentId: String? = null,

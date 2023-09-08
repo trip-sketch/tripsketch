@@ -79,15 +79,15 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         }
     }
 
+    fun getMemberIdFromKakao(accessToken: String): Long? {
+        val userInfo = getUserInfo(accessToken)
+        return userInfo?.get("id") as? Long
+    }
+
     fun getEmailFromKakao(accessToken: String): String? {
         val userInfo = getUserInfo(accessToken)
         val kakaoAccountInfo = userInfo?.get("kakao_account") as? Map<*, *>
         return kakaoAccountInfo?.get("email") as? String
-    }
-
-    fun getKakaoLoginUrl(): String {
-        val baseUrl = "https://kauth.kakao.com/oauth/authorize"
-        return "$baseUrl?client_id=${kakaoConfig.clientId}&redirect_uri=${kakaoConfig.redirectUri}&response_type=code"
     }
 
 }
