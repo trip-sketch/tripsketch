@@ -297,6 +297,7 @@ class TripService(
             else -> Sort.unsorted() // 정렬하지 않음
         }
         val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+            ?: emptyList()
         val tripDtoList = mutableListOf<TripDto>()
         findTrips.forEach { trip ->
             tripDtoList.add(fromTrip(trip, userId, false))
@@ -307,9 +308,8 @@ class TripService(
 
 
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
-        val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
-            EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
-        }
+        val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
+            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         if (findTrip.userId == userId) {
@@ -334,9 +334,8 @@ class TripService(
     }
 
     fun deleteTripById(memberId: Long, id: String) {
-        val findTrip = tripRepository.findById(id).orElseThrow {
-            EntityNotFoundException("삭제할 게시글이 존재하지 않습니다.")
-        }
+        val findTrip = tripRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         if (findTrip.userId == userId) {    //'findTrip.userId == user.id' 조건은 항상 false입니다 ?

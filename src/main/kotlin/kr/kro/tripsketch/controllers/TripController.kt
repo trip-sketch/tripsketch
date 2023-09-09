@@ -192,7 +192,7 @@ class TripController(private val tripService: TripService) {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
-        }  catch (ex: EntityNotFoundException) {
+        }  catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
@@ -212,8 +212,8 @@ class TripController(private val tripService: TripService) {
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: EntityNotFoundException) {
-            ResponseEntity.notFound().build()
+        } catch (ex: IllegalArgumentException) {
+            ResponseEntity.badRequest().body("잘못된 요청입니다.")
         } catch (ex: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
         }
@@ -230,8 +230,8 @@ class TripController(private val tripService: TripService) {
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: EntityNotFoundException) {
-            ResponseEntity.notFound().build()
+        } catch (ex: IllegalArgumentException) {
+            ResponseEntity.badRequest().body("잘못된 요청입니다.")
         } catch (ex: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
         }
