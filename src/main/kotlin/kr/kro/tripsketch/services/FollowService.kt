@@ -28,7 +28,7 @@ class FollowService(
         if (!followRepository.existsByFollowerAndFollowing(followerId, followingId)) {
             followRepository.save(Follow(follower = followerId, following = followingId))
             val follower = userService.findUserByMemberId(followerMemberId)
-            val followerNickname = follower?.nickname ?: "알수없는 사용자r"
+            val followerNickname = follower?.nickname ?: "알 수 없는 사용자"
             val followerProfileUrl = follower?.profileImageUrl
             return notificationService.sendPushNotification(
                 listOf(followingId),
