@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Document(collection = "trips")
@@ -37,6 +38,8 @@ data class Trip(
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList()
+//    var images: List<MultipartFile>? = emptyList()
+//    var images: MutableList<String>?
 )
 
 data class HashtagInfo(

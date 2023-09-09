@@ -46,16 +46,15 @@ class TripLikeService(
                 throw IllegalStateException("작성한 게시자 본인에게 알림이 가지 않습니다.")
             }
         } else {
-            throw IllegalStateException("이미 좋아요한 게시물입니다.")
+            throw IllegalArgumentException("이미 좋아요한 게시물입니다.")
         }
     }
 
     fun unlikeTrip(memberId: Long, tripId: String)  {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
-        val findTrip = tripRepository.findById(tripId).orElseThrow {
-            EntityNotFoundException("조회되는 게시물이 없습니다.")
-        }
+        val findTrip = tripRepository.findById(tripId).orElse(null)
+            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         if (findTrip.tripLikes.contains(userId)) {
             findTrip.tripLikes.remove(userId)
             findTrip.likes--
@@ -65,5 +64,3 @@ class TripLikeService(
         }
     }
 }
-
-class EntityNotFoundException(message: String) : RuntimeException(message)

@@ -1,11 +1,7 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
-import kr.kro.tripsketch.dto.TripCreateDto
-import kr.kro.tripsketch.dto.TripDto
-import kr.kro.tripsketch.dto.TripUpdateDto
-import kr.kro.tripsketch.dto.TripUpdateResponseDto
-import kr.kro.tripsketch.dto.TripCountryFrequencyDto
+import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -22,33 +18,34 @@ class TripService(
     private val followRepository: FollowRepository,
     private val userService: UserService,
     private val notificationService: NotificationService,
+    private val imageService: ImageService
 ) {
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+//        val newImageUrl = imageService.uploadImage("tripsketch/trip-user", newImageFile)
+//        user.profileImageUrl = newImageUrl
+//        println(newImageUrl)
+        println(tripCreateDto)
+        println(tripCreateDto.images)
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
             location = tripCreateDto.location,
-            startedAt = LocalDateTime.now(),
-            endAt = LocalDateTime.now(),
+            startedAt = tripCreateDto.startedAt,
+            endAt = tripCreateDto.endAt,
             latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
             hashtagInfo = tripCreateDto.hashtagInfo,
             isPublic = tripCreateDto.isPublic,
             images = tripCreateDto.images
+//            images = uploadedImages.toMutableList()  // 업로드된 이미지 파일 이름들을 저장
         )
         val createdTrip = tripRepository.save(newTrip)
 
         // 나를 팔로우하는 사람들에게 알람 보내기 기능
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findUser = userRepository.findById(userId)
-        if (findUser.isPresent) {
-            val user = findUser.get()
-            val userNickname = user.nickname ?: "Unknown user"
-            val userProfileUrl = user.profileImageUrl ?: ""
-        }
 
         val follower = followRepository.findByFollowing(userId)
         val filteredFollower = follower.filter { it.follower != userId }
@@ -66,6 +63,7 @@ class TripService(
             followingNickname,
             followingProfileUrl
         )
+
         return fromTrip(createdTrip, userId, false)
     }
 
@@ -91,15 +89,6 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId)
         return findTrips.map { fromTrip(it, userId, false) }.toSet()
-
-//        val findTrips: Set<Trip> = if (email.isNotEmpty()) {
-//            // to-do : 매개변수 이메일과 findTrips 에서의 email 과 동일하다면 비공개 포함하여 보여줌 - findByIsHiddenIsFalse
-//            tripRepository.findTripByUserId(email) +
-//                    tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(email)
-//        } else {
-//            // to-do : 같지않다면 공개 게시물만 보여줌 - findByIsPublicIsTrueAndIsHiddenIsFalse
-//            tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(email)
-//        }
     }
 
     fun getAllTripsByGuest(): Set<TripDto> {
