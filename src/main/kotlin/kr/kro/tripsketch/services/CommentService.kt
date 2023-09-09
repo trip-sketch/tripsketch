@@ -2,7 +2,6 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.dto.*
-import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.TripRepository
@@ -414,7 +413,7 @@ class CommentService(
             return CommentDto(
                 id = comment.id,
                 userNickName = commenterProfile?.nickname ?: "알 수 없는 사용자", // 사용자가 없을 경우 대비
-                userProfileUrl = commenterProfile?.profileImageUrl ?: "", // 사용자가 없을 경우 대비
+                userProfileUrl = commenterProfile?.profileImageUrl ?: "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png", // 사용자가 없을 경우 대비
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
