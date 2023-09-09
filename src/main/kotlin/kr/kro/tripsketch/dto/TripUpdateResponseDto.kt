@@ -13,8 +13,8 @@ data class TripUpdateResponseDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime = LocalDateTime.now(),
-    var endAt: LocalDateTime = LocalDateTime.now(),
+    var startedAt: LocalDateTime? = LocalDateTime.now(),
+    var endAt: LocalDateTime? = LocalDateTime.now(),
     var hashtagInfo: HashtagInfo? = null,
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도

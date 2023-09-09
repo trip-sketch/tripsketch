@@ -186,8 +186,7 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @PathVariable id: String,
         @Validated @RequestBody tripUpdateDto: TripUpdateDto
-    )
-            : ResponseEntity<Any> {
+    ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)

@@ -34,41 +34,16 @@ interface TripRepository : MongoRepository<Trip, String> {
     // 유저 아이디로 공개 + 삭제x 인 글들 조회
     fun findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(userId: String): Set<Trip>
 
-
     // 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(userId: String = ""): Set<Trip>
 
-
+    // email 조건이 맞으면서 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
 
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
-
-    @Query("" +
-            "SELECT " +
-            "   title " +
-            "   , content " +
-            "   , likes " +
-            "   , views " +
-            "   , location " +
-            "   , startedAt " +
-            "   , endAt " +
-            "   , hashtagInfo " +
-            "   , createdAt " +
-            "   , images[0] " +
-            "FROM " +
-            "   trips" +
-            "WHERE " +
-            "   isPublic = true " +
-            "   AND isHidden = false " +
-            "   AND email IN :emailSet " +
-            "GROUP BY " +
-            "   emailSet " +
-            "ORDER BY " +
-            "   createdAt DESC "
-    )
-    fun findListFollowingByUser(emailSet: Set<String>): Set<Trip>
+    fun findTripsByUserId(사용자아이디들: List<String>): List<Trip>
 
     @Query("{" +
             "\$or: [" +
