@@ -22,4 +22,5 @@ data class TripUpdateDto(
     var hashtagInfo: HashtagInfo? = null,
     var isPublic: Boolean? = true,
     var images: List<String>? = emptyList()
+//    var images: MutableList<String> = mutableListOf(),
 )

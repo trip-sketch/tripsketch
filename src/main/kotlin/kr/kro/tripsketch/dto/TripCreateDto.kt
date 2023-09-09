@@ -21,4 +21,6 @@ data class TripCreateDto(
     var hashtagInfo: HashtagInfo? = null,
     var isPublic: Boolean? = true,
     var images: List<String>? = emptyList()
+//    var images: List<MultipartFile>?
+//    var images: MutableList<String> = mutableListOf()
 )

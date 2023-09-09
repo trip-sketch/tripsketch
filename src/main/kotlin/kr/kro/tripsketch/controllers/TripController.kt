@@ -23,6 +23,22 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(createdTrip)
     }
 
+//    @PostMapping(consumes = ["multipart/form-data"])
+//    fun createTrip(
+//        req: HttpServletRequest,
+//        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
+//        @RequestParam("dir", required = false, defaultValue = "") dir: String,
+//        @RequestParam("file") file: MultipartFile
+//    ): ResponseEntity<TripDto> {
+//        try {
+//            val memberId = req.getAttribute("memberId") as Long
+//            val createdTrip = tripService.createTrip(memberId, tripCreateDto)
+//            return ResponseEntity.ok(createdTrip)
+//        } catch (e: IllegalArgumentException) {
+//            throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
+//        }
+//    }
+
     // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
     fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
