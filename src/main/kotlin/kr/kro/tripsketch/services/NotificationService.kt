@@ -26,7 +26,7 @@ class NotificationService(
     fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
         val userId = userService.getUserIdByMemberId(memberId)
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
-        return notificationRepository.findByReceiverIdsContains(userId, pageable)
+        return notificationRepository.findByReceiverId(userId, pageable)
     }
 
     fun deleteNotificationById(notificationId: String, memberId: Long) {
@@ -34,7 +34,7 @@ class NotificationService(
         val notification = notificationRepository.findById(notificationId).orElse(null)
             ?: throw IllegalArgumentException("해당 알림을 찾을 수 없습니다.")
 
-        if (notification.receiverIds.contains(userId)) {
+        if (notification.receiverId == userId) { // 수정된 부분
             notificationRepository.deleteById(notificationId)
         } else {
             throw UnauthorizedException("이 알림을 삭제할 권한이 없습니다.")
@@ -54,18 +54,19 @@ class NotificationService(
         val tokens = ids.mapNotNull { getUserToken(it) }.toSet()
 
         // 알림 객체 생성
-        val notification = Notification(
-            receiverIds = ids,
-            title = title,
-            body = body,
-            commentId = commentId,
-            parentId = parentId,
-            tripId = tripId,
-            nickname = nickname,
-            profileUrl = profileUrl,
-        )
-
-        notificationRepository.save(notification)
+        ids.forEach { receiverId ->
+            val notification = Notification(
+                receiverId = receiverId, // 수정된 부분
+                title = title,
+                body = body,
+                commentId = commentId,
+                parentId = parentId,
+                tripId = tripId,
+                nickname = nickname,
+                profileUrl = profileUrl,
+            )
+            notificationRepository.save(notification)
+        }
 
         val response = if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface NotificationRepository : MongoRepository<Notification, String> {
-    fun findByReceiverIdsContains(receiverId: String, pageable: Pageable): Page<Notification>
+    fun findByReceiverId(receiverId: String, pageable: Pageable): Page<Notification>
 }
