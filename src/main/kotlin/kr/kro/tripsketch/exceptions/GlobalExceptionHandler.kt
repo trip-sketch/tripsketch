@@ -25,12 +25,12 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<String>{
+    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<String> {
         return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(IllegalStateException::class)
-    fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<String>{
+    fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<String> {
         return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
     }
 

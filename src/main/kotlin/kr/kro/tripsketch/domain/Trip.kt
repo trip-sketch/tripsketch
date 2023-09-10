@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.domain
 
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.Length
 import org.springframework.data.annotation.Id
@@ -12,7 +11,7 @@ import java.time.LocalDateTime
 data class Trip(
     @Id val id: String? = null,
     @field:NotBlank(message = "userId 는 필수 항목입니다.")
-    var userId: String,             // User.kt -> var memberId: Long,       // 기존 trip -> var userId: String,
+    var userId: String, // User.kt -> var memberId: Long,       // 기존 trip -> var userId: String,
     @field:NotBlank(message = "제목을 입력하세요.")
     @field:Length(min = 5, max = 100, message = "텍스트 길이는 5자 이상 50자이내여야 합니다.")
     @TextIndexed
@@ -26,8 +25,8 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDateTime? = LocalDateTime.now(),
     var endAt: LocalDateTime? = LocalDateTime.now(),
-    var isPublic: Boolean? = true,        // 게시글 전체공개 또는 비공개 여부
-    var isHidden: Boolean = false,        // 게시글 삭제 여부
+    var isPublic: Boolean? = true, // 게시글 전체공개 또는 비공개 여부
+    var isHidden: Boolean = false, // 게시글 삭제 여부
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
@@ -36,7 +35,7 @@ data class Trip(
     var deletedAt: LocalDateTime? = LocalDateTime.now(),
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
-    var images: List<String>? = emptyList()
+    var images: List<String>? = emptyList(),
 )
 
 data class HashtagInfo(
@@ -48,5 +47,5 @@ data class HashtagInfo(
     val displayName: String? = null,
     val road: String? = null,
     val address: String? = null,
-    val etc: Set<String>? = null
+    val etc: Set<String>? = null,
 )
