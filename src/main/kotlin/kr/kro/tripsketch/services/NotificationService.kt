@@ -34,7 +34,7 @@ class NotificationService(
         val notification = notificationRepository.findById(notificationId).orElse(null)
             ?: throw IllegalArgumentException("해당 알림을 찾을 수 없습니다.")
 
-        if (notification.receiverId == userId) { // 수정된 부분
+        if (notification.receiverId == userId) {
             notificationRepository.deleteById(notificationId)
         } else {
             throw UnauthorizedException("이 알림을 삭제할 권한이 없습니다.")
@@ -56,7 +56,7 @@ class NotificationService(
         // 알림 객체 생성
         ids.forEach { receiverId ->
             val notification = Notification(
-                receiverId = receiverId, // 수정된 부분
+                receiverId = receiverId,
                 title = title,
                 body = body,
                 commentId = commentId,
