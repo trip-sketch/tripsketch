@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ServletFilterConfig {
 
-
     /**
      * 로깅 필터를 등록하기 위한 Bean입니다.
      *

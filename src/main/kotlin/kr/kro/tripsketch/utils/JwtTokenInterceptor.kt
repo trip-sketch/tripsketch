@@ -2,8 +2,8 @@ package kr.kro.tripsketch.utils
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.exceptions.ForbiddenException
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.JwtService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -12,7 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 @Component
 class JwtTokenInterceptor(
     private val jwtService: JwtService,
-    @Value("\${admin.ids}") private val adminIdsConfig: String
+    @Value("\${admin.ids}") private val adminIdsConfig: String,
 ) : HandlerInterceptor {
 
     private val adminIds: List<Long> by lazy {
@@ -20,7 +20,6 @@ class JwtTokenInterceptor(
     }
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-
         if (request.requestURI.startsWith("/api/oauth/kakao/callback")) {
             return true
         }
@@ -49,5 +48,4 @@ class JwtTokenInterceptor(
 
         return true
     }
-
 }

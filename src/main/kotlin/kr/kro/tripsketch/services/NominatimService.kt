@@ -42,7 +42,7 @@ class NominatimService(private val objectMapper: ObjectMapper) {
                 name = addressNode.path("name").asText(null),
                 displayName = jsonNode.path("display_name").asText(null),
                 road = addressNode.path("road").asText(null),
-                address = addressNode.path("address").asText(null)
+                address = addressNode.path("address").asText(null),
             )
         } catch (e: Exception) {
             throw Exception("JSON 파싱 중 예외가 발생했습니다: ${e.message}", e)

@@ -1,8 +1,8 @@
 package kr.kro.tripsketch.services
 
-import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.domain.Follow
 import kr.kro.tripsketch.dto.ProfileDto
+import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
 
@@ -17,7 +17,7 @@ class FollowService(
     fun follow(followerMemberId: Long, followingNickname: String): String {
         val followingId = userService.getUserIdByMemberId(
             userService.findUserByNickname(followingNickname)?.memberId
-                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다."),
         )
         val followerId = userService.getUserIdByMemberId(followerMemberId)
 
@@ -35,7 +35,7 @@ class FollowService(
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",
                 nickname = followerNickname,
-                profileUrl = followerProfileUrl
+                profileUrl = followerProfileUrl,
             )
         } else {
             throw IllegalArgumentException("이미 구독 중입니다.")
@@ -45,7 +45,7 @@ class FollowService(
     fun unfollow(followerMemberId: Long, followingNickname: String) {
         val followingId = userService.getUserIdByMemberId(
             userService.findUserByNickname(followingNickname)?.memberId
-                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다."),
         )
         val followerId = userService.getUserIdByMemberId(followerMemberId)
 
@@ -63,7 +63,7 @@ class FollowService(
     fun unfollowMe(followingMemberId: Long, followerNickname: String) {
         val followerId = userService.getUserIdByMemberId(
             userService.findUserByNickname(followerNickname)?.memberId
-                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다."),
         )
         val followingId = userService.getUserIdByMemberId(followingMemberId)
 
@@ -81,7 +81,7 @@ class FollowService(
     fun getFollowings(followerNickname: String, currentUserMemberId: Long?): List<ProfileDto> {
         val followerId = userService.getUserIdByMemberId(
             userService.findUserByNickname(followerNickname)?.memberId
-                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다."),
         )
 
         return followRepository.findByFollower(followerId).map { follow ->
@@ -95,7 +95,7 @@ class FollowService(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
                 profileImageUrl = user?.profileImageUrl,
-                isFollowing = isCurrentUserFollowing
+                isFollowing = isCurrentUserFollowing,
             )
         }
     }
@@ -103,7 +103,7 @@ class FollowService(
     fun getFollowers(followingNickname: String, currentUserMemberId: Long?): List<ProfileDto> {
         val followingId = userService.getUserIdByMemberId(
             userService.findUserByNickname(followingNickname)?.memberId
-                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다.")
+                ?: throw IllegalArgumentException("사용자가 존재하지 않습니다."),
         )
 
         return followRepository.findByFollowing(followingId).map { follow ->
@@ -117,9 +117,8 @@ class FollowService(
                 nickname = user?.nickname,
                 introduction = user?.introduction,
                 profileImageUrl = user?.profileImageUrl,
-                isFollowing = isCurrentUserFollowing
+                isFollowing = isCurrentUserFollowing,
             )
         }
     }
-
 }

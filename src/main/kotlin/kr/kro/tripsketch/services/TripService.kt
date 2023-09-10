@@ -1,11 +1,11 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
+import kr.kro.tripsketch.dto.TripCountryFrequencyDto
 import kr.kro.tripsketch.dto.TripCreateDto
 import kr.kro.tripsketch.dto.TripDto
 import kr.kro.tripsketch.dto.TripUpdateDto
 import kr.kro.tripsketch.dto.TripUpdateResponseDto
-import kr.kro.tripsketch.dto.TripCountryFrequencyDto
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-//import org.springframework.data.domain.Sort
+// import org.springframework.data.domain.Sort
 
 @Service
 class TripService(
@@ -36,7 +36,7 @@ class TripService(
             longitude = tripCreateDto.longitude,
             hashtagInfo = tripCreateDto.hashtagInfo,
             isPublic = tripCreateDto.isPublic,
-            images = tripCreateDto.images
+            images = tripCreateDto.images,
         )
         val createdTrip = tripRepository.save(newTrip)
 
@@ -64,7 +64,7 @@ class TripService(
             null,
             createdTrip.id,
             followingNickname,
-            followingProfileUrl
+            followingProfileUrl,
         )
         return fromTrip(createdTrip, userId, false)
     }
@@ -81,7 +81,7 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips =
             tripRepository.findByIsHiddenIsFalseAndUserId(userId) + tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(
-                userId
+                userId,
             )
         return findTrips.map { fromTrip(it, userId, false) }.toSet()
     }
@@ -108,21 +108,21 @@ class TripService(
     }
 
     fun getTripByNickname(nickname: String): Set<TripDto> {
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
         return findTrips.map { fromTrip(it, "", false) }.toSet()
     }
 
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.categorizeTripsByCountry()
     }
 
     fun getTripCategoryByNickname(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         // 전체 여행 목록을 카테고리화
@@ -131,16 +131,15 @@ class TripService(
         return paginateTrips(categorizedTrips.second, page, pageSize)
     }
 
-
     fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.getTripsInCountry(country)
     }
 
     fun getTripsInCountry(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         val tripsInCountry = findTrips.getTripsInCountry(country)
@@ -149,9 +148,8 @@ class TripService(
         return paginateTrips(tripsInCountry, page, pageSize)
     }
 
-
-    fun getCountryFrequencies(nickname: String): List<TripCountryFrequencyDto>{
-        val user = userService.findUserByNickname(nickname)?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
+    fun getCountryFrequencies(nickname: String): List<TripCountryFrequencyDto> {
+        val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
         return findTrips.sortTripsByCountryFrequency()
@@ -261,7 +259,6 @@ class TripService(
         return fromTripToUpdate(findTrip, userId, false)
     }
 
-
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -316,7 +313,6 @@ class TripService(
         return tripDtoList
     }
 
-
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElseThrow {
             EntityNotFoundException("수정할 게시글이 존재하지 않습니다.")
@@ -350,7 +346,7 @@ class TripService(
         }
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        if (findTrip.userId == userId) {    //'findTrip.userId == user.id' 조건은 항상 false입니다 ?
+        if (findTrip.userId == userId) { // 'findTrip.userId == user.id' 조건은 항상 false입니다 ?
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
@@ -358,7 +354,6 @@ class TripService(
             throw IllegalAccessException("삭제할 권한이 없습니다.")
         }
     }
-
 
     fun fromTrip(trip: Trip, currentUserId: String, includeUserId: Boolean = true): TripDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
@@ -400,7 +395,7 @@ class TripService(
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
                 isLiked = isLiked,
-                images = trip.images
+                images = trip.images,
             )
         } else {
             TripDto(
@@ -423,7 +418,7 @@ class TripService(
                 deletedAt = trip.deletedAt,
                 tripLikes = trip.tripLikes,
                 isLiked = isLiked,
-                images = trip.images
+                images = trip.images,
             )
         }
     }
@@ -459,11 +454,10 @@ class TripService(
             deletedAt = trip.deletedAt,
             tripLikes = trip.tripLikes,
             isLiked = isLiked,
-            images = trip.images
+            images = trip.images,
         )
     }
 }
-
 
 fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
@@ -482,6 +476,6 @@ fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, An
         "posts" to paginatedTrips,
         "currentPage" to page,
         "totalPage" to totalPage,
-        "postsPerPage" to pageSize
+        "postsPerPage" to pageSize,
     )
 }

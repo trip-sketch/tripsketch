@@ -1,12 +1,12 @@
 package kr.kro.tripsketch.services
 
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.presigner.S3Presigner
-import software.amazon.awssdk.core.sync.RequestBody
-import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
 import java.time.Duration
 import java.time.LocalDateTime
@@ -46,11 +46,11 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
             GetObjectPresignRequest.builder()
                 .signatureDuration(expiration)
                 .getObjectRequest(getRequest)
-                .build())
+                .build(),
+        )
 
         return presignedGetObjectRequest.url().toString()
     }
-
 
     fun deleteFile(key: String) {
         val deleteObjectRequest = DeleteObjectRequest.builder()

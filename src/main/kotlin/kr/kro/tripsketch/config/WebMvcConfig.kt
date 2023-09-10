@@ -34,11 +34,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * @see WebMvcConfigurer
  */
 
-
-
 @Configuration
 class WebMvcConfig(
-    private val jwtTokenInterceptor: JwtTokenInterceptor
+    private val jwtTokenInterceptor: JwtTokenInterceptor,
 ) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(jwtTokenInterceptor)
@@ -59,7 +57,7 @@ class WebMvcConfig(
                 "/api/user/upload",
                 "/api/user/uploads",
                 "/api/user/email",
-                "/favicon.ico"
+                "/favicon.ico",
             )
     }
 }

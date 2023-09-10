@@ -6,12 +6,11 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
 
-
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
 
     // userId를 기반으로 여행을 검색하는 메소드
-     fun findTripByUserId(userId: String): Set<Trip>
+    fun findTripByUserId(userId: String): Set<Trip>
 
     // tripLikes 배열의 길이를 조회하는 메소드
     fun countByTripLikes(id: String): Long
@@ -45,25 +44,25 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     fun findTripsByUserId(사용자아이디들: List<String>): List<Trip>
 
-    @Query("{" +
+    @Query(
+        "{" +
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
             "]," +
             "'isPublic': true, 'isHidden': false" +
-            "}"
+            "}",
     )
     fun findTripsByKeyword(keyword: String): List<Trip>
 
-
-    @Query("{" +
+    @Query(
+        "{" +
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
             "]," +
             "'isPublic': true, 'isHidden': false" +
-            "}"
+            "}",
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
-
 }

@@ -1,11 +1,10 @@
 package kr.kro.tripsketch.domain
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
 import jakarta.validation.constraints.NotBlank
-import org.springframework.data.mongodb.core.index.Indexed
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Size
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
+import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
 @Document(collection = "comments")

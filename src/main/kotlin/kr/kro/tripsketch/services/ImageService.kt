@@ -19,6 +19,6 @@ class ImageService(private val s3Service: S3Service) {
 
     private fun extractKeyFromUrl(url: String): String {
         val path = URL(url).path
-        return path.substring(1)  // 맨 앞의 '/'를 제거
+        return path.substring(1) // 맨 앞의 '/'를 제거
     }
 }

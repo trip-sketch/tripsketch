@@ -5,7 +5,6 @@ import kr.kro.tripsketch.domain.HashtagInfo
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 
-
 data class TripCreateDto(
     @field:NotBlank(message = "제목을 입력하세요.")
     @field:Length(min = 5, max = 100, message = "텍스트 길이는 5자 이상 50자이내여야 합니다.")
@@ -20,5 +19,5 @@ data class TripCreateDto(
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
     var isPublic: Boolean? = true,
-    var images: List<String>? = emptyList()
+    var images: List<String>? = emptyList(),
 )

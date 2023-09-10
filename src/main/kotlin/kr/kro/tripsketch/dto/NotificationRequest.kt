@@ -7,5 +7,5 @@ data class NotificationRequest(
     val commentId: String? = null,
     val parentId: String? = null,
     val tripId: String? = null,
-    val nickname: String? = null
+    val nickname: String? = null,
 )

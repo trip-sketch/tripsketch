@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("api/oauth/kakao")
 class OauthController(
-    private val authService: AuthService, private val resourceLoader: ResourceLoader,
+    private val authService: AuthService,
+    private val resourceLoader: ResourceLoader,
 ) {
 
     @GetMapping("/callback")
@@ -31,7 +32,6 @@ class OauthController(
         return ResponseEntity.ok().headers(headers).body(responseBody)
     }
 
-
     @PostMapping("/refreshToken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
@@ -48,5 +48,4 @@ class OauthController(
             ResponseEntity.status(400).build()
         }
     }
-
 }

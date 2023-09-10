@@ -21,5 +21,5 @@ data class TripUpdateDto(
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
     var isPublic: Boolean? = true,
-    var images: List<String>? = emptyList()
+    var images: List<String>? = emptyList(),
 )

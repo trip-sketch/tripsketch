@@ -1,11 +1,7 @@
 package kr.kro.tripsketch.dto
 
-import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
-
 
 data class UserProfileDto(
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
@@ -15,5 +11,5 @@ data class UserProfileDto(
     val introduction: String?,
 
     @field:Length(min = 5, max = 500, message = "텍스트 길이는 5자 이상 500자 이하이어야 합니다.")
-    val profileImageUrl: String?
+    val profileImageUrl: String?,
 )

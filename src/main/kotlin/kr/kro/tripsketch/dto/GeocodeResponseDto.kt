@@ -8,5 +8,5 @@ data class GeocodeResponseDto(
     val name: String?,
     val displayName: String?,
     val road: String?,
-    val address: String?
+    val address: String?,
 )
