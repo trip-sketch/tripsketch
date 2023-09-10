@@ -10,7 +10,7 @@ data class Notification(
     @Id
     var id: String? = null,
 
-    var receiverIds: List<String>,
+    var receiverId: String,
 
     var title: String,
 
