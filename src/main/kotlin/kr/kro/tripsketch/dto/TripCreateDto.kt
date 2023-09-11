@@ -24,3 +24,15 @@ data class TripCreateDto(
     var images: List<MultipartFile>?
 //    var images: MutableList<String> = mutableListOf()
 )
+
+data class HashtagInfo(
+    val countryCode: String? = null,
+    val country: String? = null,
+    val city: String? = null,
+    val municipality: String? = null,
+    val name: String? = null,
+    val displayName: String? = null,
+    val road: String? = null,
+    val address: String? = null,
+    val etc: Set<String>? = null
+)
