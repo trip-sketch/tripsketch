@@ -385,20 +385,58 @@ class TripService(
 //        println(uploadedImageUrls)
         if (findTrip.userId == userId) {
             // 이전 값 유지 로직 추가
-            tripUpdateDto.title?.let { findTrip.title = it }
-            tripUpdateDto.content?.let { findTrip.content = it }
-            tripUpdateDto.location?.let { findTrip.location = it }
-            tripUpdateDto.startedAt?.let { findTrip.startedAt = it }
-            tripUpdateDto.endAt?.let { findTrip.endAt = it }
-            tripUpdateDto.latitude?.let { findTrip.latitude = it }
-            tripUpdateDto.longitude?.let { findTrip.longitude = it }
-            tripUpdateDto.hashtagInfo?.let { findTrip.hashtagInfo = it }
-            tripUpdateDto.isPublic?.let { findTrip.isPublic = it }
+            tripUpdateDto.title?.let {
+                if (it != findTrip.title) {
+                    findTrip.title = it
+                }
+            }
+            tripUpdateDto.content?.let {
+                if (it != findTrip.content) {
+                    findTrip.content = it
+                }
+            }
+            tripUpdateDto.location?.let {
+                if (it != findTrip.location) {
+                    findTrip.location = it
+                }
+            }
+            tripUpdateDto.startedAt?.let {
+                if (it != findTrip.startedAt) {
+                    findTrip.startedAt = it
+                }
+            }
+            tripUpdateDto.endAt?.let {
+                if (it != findTrip.endAt) {
+                    findTrip.endAt = it
+                }
+            }
+            tripUpdateDto.latitude?.let {
+                if (it != findTrip.latitude) {
+                    findTrip.latitude = it
+                }
+            }
+            tripUpdateDto.longitude?.let {
+                if (it != findTrip.longitude) {
+                    findTrip.longitude = it
+                }
+            }
+            tripUpdateDto.hashtagInfo?.let {
+                if (it != findTrip.hashtagInfo) {
+                    findTrip.hashtagInfo = it
+                }
+            }
+            tripUpdateDto.isPublic?.let {
+                if (it != findTrip.isPublic) {
+                    findTrip.isPublic = it
+                }
+            }
+
             // 이미지 처리 (images가 null이 아닌 경우에만)
             tripUpdateDto.images?.let {
                 val uploadedImageUrls = it.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
                 findTrip.images = uploadedImageUrls
             }
+
             val updatedTrip = tripRepository.save(findTrip)
             return fromTrip(updatedTrip, "", false)
         } else {

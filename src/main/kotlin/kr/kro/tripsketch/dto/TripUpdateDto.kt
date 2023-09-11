@@ -18,10 +18,11 @@ data class TripUpdateDto(
     var location: String? = null,
     var startedAt: LocalDateTime? = LocalDateTime.now(),
     var endAt: LocalDateTime? = LocalDateTime.now(),
+    var isPublic: Boolean? = true,
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
-    var isPublic: Boolean? = true,
+    var updatedAt: LocalDateTime? = LocalDateTime.now(),
 //    var images: List<String>? = emptyList()
     var images: List<MultipartFile>?
 //    var images: MutableList<String> = mutableListOf(),
