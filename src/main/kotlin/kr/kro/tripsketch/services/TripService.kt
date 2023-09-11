@@ -32,8 +32,6 @@ class TripService(
             title = tripCreateDto.title,
             content = tripCreateDto.content,
             location = tripCreateDto.location,
-//            startedAt = tripCreateDto.startedAt,
-//            endAt = tripCreateDto.endAt,
             startedAt = startedAt,
             endAt = endAt,
             latitude = tripCreateDto.latitude,
