@@ -27,11 +27,10 @@ class CommentService(
     }
 
     fun getAllCommentsWithPagination(page: Int, pageSize: Int): Map<String, Any> {
-        val pageable = PageRequest.of(page - 1, pageSize)
-        val commentsPage = commentRepository.findAll(pageable)
-        val commentsList = commentsPage.content.map { fromComment(it, userService) }
+        val commentsPage = commentRepository.findAll()
+        val commentsList = commentsPage.map { fromComment(it, userService) }
 
-        return paginateComments(commentsList, page, pageSize, commentsPage.totalElements)
+        return paginateComments(commentsList, page, pageSize)
     }
 
 
@@ -439,18 +438,30 @@ class CommentService(
     }
 }
 
-fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int, totalElements: Long): Map<String, Any> {
-    val totalComments = totalElements.toInt()
+fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
+    val commentsList = comments.toList()
+    val commentsSize = comments.size
+    val totalComments = commentsList.size
     val startIndex = (page - 1) * pageSize
-    val endIndex = minOf(startIndex + pageSize, totalComments)
+    println("commentsList: $commentsList")
+    println("commentsSize: $commentsSize")
+    println("totalComments: $totalComments")
+
+    val endIndex = if (startIndex + pageSize < totalComments) {
+        startIndex + pageSize
+    } else {
+        totalComments
+    }
     println("startIndex: $startIndex, endIndex: $endIndex")
+
     val paginatedComments = if (startIndex < totalComments) {
-        comments.subList(startIndex, endIndex)
+        comments.slice(startIndex until endIndex)
     } else {
         emptyList()
     }
 
-    val totalPage = if (totalComments == 0) 0 else (totalComments + pageSize - 1) / pageSize
+    val totalPage = if (commentsList.isEmpty()) 0 else (totalComments + pageSize - 1) / pageSize
+
 
     return mapOf(
         "comments" to paginatedComments,
@@ -458,6 +469,7 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int, total
         "totalPage" to totalPage,
         "commentsPerPage" to pageSize
     )
+
 }
 
 
