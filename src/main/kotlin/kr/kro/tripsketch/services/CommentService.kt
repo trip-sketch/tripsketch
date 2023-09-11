@@ -8,6 +8,7 @@ import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -24,6 +25,15 @@ class CommentService(
     fun getAllComments(pageable: Pageable): Page<CommentDto> {
         return commentRepository.findAll(pageable).map { fromComment(it, userService) }
     }
+
+    fun getAllCommentsWithPagination(page: Int, pageSize: Int): Map<String, Any> {
+        val pageable = PageRequest.of(page - 1, pageSize)
+        val commentsPage = commentRepository.findAll(pageable)
+        val commentsList = commentsPage.content.map { fromComment(it, userService) }
+
+        return paginateComments(commentsList, page, pageSize, commentsPage.totalElements)
+    }
+
 
     fun getCommentsByTripId(tripId: String): List<CommentDto> {
         val trip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
@@ -428,3 +438,27 @@ class CommentService(
         }
     }
 }
+
+fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int, totalElements: Long): Map<String, Any> {
+    val totalComments = totalElements.toInt()
+    val startIndex = (page - 1) * pageSize
+    val endIndex = minOf(startIndex + pageSize, totalComments)
+    println("startIndex: $startIndex, endIndex: $endIndex")
+    val paginatedComments = if (startIndex < totalComments) {
+        comments.subList(startIndex, endIndex)
+    } else {
+        emptyList()
+    }
+
+    val totalPage = if (totalComments == 0) 0 else (totalComments + pageSize - 1) / pageSize
+
+    return mapOf(
+        "comments" to paginatedComments,
+        "currentPage" to page,
+        "totalPage" to totalPage,
+        "commentsPerPage" to pageSize
+    )
+}
+
+
+

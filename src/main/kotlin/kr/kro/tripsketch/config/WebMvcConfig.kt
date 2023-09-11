@@ -59,6 +59,7 @@ class WebMvcConfig(
                 "/api/user/upload",
                 "/api/user/uploads",
                 "/api/user/email",
+                "/api/comment/admin/commentsWithPagination/**",
                 "/favicon.ico"
             )
     }

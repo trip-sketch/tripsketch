@@ -22,6 +22,15 @@ class CommentController(private val commentService: CommentService) {
         return commentService.getAllComments(pageable)
     }
 
+    @GetMapping("/admin/commentsWithPagination")
+    fun getAllComments(
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+    ): ResponseEntity<Map<String, Any>> {
+        val paginatedComments = commentService.getAllCommentsWithPagination(page, pageSize)
+        return ResponseEntity.ok(paginatedComments)
+    }
+
     @GetMapping("/guest/{tripId}")
     fun getCommentsByTripId(@PathVariable tripId: String): List<CommentDto> {
         return commentService.getCommentsByTripId(tripId)
