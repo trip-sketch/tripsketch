@@ -84,9 +84,23 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         return userInfo?.get("id") as? Long
     }
 
-    fun getEmailFromKakao(accessToken: String): String? {
-        val userInfo = getUserInfo(accessToken)
-        val kakaoAccountInfo = userInfo?.get("kakao_account") as? Map<*, *>
-        return kakaoAccountInfo?.get("email") as? String
+    fun revokeServiceAndWithdraw(accessToken: String?): Boolean {
+        if (accessToken == null) return false
+
+        val url = "https://kapi.kakao.com/v2/user/revoke/service_terms"
+        val headers = HttpHeaders().apply {
+            add("Authorization", "Bearer $accessToken")
+            add("Content-Type", "application/x-www-form-urlencoded")
+        }
+
+        val request = HttpEntity<String>("", headers)
+
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
+            response.statusCode.is2xxSuccessful
+        } catch (e: RestClientException) {
+            println("Error while revoking service and withdrawing on Kakao: ${e.message}")
+            false
+        }
     }
 }

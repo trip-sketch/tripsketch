@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/trip")
@@ -26,12 +27,12 @@ class TripController(private val tripService: TripService) {
     @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
-        @Validated @ModelAttribute tripCreateDto: TripCreateDto
-    ): ResponseEntity<TripDto> {
+        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
+        @RequestPart("images") images: List<MultipartFile>
+    ): ResponseEntity<TripDto>  {
         try {
             val memberId = req.getAttribute("memberId") as Long
-            val images = tripCreateDto.images
-            val createdTrip = tripService.createTrip(memberId, tripCreateDto)
+            val createdTrip = tripService.createTrip(memberId, tripCreateDto, images) // 이미지를 서비스 함수로 전달
             return ResponseEntity.ok(createdTrip)
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
