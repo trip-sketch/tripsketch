@@ -21,6 +21,10 @@ class UserService(
     private val imageService: ImageService,
 ) {
 
+    companion object {
+        const val DEFAULT_IMAGE_URL = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+    }
+
     fun registerOrUpdateUser(memberId: Long): User {
         var user = userRepository.findByMemberId(memberId)
         if (user == null) {
@@ -32,7 +36,7 @@ class UserService(
             user = User(
                 memberId = memberId,
                 nickname = nickname,
-                profileImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png",
+                profileImageUrl = DEFAULT_IMAGE_URL,
                 introduction = "안녕하세요! 만나서 반갑습니다!",
             )
             user = userRepository.save(user)
@@ -72,7 +76,7 @@ class UserService(
         }
 
         userUpdateDto.profileImageUrl?.let { newImageFile ->
-            val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+            val defaultImageUrl = DEFAULT_IMAGE_URL
 
             if (user.profileImageUrl != defaultImageUrl) {
                 user.profileImageUrl?.let { oldImageUrl ->
@@ -139,22 +143,33 @@ class UserService(
         val cutoffDateForDeletion = LocalDateTime.now().minusMonths(12)
         val usersToDelete = userRepository.findUsersByUpdatedAtBefore(cutoffDateForDeletion)
 
-        val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
-
         usersToDelete.forEach { user ->
-            softDeleteUser(user, defaultImageUrl)
+            softDeleteUser(user)
         }
     }
 
-    fun softDeleteUser(user: User, defaultImageUrl: String) {
-        user.profileImageUrl = defaultImageUrl
+    fun softDeleteUser(user: User) {
+        user.profileImageUrl = DEFAULT_IMAGE_URL
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
 
-        userRepository.save(user)
+        // 랜덤 닉네임 생성
+        var newNickname: String
+        do {
+            newNickname = nicknameService.generateRandomNickname()
+        } while (isNicknameExist(newNickname))
+        user.nickname = newNickname
 
-        println("User with ID ${user.id} has been soft deleted.") // 출력 코드 추가
+        userRepository.save(user)
+        println("User with ID ${user.id} has been soft deleted.")
+    }
+
+    fun softDeleteUserByMemberId(memberId: Long) {
+        val user = userRepository.findByMemberId(memberId)
+            ?: throw IllegalArgumentException("해당 멤버 아이디를 가진 사용자가 존재하지 않습니다.")
+
+        softDeleteUser(user)
     }
 
     fun toDto(user: User, includeMemberID: Boolean = true, isAdmin: Boolean? = null): UserDto {

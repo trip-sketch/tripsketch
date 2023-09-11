@@ -3,6 +3,7 @@ package kr.kro.tripsketch.controllers
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
+import kr.kro.tripsketch.services.UserService
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class OauthController(
     private val authService: AuthService,
     private val resourceLoader: ResourceLoader,
+    private val userService: UserService,
 ) {
 
     @GetMapping("/callback")
@@ -46,6 +48,20 @@ class OauthController(
             ResponseEntity.ok().headers(headers).build()
         } else {
             ResponseEntity.status(400).build()
+        }
+    }
+
+    @GetMapping("/unlink")
+    fun unlinkKakaoUser(@RequestParam user_id: Long, @RequestParam referrer_type: String): ResponseEntity<String> {
+        if (referrer_type != "UNLINK_FROM_APPS") {
+            return ResponseEntity.badRequest().body("Invalid referrer_type.")
+        }
+
+        try {
+            userService.softDeleteUserByMemberId(user_id)
+            return ResponseEntity.ok("User with memberId $user_id soft deleted successfully.")
+        } catch (ex: Exception) {
+            return ResponseEntity.badRequest().body(ex.message)
         }
     }
 }
