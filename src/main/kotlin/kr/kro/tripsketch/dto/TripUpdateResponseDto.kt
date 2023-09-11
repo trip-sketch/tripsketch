@@ -26,5 +26,5 @@ data class TripUpdateResponseDto(
     var tripLikes: MutableSet<String> = mutableSetOf(),
 //    var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList(),
-    var isLiked: Boolean
+    var isLiked: Boolean,
 )

@@ -1,11 +1,7 @@
 package kr.kro.tripsketch.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
-import org.hibernate.validator.constraints.Length
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserDto(

@@ -17,5 +17,5 @@ data class TripCardDto(
     var isHidden: Boolean = false,
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList(),
-    var isLiked: Boolean
+    var isLiked: Boolean,
 )

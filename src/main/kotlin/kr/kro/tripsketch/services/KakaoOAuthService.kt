@@ -89,5 +89,4 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val kakaoAccountInfo = userInfo?.get("kakao_account") as? Map<*, *>
         return kakaoAccountInfo?.get("email") as? String
     }
-
 }

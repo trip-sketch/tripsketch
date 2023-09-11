@@ -1,28 +1,25 @@
 package kr.kro.tripsketch
 
-import kr.kro.tripsketch.repositories.UserRepository
-import kr.kro.tripsketch.services.JwtService
+import kr.kro.tripsketch.services.OracleObjectStorageService
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
-import kr.kro.tripsketch.services.OracleObjectStorageService
-import org.springframework.beans.factory.annotation.Autowired
 
 @SpringBootTest
 class TripsketchApplicationTests(
 
     @Autowired
-    private val oracleObjectStorageService: OracleObjectStorageService
-){
+    private val oracleObjectStorageService: OracleObjectStorageService,
+) {
 
     @Test
     fun contextLoads() {
     }
 
     @Test
-    fun testUploadImageAndGetUrl(){
-
+    fun testUploadImageAndGetUrl() {
         // 테스트용 파일 생성
         val bucketName = "tripsketch"
         val fileName = "example.txt"

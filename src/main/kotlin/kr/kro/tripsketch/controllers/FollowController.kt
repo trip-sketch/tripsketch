@@ -1,16 +1,15 @@
 package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import jakarta.validation.Valid
+import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.FollowDto
 import kr.kro.tripsketch.dto.ProfileDto
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.FollowService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.exceptions.UnauthorizedException
 
 @Validated
 @RestController
@@ -28,7 +27,6 @@ class FollowController(
         val responseFromExpo = followService.follow(memberId, followDto.nickname)
         return ResponseEntity.status(HttpStatus.OK).body(responseFromExpo)
     }
-
 
     @DeleteMapping
     @ApiResponse(responseCode = "200", description = "구독 취소되었습니다.")
@@ -75,5 +73,4 @@ class FollowController(
     fun getFollowersByGuest(@RequestParam nickname: String): List<ProfileDto> {
         return followService.getFollowers(nickname, null)
     }
-
 }

@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
-
 @RestController
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
@@ -97,7 +96,7 @@ class TripController(private val tripService: TripService) {
     fun getTripsCategorizedByCountryWithPagination(
         @RequestParam("nickname") nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -107,7 +106,7 @@ class TripController(private val tripService: TripService) {
     @GetMapping("/nickname/trips/country/{country}")
     fun getTripsInCountry(
         @RequestParam("nickname") nickname: String,
-        @PathVariable("country") country: String
+        @PathVariable("country") country: String,
     ): ResponseEntity<Set<TripDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -118,7 +117,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -145,7 +144,7 @@ class TripController(private val tripService: TripService) {
     @GetMapping("modify/{id}")
     fun getTripByMemberIdAndIdToUpdate(
         req: HttpServletRequest,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<TripUpdateResponseDto> {
         val memberId = req.getAttribute("memberId") as Long
         val findTrip = tripService.getTripByMemberIdAndIdToUpdate(memberId, id)
@@ -194,7 +193,6 @@ class TripController(private val tripService: TripService) {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
-            println(findTrips)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
         }  catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -240,8 +238,6 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
         }
     }
-
-
 }
 
 private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {

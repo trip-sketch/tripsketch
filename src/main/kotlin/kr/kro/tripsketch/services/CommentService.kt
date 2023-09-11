@@ -18,7 +18,7 @@ class CommentService(
     private val userRepository: UserRepository,
     private val userService: UserService,
     private val notificationService: NotificationService,
-    private val tripRepository: TripRepository
+    private val tripRepository: TripRepository,
 ) {
 
     fun getAllComments(pageable: Pageable): Page<CommentDto> {
@@ -50,7 +50,6 @@ class CommentService(
 //    fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
 //        return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
 //    }
-
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
     fun getIsLikedByTokenForTrip(memberId: Long, tripId: String): List<CommentDto> {
@@ -92,7 +91,7 @@ class CommentService(
 
         val tripUserId = findTrip.userId
         // 알림 적용
-        if (tripUserId != commenter.id && findTrip.isPublic == true)
+        if (tripUserId != commenter.id && findTrip.isPublic == true) {
             notificationService.sendPushNotification(
                 listOf(tripUserId),
                 "새로운 여행의 시작, 트립스케치",
@@ -100,17 +99,17 @@ class CommentService(
                 nickname = commenter.nickname,
                 profileUrl = commenter.profileImageUrl,
                 tripId = comment.tripId,
-                commentId = comment.id
+                commentId = comment.id,
             )
+        }
         return fromComment(createdComment, userService)
     }
 
     fun createChildrenComment(
         memberId: Long,
         parentId: String,
-        commentChildrenCreateDto: CommentChildrenCreateDto
+        commentChildrenCreateDto: CommentChildrenCreateDto,
     ): CommentDto {
-
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentChildrenCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
@@ -165,14 +164,13 @@ class CommentService(
                 profileUrl = commenter.profileImageUrl,
                 tripId = childComment.tripId,
                 parentId = childComment.parentId,
-                commentId = childComment.id
+                commentId = childComment.id,
             )
         }
         return fromComment(createdComment, userService)
     }
 
     fun updateComment(memberId: Long, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
-
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
@@ -188,7 +186,7 @@ class CommentService(
         val updatedTime = LocalDateTime.now()
         val updatedComment = comment.copy(
             content = commentUpdateDto.content ?: comment.content,
-            updatedAt = updatedTime
+            updatedAt = updatedTime,
         )
 
         val savedComment = commentRepository.save(updatedComment)
@@ -200,7 +198,7 @@ class CommentService(
         memberId: Long,
         parentId: String,
         id: String,
-        commentUpdateDto: CommentUpdateDto
+        commentUpdateDto: CommentUpdateDto,
     ): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
@@ -225,7 +223,7 @@ class CommentService(
         val updatedTime = LocalDateTime.now()
         val updatedChildComment = parentComment.children[childCommentIndex].copy(
             content = commentUpdateDto.content ?: parentComment.children[childCommentIndex].content,
-            updatedAt = updatedTime
+            updatedAt = updatedTime,
         )
 
         parentComment.children[childCommentIndex] = updatedChildComment
@@ -256,7 +254,7 @@ class CommentService(
             content = "삭제 된 댓글입니다.",
             isDeleted = true,
             likedBy = mutableSetOf(),
-            numberOfLikes = 0
+            numberOfLikes = 0,
         )
         commentRepository.save(deletedComment)
     }
@@ -301,7 +299,6 @@ class CommentService(
     }
 
     fun toggleLikeComment(memberId: Long, id: String): CommentDto {
-
         val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         val userId = commenter.id
@@ -336,7 +333,7 @@ class CommentService(
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = comment.tripId,
-                    commentId = comment.id
+                    commentId = comment.id,
                 )
             }
         }
@@ -346,7 +343,6 @@ class CommentService(
     }
 
     fun toggleLikeChildrenComment(memberId: Long, parentId: String, id: String): CommentDto {
-
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
@@ -384,7 +380,7 @@ class CommentService(
                     profileUrl = commenter.profileImageUrl,
                     tripId = childComment.tripId,
                     parentId = childComment.parentId,
-                    commentId = childComment.id
+                    commentId = childComment.id,
                 )
             }
         }
@@ -395,14 +391,13 @@ class CommentService(
 
     companion object {
         fun fromComment(comment: Comment, userService: UserService): CommentDto {
-
             val commenter = comment.userId?.let { userService.findUserById(it) }
 
             val commenterProfile = commenter?.let {
                 UserProfileDto(
                     nickname = it.nickname,
                     introduction = it.introduction ?: "",
-                    profileImageUrl = it.profileImageUrl ?: ""
+                    profileImageUrl = it.profileImageUrl ?: "",
                 )
             }
 
