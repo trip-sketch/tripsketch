@@ -32,8 +32,8 @@ data class Trip(
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    var updatedAt: LocalDateTime? = LocalDateTime.now(),
-    var deletedAt: LocalDateTime? = LocalDateTime.now(),
+    var updatedAt: LocalDateTime? = null,
+    var deletedAt: LocalDateTime? = null,
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList()
