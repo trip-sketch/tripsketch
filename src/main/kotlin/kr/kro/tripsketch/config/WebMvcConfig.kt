@@ -56,6 +56,7 @@ class WebMvcConfig(
                 "/api/geocode",
                 "/api/user/upload",
                 "/api/user/uploads",
+                "/api/user/delete",
                 "/api/user/email",
                 "/favicon.ico",
             )
