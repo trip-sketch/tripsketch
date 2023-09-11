@@ -6,6 +6,7 @@ import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.services.ImageService
 import kr.kro.tripsketch.services.NotificationService
 import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.services.UserService
@@ -20,7 +21,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val notificationService: NotificationService, private val s3Service: S3Service) {
+class UserController(private val userService: UserService, private val imageService: ImageService, private val s3Service: S3Service) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -118,6 +119,16 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
+        }
+    }
+
+    @DeleteMapping("/delete")
+    fun deleteImage(@RequestParam url: String): ResponseEntity<String> {
+        return try {
+            imageService.deleteImage(url)
+            ResponseEntity.ok("Image successfully deleted!")
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body("Failed to delete the image. Error: ${e.message}")
         }
     }
 }

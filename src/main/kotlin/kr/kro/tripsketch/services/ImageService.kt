@@ -13,15 +13,18 @@ class ImageService(private val s3Service: S3Service) {
     }
 
     fun deleteImage(url: String) {
-        val key = extractKeyFromUrl(url)
-        s3Service.deleteFile(key)
+        val (dir, key) = extractDirAndKeyFromUrl(url)
+        s3Service.deleteFile(dir, key)
     }
 
-    private fun extractKeyFromUrl(url: String): String {
+    private fun extractDirAndKeyFromUrl(url: String): Pair<String, String> {
         val path = URL(url).path
-        val segments = path.split("/")
-        if (segments.size < 5) return "" // 무효한 URL
-        return segments.drop(5).joinToString("/")
+        val parts = path.split('/')
+
+        val dir = "${parts[4]}/${parts[6]}"
+        val key = parts[7]
+
+        return Pair(dir, key)
     }
 
 }
