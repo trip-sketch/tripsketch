@@ -3,6 +3,7 @@ package kr.kro.tripsketch.dto
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class TripDto(
@@ -18,8 +19,8 @@ data class TripDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime? = null,
-    var endAt: LocalDateTime? = null,
+    var startedAt: LocalDate? = null,
+    var endAt: LocalDate? = null,
     var hashtag: Set<String>? = setOf(),
     var latitude: Double? = null, // 위도
     var longitude: Double? = null, // 경도

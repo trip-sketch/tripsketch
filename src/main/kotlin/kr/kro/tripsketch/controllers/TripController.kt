@@ -3,6 +3,7 @@ package kr.kro.tripsketch.controllers
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,7 @@ class TripController(private val tripService: TripService) {
             val createdTrip = tripService.createTrip(memberId, tripCreateDto, images) // 이미지를 서비스 함수로 전달
             return ResponseEntity.ok(createdTrip)
         } catch (e: IllegalArgumentException) {
-            throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
         }
     }
 
@@ -201,10 +202,10 @@ class TripController(private val tripService: TripService) {
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: IllegalArgumentException) {
-            ResponseEntity.badRequest().body("잘못된 요청입니다.")
-        } catch (ex: IllegalAccessException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+        } catch (e: IllegalAccessException) {
+            throw ForbiddenException("수정할 권한이 없습니다. ${e.message}")
         }
     }
 
@@ -219,10 +220,10 @@ class TripController(private val tripService: TripService) {
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: IllegalArgumentException) {
-            ResponseEntity.badRequest().body("잘못된 요청입니다.")
-        } catch (ex: IllegalAccessException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+        } catch (e: IllegalAccessException) {
+            throw ForbiddenException("삭제할 권한이 없습니다. ${e.message}")
         }
     }
 }
