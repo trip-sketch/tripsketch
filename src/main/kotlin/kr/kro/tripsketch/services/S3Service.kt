@@ -8,12 +8,16 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import java.net.URLEncoder
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
 class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presigner) {
+
+    @Value("\${aws.region}")
+    lateinit var region: String
 
     @Value("\${aws.bucketName}")
     lateinit var bucketName: String
@@ -30,11 +34,14 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
 
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
-        // Generate a presigned URL for the uploaded object
-        val presignedUrl = getPresignedUrl(bucketName, key, Duration.ofDays(7))
+        val baseUrl = "https://objectstorage.${region}.oraclecloud.com/n/${bucketName}/b/${dir.split("/")[0]}/o"
+        val encodedPathSuffix = if (dir.contains("/")) URLEncoder.encode(dir.split("/", limit = 2)[1], "UTF-8") else ""
+        val encodedPath = "$encodedPathSuffix/$datetime${URLEncoder.encode(multipartFile.originalFilename, "UTF-8")}"
+        val url = "$baseUrl/$encodedPath"
 
-        return Pair(presignedUrl, response)
+        return Pair(url, response)
     }
+
 
     fun getPresignedUrl(bucket: String, key: String, expiration: Duration): String {
         val getRequest = GetObjectRequest.builder()
