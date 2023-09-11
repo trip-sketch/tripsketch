@@ -87,6 +87,7 @@ class UserController(private val userService: UserService, private val imageServ
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
 
+
     @PostMapping("/upload", consumes = ["multipart/form-data"])
     fun uploadFile(
         @RequestParam("dir", required = false, defaultValue = "") dir: String,
