@@ -64,5 +64,3 @@ class TripLikeService(
         }
     }
 }
-
-class EntityNotFoundException(message: String) : RuntimeException(message)
