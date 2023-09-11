@@ -35,9 +35,12 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
         val baseUrl = "https://objectstorage.${region}.oraclecloud.com/n/${bucketName}/b/${dir.split("/")[0]}/o"
-        val encodedPathSuffix = if (dir.contains("/")) URLEncoder.encode(dir.split("/", limit = 2)[1], "UTF-8") else ""
-        val encodedPath = "$encodedPathSuffix/$datetime${URLEncoder.encode(multipartFile.originalFilename, "UTF-8")}"
-        val url = "$baseUrl/$encodedPath"
+
+        // encodedPathSuffix를 조건적으로 생성
+        val encodedPathSuffix = if (dir.contains("/")) "${URLEncoder.encode(dir.split("/", limit = 2)[1], "UTF-8")}/" else ""
+
+        val encodedFileName = URLEncoder.encode("$datetime${multipartFile.originalFilename}", "UTF-8")
+        val url = "$baseUrl/$encodedPathSuffix$encodedFileName"
 
         return Pair(url, response)
     }
