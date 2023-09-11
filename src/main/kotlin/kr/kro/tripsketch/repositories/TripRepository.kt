@@ -43,18 +43,7 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
-    fun findTripsByUserId(사용자아이디들: List<String>): List<Trip>
-
-    @Query("{" +
-            "\$or: [" +
-            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
-            "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
-            "]," +
-            "'isPublic': true, 'isHidden': false" +
-            "}"
-    )
-    fun findTripsByKeyword(keyword: String): List<Trip>
-
+    fun findLatestTripByUserId(userId: String): Trip?
 
     @Query("{" +
             "\$or: [" +

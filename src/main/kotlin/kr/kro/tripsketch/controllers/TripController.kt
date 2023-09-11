@@ -2,6 +2,7 @@ package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,31 +14,35 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
 
-    @PostMapping
-    fun createTrip(
-        req: HttpServletRequest,
-        @Validated @RequestBody tripCreateDto: TripCreateDto
-    ): ResponseEntity<TripDto> {
-        val memberId = req.getAttribute("memberId") as Long
-        val createdTrip = tripService.createTrip(memberId, tripCreateDto)
-        return ResponseEntity.ok(createdTrip)
-    }
-
-//    @PostMapping(consumes = ["multipart/form-data"])
+//    @PostMapping
 //    fun createTrip(
 //        req: HttpServletRequest,
-//        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
+//        @Validated @RequestBody tripCreateDto: TripCreateDto
+//    ): ResponseEntity<TripDto> {
+//        val memberId = req.getAttribute("memberId") as Long
+//        val createdTrip = tripService.createTrip(memberId, tripCreateDto)
+//        return ResponseEntity.ok(createdTrip)
+//    }
+
+    @PostMapping(consumes = ["multipart/form-data"])
+    fun createTrip(
+        req: HttpServletRequest,
+        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
 //        @RequestParam("dir", required = false, defaultValue = "") dir: String,
 //        @RequestParam("file") file: MultipartFile
-//    ): ResponseEntity<TripDto> {
-//        try {
-//            val memberId = req.getAttribute("memberId") as Long
-//            val createdTrip = tripService.createTrip(memberId, tripCreateDto)
-//            return ResponseEntity.ok(createdTrip)
-//        } catch (e: IllegalArgumentException) {
-//            throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
-//        }
-//    }
+    ): ResponseEntity<TripDto> {
+        try {
+            val memberId = req.getAttribute("memberId") as Long
+            val images = tripCreateDto.images
+            println(images)
+            println("Received request with memberId: $memberId, images: $images")
+            val createdTrip = tripService.createTrip(memberId, tripCreateDto)
+            println("Received request with memberId: $memberId, tripCreateDto: $tripCreateDto")
+            return ResponseEntity.ok(createdTrip)
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
+        }
+    }
 
     // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
     @GetMapping("/admin/trips")
@@ -165,12 +170,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
     @GetMapping("/list/following")
-    fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
+    fun getListFollowingTrips(req: HttpServletRequest): ResponseEntity<Any> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getListFollowingByUser(memberId)
+        val findTrips = tripService.getListFollowingTrips(memberId)
         return try {
             if (findTrips.isNotEmpty()) {
                 ResponseEntity.ok(findTrips)
@@ -191,6 +194,7 @@ class TripController(private val tripService: TripService) {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
+            println(findTrips)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
         }  catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
@@ -236,6 +240,7 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
         }
     }
+
 
 }
 
