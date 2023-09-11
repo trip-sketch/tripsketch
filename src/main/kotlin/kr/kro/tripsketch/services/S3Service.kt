@@ -31,7 +31,7 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
         // Generate a presigned URL for the uploaded object
-        val presignedUrl = getPresignedUrl(bucketName, key, Duration.ofHours(5000))
+        val presignedUrl = getPresignedUrl(bucketName, key, Duration.ofDays(7))
 
         return Pair(presignedUrl, response)
     }
