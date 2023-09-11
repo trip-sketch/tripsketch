@@ -29,14 +29,9 @@ class TripController(private val tripService: TripService) {
         @Validated @ModelAttribute tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
         try {
-            println(tripCreateDto)
-            println(tripCreateDto.hashtagInfo)
             val memberId = req.getAttribute("memberId") as Long
             val images = tripCreateDto.images
-            println(images)
-            println("Received request with memberId: $memberId, images: $images")
             val createdTrip = tripService.createTrip(memberId, tripCreateDto)
-            println("Received request with memberId: $memberId, tripCreateDto: $tripCreateDto")
             return ResponseEntity.ok(createdTrip)
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
@@ -199,11 +194,33 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    @PatchMapping("/{id}")
+//    @PatchMapping("/{id}")
+//    fun updateTrip(
+//        req: HttpServletRequest,
+//        @PathVariable id: String,
+//        @Validated @RequestBody tripUpdateDto: TripUpdateDto
+//    ): ResponseEntity<Any> {
+//        return try {
+//            val memberId = req.getAttribute("memberId") as Long
+//            val findTrip = tripService.getTripById(id)
+//            if (findTrip != null) {
+//                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
+//                ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
+//            } else {
+//                ResponseEntity.notFound().build()
+//            }
+//        } catch (ex: IllegalArgumentException) {
+//            ResponseEntity.badRequest().body("잘못된 요청입니다.")
+//        } catch (ex: IllegalAccessException) {
+//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
+//        }
+//    }
+
+    @PatchMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @RequestBody tripUpdateDto: TripUpdateDto
+        @Validated @ModelAttribute tripUpdateDto: TripUpdateDto
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long

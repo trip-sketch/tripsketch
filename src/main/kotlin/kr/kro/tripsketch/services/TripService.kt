@@ -6,12 +6,7 @@ import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Sort
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.services.s3.model.S3Exception
 import java.time.LocalDateTime
 
 //import org.springframework.data.domain.Sort
@@ -372,25 +367,56 @@ class TripService(
         }
     }
 
+//    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
+//        val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
+//            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//        if (findTrip.userId == userId) {
+//            findTrip.apply {
+//                title = tripUpdateDto.title
+//                content = tripUpdateDto.content
+//                location = tripUpdateDto.location
+//                startedAt = tripUpdateDto.startedAt ?: startedAt
+//                endAt = tripUpdateDto.endAt ?: endAt
+//                latitude = tripUpdateDto.latitude
+//                longitude = tripUpdateDto.longitude
+//                hashtagInfo = tripUpdateDto.hashtagInfo
+//                isPublic = tripUpdateDto.isPublic
+//                updatedAt = LocalDateTime.now()
+//                images = tripUpdateDto.images
+//            }
+//            val updatedTrip = tripRepository.save(findTrip)
+//            return fromTrip(updatedTrip, "", false)
+//        } else {
+//            throw IllegalAccessException("수정할 권한이 없습니다.")
+//        }
+//    }
 
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
+        println(tripUpdateDto)
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//        val uploadedImageUrls = tripUpdateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+//            ?: emptyList()
+//        println(uploadedImageUrls)
         if (findTrip.userId == userId) {
-            findTrip.apply {
-                title = tripUpdateDto.title
-                content = tripUpdateDto.content
-                location = tripUpdateDto.location
-                startedAt = tripUpdateDto.startedAt ?: startedAt
-                endAt = tripUpdateDto.endAt ?: endAt
-                latitude = tripUpdateDto.latitude
-                longitude = tripUpdateDto.longitude
-                hashtagInfo = tripUpdateDto.hashtagInfo
-                isPublic = tripUpdateDto.isPublic
-                updatedAt = LocalDateTime.now()
-                images = tripUpdateDto.images
+            // 이전 값 유지 로직 추가
+            tripUpdateDto.title?.let { findTrip.title = it }
+            tripUpdateDto.content?.let { findTrip.content = it }
+            tripUpdateDto.location?.let { findTrip.location = it }
+            tripUpdateDto.startedAt?.let { findTrip.startedAt = it }
+            tripUpdateDto.endAt?.let { findTrip.endAt = it }
+            tripUpdateDto.latitude?.let { findTrip.latitude = it }
+            tripUpdateDto.longitude?.let { findTrip.longitude = it }
+            tripUpdateDto.hashtagInfo?.let { findTrip.hashtagInfo = it }
+            tripUpdateDto.isPublic?.let { findTrip.isPublic = it }
+            // 이미지 처리 (images가 null이 아닌 경우에만)
+            tripUpdateDto.images?.let {
+                val uploadedImageUrls = it.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+                findTrip.images = uploadedImageUrls
             }
             val updatedTrip = tripRepository.save(findTrip)
             return fromTrip(updatedTrip, "", false)
