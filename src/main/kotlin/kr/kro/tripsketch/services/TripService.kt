@@ -234,7 +234,7 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        return fromTripToUpdate(findTrip, userId, false)
+        return fromTripToUpdate(findTrip, userId)
     }
 
     fun getTripById(id: String): TripDto? {
@@ -426,7 +426,7 @@ class TripService(
         )
     }
 
-    fun fromTripToUpdate(trip: Trip, currentUserId: String, includeEmail: Boolean = false): TripUpdateResponseDto {
+    fun fromTripToUpdate(trip: Trip, currentUserId: String): TripUpdateResponseDto {
         val user = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.1")
 
         val isLiked: Boolean = if (currentUserId != "") {
