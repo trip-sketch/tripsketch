@@ -29,6 +29,8 @@ class TripController(private val tripService: TripService) {
         @Validated @ModelAttribute tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
         try {
+            println(tripCreateDto)
+            println(tripCreateDto.hashtagInfo)
             val memberId = req.getAttribute("memberId") as Long
             val images = tripCreateDto.images
             println(images)

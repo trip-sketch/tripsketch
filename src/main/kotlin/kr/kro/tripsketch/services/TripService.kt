@@ -6,7 +6,12 @@ import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Sort
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.services.s3.model.S3Exception
 import java.time.LocalDateTime
 
 //import org.springframework.data.domain.Sort
@@ -62,8 +67,12 @@ class TripService(
 
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        println("======================")
         println(user)
         println(tripCreateDto)
+        println(tripCreateDto.hashtagInfo)
+        println(tripCreateDto.hashtagInfo?.country)
+        println(tripCreateDto.hashtagInfo?.etc)
         val uploadedImageUrls = tripCreateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
             ?: emptyList()
         println(uploadedImageUrls)
@@ -77,6 +86,17 @@ class TripService(
             latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
             hashtagInfo = tripCreateDto.hashtagInfo,
+//            hashtagInfo = tripCreateDto.hashtagInfo(
+//                countryCode = tripCreateDto.hashtagInfo?.countryCode,
+//                country = tripCreateDto.hashtagInfo?.country,
+//                city = tripCreateDto.hashtagInfo?.city,
+//                municipality = tripCreateDto.hashtagInfo?.municipality,
+//                name = tripCreateDto.hashtagInfo?.name,
+//                displayName = tripCreateDto.hashtagInfo?.displayName,
+//                road = tripCreateDto.hashtagInfo?.road,
+//                address = tripCreateDto.hashtagInfo?.address,
+//                etc = tripCreateDto.hashtagInfo?.etc
+//            ),
             isPublic = tripCreateDto.isPublic,
 //            images = tripCreateDto.images
             images = uploadedImageUrls
