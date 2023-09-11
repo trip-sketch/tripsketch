@@ -14,21 +14,11 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
 
-//    @PostMapping
-//    fun createTrip(
-//        req: HttpServletRequest,
-//        @Validated @RequestBody tripCreateDto: TripCreateDto
-//    ): ResponseEntity<TripDto> {
-//        val memberId = req.getAttribute("memberId") as Long
-//        val createdTrip = tripService.createTrip(memberId, tripCreateDto)
-//        return ResponseEntity.ok(createdTrip)
-//    }
-
     @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
         @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
-        @RequestPart("images") images: List<MultipartFile>
+        @RequestPart("images") images: List<MultipartFile>?
     ): ResponseEntity<TripDto>  {
         try {
             val memberId = req.getAttribute("memberId") as Long
@@ -195,39 +185,18 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-//    @PatchMapping("/{id}")
-//    fun updateTrip(
-//        req: HttpServletRequest,
-//        @PathVariable id: String,
-//        @Validated @RequestBody tripUpdateDto: TripUpdateDto
-//    ): ResponseEntity<Any> {
-//        return try {
-//            val memberId = req.getAttribute("memberId") as Long
-//            val findTrip = tripService.getTripById(id)
-//            if (findTrip != null) {
-//                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
-//                ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
-//            } else {
-//                ResponseEntity.notFound().build()
-//            }
-//        } catch (ex: IllegalArgumentException) {
-//            ResponseEntity.badRequest().body("잘못된 요청입니다.")
-//        } catch (ex: IllegalAccessException) {
-//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
-//        }
-//    }
-
     @PatchMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @ModelAttribute tripUpdateDto: TripUpdateDto
+        @Validated @RequestPart("tripUpdateDto") tripUpdateDto: TripUpdateDto,
+        @RequestPart("images") images: List<MultipartFile>?
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
-                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
+                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto, images)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()

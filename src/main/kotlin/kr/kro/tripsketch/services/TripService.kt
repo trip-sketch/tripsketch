@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
-//import org.springframework.data.domain.Sort
-
 @Service
 class TripService(
     private val tripRepository: TripRepository,
@@ -21,51 +19,9 @@ class TripService(
     private val notificationService: NotificationService,
     private val imageService: ImageService
 ) {
-//    fun createTrip(memberId: Long, tripCreateDto: TripCreateDto): TripDto {
-//        val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")        val newTrip = Trip(
-//            userId = user.id!!,
-//            title = tripCreateDto.title,
-//            content = tripCreateDto.content,
-//            location = tripCreateDto.location,
-//            startedAt = tripCreateDto.startedAt,
-//            endAt = tripCreateDto.endAt,
-//            latitude = tripCreateDto.latitude,
-//            longitude = tripCreateDto.longitude,
-//            hashtagInfo = tripCreateDto.hashtagInfo,
-//            isPublic = tripCreateDto.isPublic,
-//            images = tripCreateDto.images
-////            images = uploadedImages.toMutableList()  // 업로드된 이미지 파일 이름들을 저장
-//        )
-//        val createdTrip = tripRepository.save(newTrip)
-//
-//        // 나를 팔로우하는 사람들에게 알람 보내기 기능
-//        val userId = userRepository.findByMemberId(memberId)?.id
-//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-//
-//        val follower = followRepository.findByFollowing(userId)
-//        val filteredFollower = follower.filter { it.follower != userId }
-//        val followerUserIds = filteredFollower.map { it.follower }
-//        val followingNickname = userService.findUserByMemberId(memberId)?.nickname ?: "Unknown user"
-//        val followingProfileUrl = userService.findUserByMemberId(memberId)?.profileImageUrl ?: ""
-//
-//        notificationService.sendPushNotification(
-//            followerUserIds,
-//            "새로운 여행의 시작, 트립스케치",
-//            "$followingNickname 님이 새로운 글을 작성하였습니다.",
-//            null,
-//            null,
-//            createdTrip.id,
-//            followingNickname,
-//            followingProfileUrl
-//        )
-//        return fromTrip(createdTrip, userId, false)
-//    }
-
-    fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>): TripDto {
+    fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>?): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
-
-        val uploadedImageUrls = images.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
-
+        val uploadedImageUrls = images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
@@ -87,7 +43,6 @@ class TripService(
         val followerUserIds = filteredFollower.map { it.follower }
         val followingNickname = userService.findUserByMemberId(memberId)?.nickname ?: "Unknown user"
         val followingProfileUrl = userService.findUserByMemberId(memberId)?.profileImageUrl ?: ""
-
         notificationService.sendPushNotification(
             followerUserIds,
             "새로운 여행의 시작, 트립스케치",
@@ -98,10 +53,8 @@ class TripService(
             followingNickname,
             followingProfileUrl
         )
-
         return fromTrip(createdTrip, userId, false)
     }
-
 
     fun getAllTrips(memberId: Long): Set<TripDto> {
         val userId = userRepository.findByMemberId(memberId)?.id
@@ -348,43 +301,12 @@ class TripService(
         }
     }
 
-//    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
-//        val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
-//            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-//        val userId = userRepository.findByMemberId(memberId)?.id
-//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-//        if (findTrip.userId == userId) {
-//            findTrip.apply {
-//                title = tripUpdateDto.title
-//                content = tripUpdateDto.content
-//                location = tripUpdateDto.location
-//                startedAt = tripUpdateDto.startedAt ?: startedAt
-//                endAt = tripUpdateDto.endAt ?: endAt
-//                latitude = tripUpdateDto.latitude
-//                longitude = tripUpdateDto.longitude
-//                hashtagInfo = tripUpdateDto.hashtagInfo
-//                isPublic = tripUpdateDto.isPublic
-//                updatedAt = LocalDateTime.now()
-//                images = tripUpdateDto.images
-//            }
-//            val updatedTrip = tripRepository.save(findTrip)
-//            return fromTrip(updatedTrip, "", false)
-//        } else {
-//            throw IllegalAccessException("수정할 권한이 없습니다.")
-//        }
-//    }
-
-    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
-        println(tripUpdateDto)
+    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto, images: List<MultipartFile>?): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-//        val uploadedImageUrls = tripUpdateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
-//            ?: emptyList()
-//        println(uploadedImageUrls)
         if (findTrip.userId == userId) {
-            // 이전 값 유지 로직 추가
             tripUpdateDto.title?.let {
                 if (it != findTrip.title) {
                     findTrip.title = it
@@ -430,15 +352,19 @@ class TripService(
                     findTrip.isPublic = it
                 }
             }
-
-            // 이미지 처리 (images가 null이 아닌 경우에만)
-            tripUpdateDto.images?.let {
-                val uploadedImageUrls = it.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+            images?.let { newImages ->
+                findTrip.images?.forEach { oldImageUrl ->
+                    try {
+                        imageService.deleteImage(oldImageUrl)
+                    } catch (e: Exception) {
+                        println("이미지 삭제에 실패하였습니다. URL: $oldImageUrl, 오류: {$e.message}")
+                    }
+                }
+                val uploadedImageUrls = newImages.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
                 findTrip.images = uploadedImageUrls
             }
-
             val updatedTrip = tripRepository.save(findTrip)
-            return fromTrip(updatedTrip, "", false)
+            return fromTrip(updatedTrip, userId, false)
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }

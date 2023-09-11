@@ -3,7 +3,6 @@ package kr.kro.tripsketch.dto
 import jakarta.validation.constraints.NotBlank
 import kr.kro.tripsketch.domain.HashtagInfo
 import org.hibernate.validator.constraints.Length
-import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 data class TripUpdateDto(
@@ -22,8 +21,5 @@ data class TripUpdateDto(
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
-    var updatedAt: LocalDateTime? = LocalDateTime.now(),
-//    var images: List<String>? = emptyList()
-    var images: List<MultipartFile>?
-//    var images: MutableList<String> = mutableListOf(),
+    var updatedAt: LocalDateTime? = LocalDateTime.now()
 )
