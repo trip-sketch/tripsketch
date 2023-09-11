@@ -1,8 +1,8 @@
 package kr.kro.tripsketch.dto
 
-import java.time.LocalDateTime
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import java.time.LocalDateTime
 
 data class CommentDto(
     val id: String? = null,

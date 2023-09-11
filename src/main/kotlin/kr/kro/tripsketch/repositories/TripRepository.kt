@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 interface TripRepository : MongoRepository<Trip, String> {
 
     // userId를 기반으로 여행을 검색하는 메소드
-     fun findTripByUserId(userId: String): Set<Trip>
+    fun findTripByUserId(userId: String): Set<Trip>
 
     // tripLikes 배열의 길이를 조회하는 메소드
     fun countByTripLikes(id: String): Long
@@ -51,8 +51,7 @@ interface TripRepository : MongoRepository<Trip, String> {
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
             "]," +
             "'isPublic': true, 'isHidden': false" +
-            "}"
+            "}",
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
-
 }

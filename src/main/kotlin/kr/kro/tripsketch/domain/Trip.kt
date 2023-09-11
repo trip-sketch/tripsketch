@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.domain
 
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.Length
 import org.springframework.data.annotation.Id

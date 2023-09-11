@@ -50,7 +50,7 @@ class TripLikeService(
         }
     }
 
-    fun unlikeTrip(memberId: Long, tripId: String)  {
+    fun unlikeTrip(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
         val findTrip = tripRepository.findById(tripId).orElse(null)
@@ -64,3 +64,5 @@ class TripLikeService(
         }
     }
 }
+
+class EntityNotFoundException(message: String) : RuntimeException(message)

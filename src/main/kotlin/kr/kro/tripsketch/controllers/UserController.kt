@@ -2,24 +2,21 @@ package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.NotificationRequest
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
+import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.services.UserService
+import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import kr.kro.tripsketch.services.S3Service
-import kr.kro.tripsketch.utils.EnvLoader
 import software.amazon.awssdk.services.s3.model.S3Exception
-
 
 @RestController
 @RequestMapping("api/user")
@@ -31,7 +28,7 @@ class UserController(private val userService: UserService, private val notificat
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
     fun getUser(
         req: HttpServletRequest,
-        @RequestParam token: String
+        @RequestParam token: String,
     ): ResponseEntity<Any> {
         val memberId = req.getAttribute("memberId") as Long
         val user = userService.findUserByMemberId(memberId)
@@ -52,7 +49,6 @@ class UserController(private val userService: UserService, private val notificat
         }
     }
 
-
     @GetMapping("/nickname")
     @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
@@ -69,8 +65,9 @@ class UserController(private val userService: UserService, private val notificat
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
-    fun updateUser(req: HttpServletRequest,
-                   @Validated @ModelAttribute userUpdateDto: UserUpdateDto
+    fun updateUser(
+        req: HttpServletRequest,
+        @Validated @ModelAttribute userUpdateDto: UserUpdateDto,
     ): ResponseEntity<UserDto> {
         val memberId = req.getAttribute("memberId") as Long? ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
 
@@ -81,7 +78,6 @@ class UserController(private val userService: UserService, private val notificat
             throw BadRequestException("요청이 잘못되었습니다: ${e.message}")
         }
     }
-    
 
     @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
@@ -90,28 +86,11 @@ class UserController(private val userService: UserService, private val notificat
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
 
-    @PostMapping("/send")
-    fun sendNotification(@RequestBody notificationRequest: NotificationRequest): ResponseEntity<String> {
-        val expoResponseMessage = notificationService.sendPushNotification(
-            listOf(notificationRequest.memberId),
-            notificationRequest.title,
-            notificationRequest.body,
-            notificationRequest.commentId,
-            notificationRequest.parentId,
-            notificationRequest.tripId,
-            notificationRequest.nickname
-        )
-
-        return if (expoResponseMessage == "Notification sent successfully!") {
-            ResponseEntity.ok(expoResponseMessage)
-        } else {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(expoResponseMessage)
-        }
-    }
-
     @PostMapping("/upload", consumes = ["multipart/form-data"])
-    fun uploadFile(@RequestParam("dir", required = false, defaultValue = "") dir: String,
-                   @RequestParam("file") file: MultipartFile): ResponseEntity<Any> {
+    fun uploadFile(
+        @RequestParam("dir", required = false, defaultValue = "") dir: String,
+        @RequestParam("file") file: MultipartFile,
+    ): ResponseEntity<Any> {
         return try {
             val (url, response) = s3Service.uploadFile(dir, file)
             ResponseEntity.ok(mapOf("url" to url, "eTag" to response.eTag()))
@@ -125,9 +104,8 @@ class UserController(private val userService: UserService, private val notificat
     @PostMapping("/uploads", consumes = ["multipart/form-data"])
     fun uploadFiles(
         @RequestParam("dir", required = false, defaultValue = "") dir: String?,
-        @RequestParam("files") files: Array<MultipartFile>
+        @RequestParam("files") files: Array<MultipartFile>,
     ): ResponseEntity<Any> {
-
         val directory = dir ?: ""
 
         return try {
@@ -142,5 +120,4 @@ class UserController(private val userService: UserService, private val notificat
             ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
         }
     }
-
 }
