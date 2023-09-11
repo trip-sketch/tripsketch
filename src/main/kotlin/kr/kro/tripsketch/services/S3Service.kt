@@ -8,19 +8,29 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import java.net.URLEncoder
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Service
 class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presigner) {
+
+    @Value("\${aws.region}")
+    lateinit var region: String
 
     @Value("\${aws.bucketName}")
     lateinit var bucketName: String
 
     fun uploadFile(dir: String, multipartFile: MultipartFile): Pair<String, PutObjectResponse> {
         val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-        val key = "$dir/$datetime${multipartFile.originalFilename}"
+        val originalFilenameWithoutExtension = multipartFile.originalFilename?.substringBeforeLast(".") ?: "file"
+        val fileExtension = multipartFile.originalFilename?.substringAfterLast(".", "")
+
+        val encodedFileNameWithoutExtension = Base64.getEncoder().encodeToString(originalFilenameWithoutExtension.toByteArray(Charsets.UTF_8)).replace("=", "")
+        val newFilename = "$datetime$encodedFileNameWithoutExtension.$fileExtension"
+        val key = "$dir/$newFilename"
 
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
@@ -30,34 +40,24 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
 
         val response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.bytes))
 
-        // Generate a presigned URL for the uploaded object
-        val presignedUrl = getPresignedUrl(bucketName, key, Duration.ofDays(7))
+        // URL 구조 변경
+        val baseUrl = "https://${bucketName}.objectstorage.${region}.oci.customer-oci.com/n/${bucketName}/b/${dir.split("/")[0]}/o"
+        val encodedPathSuffix = if (dir.contains("/")) "${URLEncoder.encode(dir.split("/", limit = 2)[1], "UTF-8")}/" else ""
+        val url = "$baseUrl/$encodedPathSuffix$newFilename"
 
-        return Pair(presignedUrl, response)
+        return Pair(url, response)
     }
 
-    fun getPresignedUrl(bucket: String, key: String, expiration: Duration): String {
-        val getRequest = GetObjectRequest.builder()
-            .bucket(bucket)
-            .key(key)
-            .build()
 
-        val presignedGetObjectRequest = s3Presigner.presignGetObject(
-            GetObjectPresignRequest.builder()
-                .signatureDuration(expiration)
-                .getObjectRequest(getRequest)
-                .build(),
-        )
+    fun deleteFile(dir: String, key: String) {
+        val fullPath = "$dir/$key"
 
-        return presignedGetObjectRequest.url().toString()
-    }
-
-    fun deleteFile(key: String) {
         val deleteObjectRequest = DeleteObjectRequest.builder()
             .bucket(bucketName)
-            .key(key)
+            .key(fullPath)
             .build()
 
         s3Client.deleteObject(deleteObjectRequest)
     }
+
 }
