@@ -21,14 +21,21 @@ class TripService(
 ) {
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>?): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val startedAt = tripCreateDto.startedAt
+        val endAt = tripCreateDto.endAt
+        if (startedAt != null && endAt != null && startedAt.isAfter(endAt)) {
+            throw IllegalArgumentException("시작일은 종료일보다 같거나 그 이전이어야 합니다.")
+        }
         val uploadedImageUrls = images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
             location = tripCreateDto.location,
-            startedAt = tripCreateDto.startedAt,
-            endAt = tripCreateDto.endAt,
+//            startedAt = tripCreateDto.startedAt,
+//            endAt = tripCreateDto.endAt,
+            startedAt = startedAt,
+            endAt = endAt,
             latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
             hashtagInfo = tripCreateDto.hashtagInfo,
@@ -306,6 +313,7 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+
         if (findTrip.userId == userId) {
             tripUpdateDto.title?.let {
                 if (it != findTrip.title) {
@@ -321,6 +329,9 @@ class TripService(
                 if (it != findTrip.location) {
                     findTrip.location = it
                 }
+            }
+            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
+                throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
             tripUpdateDto.startedAt?.let {
                 if (it != findTrip.startedAt) {

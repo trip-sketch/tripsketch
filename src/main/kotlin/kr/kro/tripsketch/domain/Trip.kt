@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Document(collection = "trips")
@@ -24,8 +25,8 @@ data class Trip(
     var likes: Int = 0,
     var views: Int = 0,
     var location: String? = null,
-    var startedAt: LocalDateTime? = LocalDateTime.now(),
-    var endAt: LocalDateTime? = LocalDateTime.now(),
+    var startedAt: LocalDate? = LocalDate.now(),
+    var endAt: LocalDate? = LocalDate.now(),
     var isPublic: Boolean? = true,        // 게시글 전체공개 또는 비공개 여부
     var isHidden: Boolean = false,        // 게시글 삭제 여부
     var latitude: Double? = null,
