@@ -49,22 +49,6 @@ class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presi
     }
 
 
-    fun getPresignedUrl(bucket: String, key: String, expiration: Duration): String {
-        val getRequest = GetObjectRequest.builder()
-            .bucket(bucket)
-            .key(key)
-            .build()
-
-        val presignedGetObjectRequest = s3Presigner.presignGetObject(
-            GetObjectPresignRequest.builder()
-                .signatureDuration(expiration)
-                .getObjectRequest(getRequest)
-                .build(),
-        )
-
-        return presignedGetObjectRequest.url().toString()
-    }
-
     fun deleteFile(dir: String, key: String) {
         val fullPath = "$dir/$key"
 
