@@ -26,9 +26,7 @@ class TripController(private val tripService: TripService) {
     @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
-        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
-//        @RequestParam("dir", required = false, defaultValue = "") dir: String,
-//        @RequestParam("file") file: MultipartFile
+        @Validated @ModelAttribute tripCreateDto: TripCreateDto
     ): ResponseEntity<TripDto> {
         try {
             val memberId = req.getAttribute("memberId") as Long

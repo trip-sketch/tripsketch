@@ -62,9 +62,11 @@ class TripService(
 
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
-
-        val uploadedImages = tripCreateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) } ?: emptyList()
-
+        println(user)
+        println(tripCreateDto)
+        val uploadedImageUrls = tripCreateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+            ?: emptyList()
+        println(uploadedImageUrls)
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
@@ -77,7 +79,7 @@ class TripService(
             hashtagInfo = tripCreateDto.hashtagInfo,
             isPublic = tripCreateDto.isPublic,
 //            images = tripCreateDto.images
-            images = uploadedImages
+            images = uploadedImageUrls
     //            images = uploadedImages.toMutableList()  // 업로드된 이미지 파일 이름들을 저장
         )
         val createdTrip = tripRepository.save(newTrip)
