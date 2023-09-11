@@ -63,7 +63,7 @@ class TripService(
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
-        val uploadedImages = tripCreateDto.images?.map { imageService.uploadImage("tripsketch/trip-user", it) } ?: emptyList()
+        val uploadedImages = tripCreateDto.images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) } ?: emptyList()
 
         val newTrip = Trip(
             userId = user.id!!,
