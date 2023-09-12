@@ -1,6 +1,8 @@
 package kr.kro.tripsketch.repositories
 
 import kr.kro.tripsketch.domain.Trip
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
@@ -21,13 +23,13 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     // 로그인 사용자가 작성한 게시글 조회 (userId 사용)
     fun findByIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
+    fun findByIsHiddenIsFalseAndUserId(userId: String, pageable: Pageable): Page<Trip>
 
     // trip id가 일치하는 게시글 조회
     fun findByIdAndIsHiddenIsFalse(id: String): Trip?
 
     // public true, hidden false 인 trip id가 일치하는 게시글 조회
     fun findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id: String): Trip?
-
 
     // 로그인 사용자 외 작성자가 작성한 게시글 조회
     fun findByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
