@@ -71,7 +71,6 @@ class TripService(
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
-
         return mapOf(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
@@ -89,11 +88,20 @@ class TripService(
         return findTrips.map { fromTrip(it, userId) }.toSet()
     }
 
-    fun getAllMyTripsByUser(memberId: Long): Set<TripDto> {
+    fun getAllMyTripsByUser(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId)
-        return findTrips.map { fromTrip(it, userId) }.toSet()
+        val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId, pageable)
+        val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage
+        )
     }
 
     fun getAllTripsByGuest(): Set<TripDto> {
