@@ -429,10 +429,8 @@ class TripService(
     }
 
     fun deleteTripById(memberId: Long, id: String) {
-        val findTrip = tripRepository.findById(id).orElse(null)
+        val findTrip = tripRepository.findByIsHiddenIsFalseAndId(id)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
-//        val userId = userRepository.findByMemberId(memberId)?.id
-//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findUser = userService.findUserByMemberId(memberId)
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val userId = findUser.id
