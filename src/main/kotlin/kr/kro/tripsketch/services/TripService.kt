@@ -6,6 +6,7 @@ import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -62,11 +63,32 @@ class TripService(
         return fromTrip(createdTrip, userId)
     }
 
-    fun getAllTrips(memberId: Long): Set<TripDto> {
+//    fun getAllTrips(memberId: Long, pageable: Pageable): Page<Set<TripDto>> {
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//        val findTrips = tripRepository.findAll()
+////        return findTrips.map { fromTrip(it, userId) }.toSet()
+//        return findTrips.map { fromTrip(it, userId) }.toSet()
+//    }
+//
+    fun getAllTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrips = tripRepository.findAll()
-        return findTrips.map { fromTrip(it, userId) }.toSet()
+        val findTrips = tripRepository.findAll(pageable)
+        val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
+
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+//        val totalPosts = findTrips.totalElements
+
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage,
+//            "totalElements" to totalPosts
+        )
     }
 
     fun getAllTripsByUser(memberId: Long): Set<TripDto> {
