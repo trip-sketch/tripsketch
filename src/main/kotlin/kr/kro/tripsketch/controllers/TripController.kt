@@ -3,6 +3,7 @@ package kr.kro.tripsketch.controllers
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
+import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
 import org.springframework.data.domain.PageRequest
@@ -39,10 +40,16 @@ class TripController(private val tripService: TripService) {
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int
     ): ResponseEntity<Map<String, Any>> {
-        val memberId = req.getAttribute("memberId") as Long
-        val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
-        val findTrips = tripService.getAllTrips(memberId, pageable)
-        return ResponseEntity.ok(findTrips)
+        return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+            val findTrips = tripService.getAllTrips(memberId, pageable)
+            ResponseEntity.ok(findTrips)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+        } catch (e: DataNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+        }
     }
 
     @GetMapping("/trips")
@@ -61,9 +68,11 @@ class TripController(private val tripService: TripService) {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
-                val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
-                ResponseEntity.ok(findTrips)
+            val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
+            ResponseEntity.ok(findTrips)
         } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+        } catch (e: DataNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
         }
     }
