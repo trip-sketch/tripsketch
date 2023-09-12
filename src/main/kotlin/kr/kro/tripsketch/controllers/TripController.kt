@@ -20,7 +20,7 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
         @RequestPart("images") images: List<MultipartFile>?
-    ): ResponseEntity<TripDto>  {
+    ): ResponseEntity<TripDto> {
         try {
             val memberId = req.getAttribute("memberId") as Long
             val createdTrip = tripService.createTrip(memberId, tripCreateDto, images) // 이미지를 서비스 함수로 전달
@@ -74,8 +74,19 @@ class TripController(private val tripService: TripService) {
 
     // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터
     @GetMapping("/guest/tripAndComments/{tripId}")
-    fun getTripAndCommentsByTripId(@PathVariable tripId: String,): ResponseEntity<TripAndCommentResponseDto> {
+    fun getTripAndCommentsByTripId(@PathVariable tripId: String): ResponseEntity<TripAndCommentResponseDto> {
         val findTripAndComment = tripService.getTripAndCommentsIsPublicByTripIdGuest(tripId)
+        return ResponseEntity.ok(findTripAndComment)
+    }
+
+    // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 회원 라우터
+    @GetMapping("/user/tripAndComments/{tripId}")
+    fun getTripIsLikedAndCommentsByTripId(
+        req: HttpServletRequest,
+        @PathVariable tripId: String,
+    ): ResponseEntity<TripAndCommentResponseDto> {
+        val memberId = req.getAttribute("memberId") as Long
+        val findTripAndComment = tripService.getTripAndCommentsIsLikedByTripIdGuest(tripId,memberId)
         return ResponseEntity.ok(findTripAndComment)
     }
 
@@ -188,7 +199,7 @@ class TripController(private val tripService: TripService) {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
-        }  catch (ex: IllegalArgumentException) {
+        } catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
