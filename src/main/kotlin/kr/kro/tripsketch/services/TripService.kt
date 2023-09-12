@@ -431,11 +431,17 @@ class TripService(
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
-        val userId = userRepository.findByMemberId(memberId)?.id
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+        val findUser = userService.findUserByMemberId(memberId)
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        if (findTrip.userId == userId) {
+        val userId = findUser.id
+        val userDto = userService.toDto(findUser, true)
+        val isAdmin = userDto.isAdmin
+        if (findTrip.userId == memberId.toString() || isAdmin == true) {    //memberId 수정 필요
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
+            findTrip.deletedUserId = userId
             tripRepository.save(findTrip)
         } else {
             throw IllegalAccessException("삭제할 권한이 없습니다.")

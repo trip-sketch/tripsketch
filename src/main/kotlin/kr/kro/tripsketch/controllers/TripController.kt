@@ -259,14 +259,14 @@ class TripController(private val tripService: TripService) {
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
                 tripService.deleteTripById(memberId, id)
-                ResponseEntity.ok("게시물이 삭제되었습니다.")
+                ResponseEntity.status(HttpStatus.OK).body("게시물이 삭제되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
             }
         } catch (e: IllegalArgumentException) {
-            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: IllegalAccessException) {
-            throw ForbiddenException("삭제할 권한이 없습니다. ${e.message}")
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to (e.message ?: "")))
         }
     }
 }
