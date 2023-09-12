@@ -59,6 +59,7 @@ class WebMvcConfig(
                 "/api/user/delete",
                 "/api/user/email",
                 "/favicon.ico",
+                "/api/comment/admin/commentsWithPagination/**",
             )
     }
 }

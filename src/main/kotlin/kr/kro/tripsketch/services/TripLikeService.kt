@@ -14,10 +14,8 @@ class TripLikeService(
     fun likeTrip(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
-        println(userId)
         val findTrip = tripRepository.findById(tripId).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-        println(findTrip)
         if (!findTrip.tripLikes.contains(userId)) {
             findTrip.tripLikes.add(userId)
             findTrip.likes++
