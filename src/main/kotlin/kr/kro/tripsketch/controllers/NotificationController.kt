@@ -27,9 +27,9 @@ class NotificationController(
         val originalResponse = notificationService.getNotificationsByReceiverId(memberId, page, size)
 
         val response = ResponseFormat(
-            currentPage = originalResponse.number + 1,  // pageNumber는 0부터 시작하기 때문에 1을 더합니다.
-            posts = originalResponse.content,
-            postsPerPage = originalResponse.size,
+            currentPage = originalResponse.number + 1,
+            notifications = originalResponse.content,
+            notificationsPerPage = originalResponse.size,
             totalPage = originalResponse.totalPages
         )
 
