@@ -20,5 +20,14 @@ data class TripCreateDto(
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
-    var images: List<MultipartFile>? = null
+    var images: List<MultipartFile>? = null,
+    var countryCode: String? = null,
+    var country: String? = null,
+    var city: String? = null,
+    var municipality: String? = null,
+    var name: String? = null,
+    var displayName: String? = null,
+    var road: String? = null,
+    var address: String? = null,
+    var etc: Set<String>? = null,
 )
