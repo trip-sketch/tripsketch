@@ -6,9 +6,9 @@ import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import kr.kro.tripsketch.utils.EnvLoader
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -258,6 +258,21 @@ class CommentService(
         val commenter =
             userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
+
+        if (memberId in adminIds) {
+            // Soft delete 처리 부분으로 넘어감
+            val deletedComment = comment.copy(
+                content = "삭제 된 댓글입니다.",
+                isDeleted = true,
+                likedBy = mutableSetOf(),
+                numberOfLikes = 0
+            )
+            commentRepository.save(deletedComment)
+            return
+        }
+
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
         }
@@ -292,6 +307,24 @@ class CommentService(
 
         val commenter =
             userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
+
+        if (memberId in adminIds) {
+            // Soft delete 처리
+            val deletedChildComment =
+                parentComment.children[childCommentIndex].copy(
+                    content = "삭제 된 댓글입니다.",
+                    isDeleted = true,
+                    likedBy = mutableSetOf(),
+                    numberOfLikes = 0,
+                    replyToUserId = "",
+                )
+            parentComment.children[childCommentIndex] = deletedChildComment
+            commentRepository.save(parentComment)
+            return
+        }
 
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
