@@ -3,6 +3,7 @@ package kr.kro.tripsketch.controllers
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.domain.Notification
 import kr.kro.tripsketch.dto.NotificationRequest
+import kr.kro.tripsketch.dto.ResponseFormat
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.NotificationService
 import org.springframework.data.domain.Page
@@ -19,11 +20,20 @@ class NotificationController(
     fun getNotificationsByReceiverId(
         req: HttpServletRequest,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int,
-    ): ResponseEntity<Page<Notification>> {
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<ResponseFormat> {
         val memberId = req.getAttribute("memberId") as Long? ?: throw UnauthorizedException("인증되지 않은 사용자입니다.")
 
-        return ResponseEntity.ok(notificationService.getNotificationsByReceiverId(memberId, page, size))
+        val originalResponse = notificationService.getNotificationsByReceiverId(memberId, page, size)
+
+        val response = ResponseFormat(
+            currentPage = originalResponse.number + 1,  // pageNumber는 0부터 시작하기 때문에 1을 더합니다.
+            posts = originalResponse.content,
+            postsPerPage = originalResponse.size,
+            totalPage = originalResponse.totalPages
+        )
+
+        return ResponseEntity.ok(response)
     }
 
     @DeleteMapping("/{notificationId}")
