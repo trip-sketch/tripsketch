@@ -86,7 +86,7 @@ class TripController(private val tripService: TripService) {
         @PathVariable tripId: String,
     ): ResponseEntity<TripAndCommentResponseDto> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTripAndComment = tripService.getTripAndCommentsIsLikedByTripIdGuest(tripId,memberId)
+        val findTripAndComment = tripService.getTripAndCommentsIsLikedByTripIdMember(tripId,memberId)
         return ResponseEntity.ok(findTripAndComment)
     }
 
