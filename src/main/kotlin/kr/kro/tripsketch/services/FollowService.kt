@@ -34,6 +34,7 @@ class FollowService(
                 listOf(followingId),
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",
+                senderId = followerId.toString(),
                 nickname = followerNickname,
                 profileUrl = followerProfileUrl,
             )
