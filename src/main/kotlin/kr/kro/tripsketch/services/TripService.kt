@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -17,7 +18,8 @@ class TripService(
     private val followRepository: FollowRepository,
     private val userService: UserService,
     private val notificationService: NotificationService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val commentService: CommentService
 ) {
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>?): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
@@ -94,6 +96,23 @@ class TripService(
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
         return findTrips.map { fromTrip(it, "") }.toSet()
+    }
+
+    fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
+        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        val commentDtoList = commentService.getCommentsByTripId(id)
+        return fromTripAndComments(findTrip, commentDtoList, "")
+    }
+
+    fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId:Long): TripAndCommentResponseDto {
+        val userId = userRepository.findByMemberId(memberId)?.id
+            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        if(findTrip.isPublic==false&&findTrip.userId!=userId){
+            throw ForbiddenException("해당 게시물에 접근 권한이 없습니다.")
+        }
+        val commentDtoList = commentService.getIsLikedByMemberIdForTrip(memberId,id)
+        return fromTripAndComments(findTrip, commentDtoList, userId)
     }
 
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
@@ -297,7 +316,6 @@ class TripService(
             findTrips.forEach { trip ->
                 tripDtoList.add(fromTrip(trip, userId))
             }
-            println(tripDtoList)
             return tripDtoList
         } catch (ex: Exception) {
             println("에러 발생: ${ex.message}")
@@ -327,7 +345,10 @@ class TripService(
                     findTrip.location = it
                 }
             }
-            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
+            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(
+                    tripUpdateDto.endAt
+                )
+            ) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
             tripUpdateDto.startedAt?.let {
@@ -395,7 +416,8 @@ class TripService(
     fun fromTrip(trip: Trip, currentUserId: String): TripDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
         val isLiked: Boolean = if (currentUserId != "") {
-            val currentUser = userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
+            val currentUser =
+                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
             trip.tripLikes.contains(currentUser.id)
         } else {
             false
@@ -435,11 +457,11 @@ class TripService(
     }
 
     fun fromTripToUpdate(trip: Trip, currentUserId: String): TripUpdateResponseDto {
-        val user = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.1")
+        val user = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
 
         val isLiked: Boolean = if (currentUserId != "") {
             val currentUser =
-                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.7")
+                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
             trip.tripLikes.contains(currentUser.id)
         } else {
             false
@@ -468,7 +490,16 @@ class TripService(
             images = trip.images
         )
     }
+
+    fun fromTripAndComments(trip: Trip, comments: List<CommentDto>, currentUserId: String): TripAndCommentResponseDto {
+        return TripAndCommentResponseDto(
+            tripAndCommentPairDataByTripId = Pair(
+                fromTrip(trip, currentUserId),
+                comments)
+        )
+    }
 }
+
 
 fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
