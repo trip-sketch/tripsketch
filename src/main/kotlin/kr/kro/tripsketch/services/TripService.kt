@@ -2,6 +2,7 @@ package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
@@ -71,6 +72,11 @@ class TripService(
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
+        if (currentPage <= totalPage && findTrips.isEmpty) {
+            throw DataNotFoundException("작성한 게시글이 존재하지 않습니다.")
+        } else if (currentPage > totalPage) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
         return mapOf(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
@@ -92,13 +98,15 @@ class TripService(
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId, pageable)
-        if (findTrips.isEmpty) {
-            throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
-        }
         val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
+        if (currentPage <= totalPage && findTrips.isEmpty) {
+            throw DataNotFoundException("작성한 게시글이 존재하지 않습니다.")
+        } else if (currentPage > totalPage) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
         return mapOf(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
