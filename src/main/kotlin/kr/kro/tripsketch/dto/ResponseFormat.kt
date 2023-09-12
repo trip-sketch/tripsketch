@@ -4,7 +4,7 @@ import kr.kro.tripsketch.domain.Notification
 
 data class ResponseFormat(
     val currentPage: Int,
-    val posts: List<Notification>,
-    val postsPerPage: Int,
+    val notifications: List<Notification>,
+    val notificationsPerPage: Int,
     val totalPage: Int
 )
