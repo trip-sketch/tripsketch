@@ -1,19 +1,16 @@
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.User
-import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
-import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
@@ -23,6 +20,10 @@ class UserService(
     private val nicknameService: NickNameService,
     private val imageService: ImageService,
 ) {
+
+    companion object {
+        const val DEFAULT_IMAGE_URL = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+    }
 
     fun registerOrUpdateUser(memberId: Long): User {
         var user = userRepository.findByMemberId(memberId)
@@ -35,8 +36,8 @@ class UserService(
             user = User(
                 memberId = memberId,
                 nickname = nickname,
-                profileImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png",
-                introduction = "안녕하세요! 만나서 반갑습니다!"
+                profileImageUrl = DEFAULT_IMAGE_URL,
+                introduction = "안녕하세요! 만나서 반갑습니다!",
             )
             user = userRepository.save(user)
         }
@@ -52,7 +53,6 @@ class UserService(
         return userRepository.findByMemberId(memberId)
     }
 
-
     fun findUserByNickname(nickname: String): User? {
         return userRepository.findByNickname(nickname)
     }
@@ -65,7 +65,6 @@ class UserService(
         return userRepository.findAll(pageable)
     }
 
-
     fun updateUser(memberId: Long, userUpdateDto: UserUpdateDto): User {
         val user = userRepository.findByMemberId(memberId) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
@@ -77,12 +76,12 @@ class UserService(
         }
 
         userUpdateDto.profileImageUrl?.let { newImageFile ->
-            val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+            val defaultImageUrl = DEFAULT_IMAGE_URL
 
             if (user.profileImageUrl != defaultImageUrl) {
                 user.profileImageUrl?.let { oldImageUrl ->
                     try {
-                        imageService.deleteImage(oldImageUrl)  // `ImageService`의 `deleteImage` 함수를 사용하여 URL을 삭제합니다.
+                        imageService.deleteImage(oldImageUrl) // `ImageService`의 `deleteImage` 함수를 사용하여 URL을 삭제합니다.
                     } catch (e: Exception) {
                         // 오류 로깅
                         println("이미지 삭제에 실패했습니다. URL: $oldImageUrl, 오류: ${e.message}")
@@ -100,7 +99,6 @@ class UserService(
 
         return userRepository.save(user)
     }
-
 
     fun saveOrUpdate(user: User): User {
         return userRepository.save(user)
@@ -145,24 +143,34 @@ class UserService(
         val cutoffDateForDeletion = LocalDateTime.now().minusMonths(12)
         val usersToDelete = userRepository.findUsersByUpdatedAtBefore(cutoffDateForDeletion)
 
-        val defaultImageUrl = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
-
         usersToDelete.forEach { user ->
-            softDeleteUser(user, defaultImageUrl)
+            softDeleteUser(user)
         }
     }
 
-    fun softDeleteUser(user: User, defaultImageUrl: String) {
-        user.profileImageUrl = defaultImageUrl
+    fun softDeleteUser(user: User) {
+        user.profileImageUrl = DEFAULT_IMAGE_URL
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
 
-        userRepository.save(user)
+        // 랜덤 닉네임 생성
+        var newNickname: String
+        do {
+            newNickname = nicknameService.generateRandomNickname()
+        } while (isNicknameExist(newNickname))
+        user.nickname = newNickname
 
-        println("User with ID ${user.id} has been soft deleted.")  // 출력 코드 추가
+        userRepository.save(user)
+        println("User with ID ${user.id} has been soft deleted.")
     }
 
+    fun softDeleteUserByMemberId(memberId: Long) {
+        val user = userRepository.findByMemberId(memberId)
+            ?: throw IllegalArgumentException("해당 멤버 아이디를 가진 사용자가 존재하지 않습니다.")
+
+        softDeleteUser(user)
+    }
 
     fun toDto(user: User, includeMemberID: Boolean = true, isAdmin: Boolean? = null): UserDto {
         val (followersCount, followingCount) = getUserFollowInfo(user.id.toString())
@@ -174,7 +182,7 @@ class UserService(
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
                 followingCount = followingCount,
-                isAdmin = isAdmin
+                isAdmin = isAdmin,
             )
         } else {
             UserDto(
@@ -183,11 +191,8 @@ class UserService(
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
                 followingCount = followingCount,
-                isAdmin = null // 관리자 여부를 노출하지 않음
+                isAdmin = null, // 관리자 여부를 노출하지 않음
             )
         }
     }
-
 }
-
-

@@ -15,5 +15,5 @@ data class ProfileDto(
     @field:Length(min = 5, max = 500, message = "텍스트 길이는 5자 이상 500자 이하이어야 합니다.")
     val profileImageUrl: String?,
 
-    val isFollowing: Boolean? = null
+    val isFollowing: Boolean? = null,
 )

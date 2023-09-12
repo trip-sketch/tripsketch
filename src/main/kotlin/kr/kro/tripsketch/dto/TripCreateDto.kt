@@ -3,8 +3,7 @@ package kr.kro.tripsketch.dto
 import jakarta.validation.constraints.NotBlank
 import kr.kro.tripsketch.domain.HashtagInfo
 import org.hibernate.validator.constraints.Length
-import java.time.LocalDateTime
-
+import java.time.LocalDate
 
 data class TripCreateDto(
     @field:NotBlank(message = "제목을 입력하세요.")
@@ -14,11 +13,10 @@ data class TripCreateDto(
     @field:Length(min = 5, max = 100, message = "텍스트 길이가 5자 이상이어야 합니다.")
     var content: String,
     var location: String? = null,
-    var startedAt: LocalDateTime? = LocalDateTime.now(),
-    var endAt: LocalDateTime? = LocalDateTime.now(),
+    var startedAt: LocalDate? = LocalDate.now(),
+    var endAt: LocalDate? = LocalDate.now(),
+    var isPublic: Boolean? = true,
     var latitude: Double? = null,
     var longitude: Double? = null,
-    var hashtagInfo: HashtagInfo? = null,
-    var isPublic: Boolean? = true,
-    var images: List<String>? = emptyList()
+    var hashtagInfo: HashtagInfo? = null
 )

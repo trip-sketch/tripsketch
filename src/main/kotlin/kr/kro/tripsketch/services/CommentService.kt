@@ -19,7 +19,7 @@ class CommentService(
     private val userRepository: UserRepository,
     private val userService: UserService,
     private val notificationService: NotificationService,
-    private val tripRepository: TripRepository
+    private val tripRepository: TripRepository,
 ) {
 
     fun getAllComments(pageable: Pageable): Page<CommentDto> {
