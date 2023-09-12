@@ -3,6 +3,7 @@ package kr.kro.tripsketch.dto
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class TripDto(
@@ -18,18 +19,18 @@ data class TripDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime,
-    var endAt: LocalDateTime,
+    var startedAt: LocalDate? = null,
+    var endAt: LocalDate? = null,
     var hashtag: Set<String>? = setOf(),
     var latitude: Double? = null, // 위도
     var longitude: Double? = null, // 경도
     var isPublic: Boolean,
     var isHidden: Boolean = false,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
     var tripLikes: MutableSet<String> = mutableSetOf(),
 //    var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList(),
-    var isLiked: Boolean
+    var isLiked: Boolean,
 )

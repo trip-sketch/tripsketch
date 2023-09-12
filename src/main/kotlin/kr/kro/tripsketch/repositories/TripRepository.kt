@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 interface TripRepository : MongoRepository<Trip, String> {
 
     // userId를 기반으로 여행을 검색하는 메소드
-     fun findTripByUserId(userId: String): Set<Trip>
+    fun findTripByUserId(userId: String): Set<Trip>
 
     // tripLikes 배열의 길이를 조회하는 메소드
     fun countByTripLikes(id: String): Long
@@ -34,41 +34,16 @@ interface TripRepository : MongoRepository<Trip, String> {
     // 유저 아이디로 공개 + 삭제x 인 글들 조회
     fun findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(userId: String): Set<Trip>
 
-
     // 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(userId: String = ""): Set<Trip>
 
-
+    // email 조건이 맞으면서 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
 
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
-
-    @Query("" +
-            "SELECT " +
-            "   title " +
-            "   , content " +
-            "   , likes " +
-            "   , views " +
-            "   , location " +
-            "   , startedAt " +
-            "   , endAt " +
-            "   , hashtagInfo " +
-            "   , createdAt " +
-            "   , images[0] " +
-            "FROM " +
-            "   trips" +
-            "WHERE " +
-            "   isPublic = true " +
-            "   AND isHidden = false " +
-            "   AND email IN :emailSet " +
-            "GROUP BY " +
-            "   emailSet " +
-            "ORDER BY " +
-            "   createdAt DESC "
-    )
-    fun findListFollowingByUser(emailSet: Set<String>): Set<Trip>
+    fun findLatestTripByUserId(userId: String): Trip?
 
     @Query("{" +
             "\$or: [" +
@@ -76,19 +51,7 @@ interface TripRepository : MongoRepository<Trip, String> {
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
             "]," +
             "'isPublic': true, 'isHidden': false" +
-            "}"
-    )
-    fun findTripsByKeyword(keyword: String): List<Trip>
-
-
-    @Query("{" +
-            "\$or: [" +
-            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
-            "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
-            "]," +
-            "'isPublic': true, 'isHidden': false" +
-            "}"
+            "}",
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
-
 }

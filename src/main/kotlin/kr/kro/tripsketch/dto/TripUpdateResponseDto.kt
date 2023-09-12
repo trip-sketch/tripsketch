@@ -2,6 +2,7 @@ package kr.kro.tripsketch.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import kr.kro.tripsketch.domain.HashtagInfo
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,8 +14,8 @@ data class TripUpdateResponseDto(
     var likes: Int?,
     var views: Int?,
     var location: String? = null,
-    var startedAt: LocalDateTime = LocalDateTime.now(),
-    var endAt: LocalDateTime = LocalDateTime.now(),
+    var startedAt: LocalDate? = LocalDate.now(),
+    var endAt: LocalDate? = LocalDate.now(),
     var hashtagInfo: HashtagInfo? = null,
     val latitude: Double? = null, // 위도
     val longitude: Double? = null, // 경도
@@ -26,5 +27,5 @@ data class TripUpdateResponseDto(
     var tripLikes: MutableSet<String> = mutableSetOf(),
 //    var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList(),
-    var isLiked: Boolean
+    var isLiked: Boolean,
 )

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 @RequestMapping("api/trip")
 class TripLikeController(private val tripLikeService: TripLikeService) {
@@ -26,7 +25,7 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         return try {
             tripLikeService.likeTrip(memberId, tripIdDto.id)
             ResponseEntity.status(HttpStatus.OK).body("해당 게시물을 '좋아요'하였습니다.")
-        } catch (ex: EntityNotFoundException) {
+        } catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
@@ -41,11 +40,8 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         return try {
             tripLikeService.unlikeTrip(memberId, tripIdDto.id)
             ResponseEntity.status(HttpStatus.OK).body("좋아요 취소")
-        } catch (ex: EntityNotFoundException) {
+        } catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
 }
-
-
-class EntityNotFoundException(message: String) : RuntimeException(message)

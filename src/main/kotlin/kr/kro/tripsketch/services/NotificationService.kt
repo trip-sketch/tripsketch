@@ -1,20 +1,45 @@
 package kr.kro.tripsketch.services
 
+import kr.kro.tripsketch.domain.Notification
+import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.repositories.NotificationRepository
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
 @Service
 class NotificationService(
-    private val userService: UserService
+    private val userService: UserService,
+    private val notificationRepository: NotificationRepository,
 ) {
 
     private val client = OkHttpClient()
+
+    fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
+        val userId = userService.getUserIdByMemberId(memberId)
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
+        return notificationRepository.findByReceiverId(userId, pageable)
+    }
+
+    fun deleteNotificationById(notificationId: String, memberId: Long) {
+        val userId = userService.getUserIdByMemberId(memberId)
+        val notification = notificationRepository.findById(notificationId).orElse(null)
+            ?: throw IllegalArgumentException("해당 알림을 찾을 수 없습니다.")
+
+        if (notification.receiverId == userId) {
+            notificationRepository.deleteById(notificationId)
+        } else {
+            throw UnauthorizedException("이 알림을 삭제할 권한이 없습니다.")
+        }
+    }
 
     fun sendPushNotification(
         ids: List<String>,
@@ -24,9 +49,25 @@ class NotificationService(
         parentId: String? = null,
         tripId: String? = null,
         nickname: String? = null,
-        profileUrl: String? = null
+        profileUrl: String? = null,
     ): String {
         val tokens = ids.mapNotNull { getUserToken(it) }.toSet()
+
+        // 알림 객체 생성
+        ids.forEach { receiverId ->
+            val notification = Notification(
+                receiverId = receiverId,
+                title = title,
+                body = body,
+                commentId = commentId,
+                parentId = parentId,
+                tripId = tripId,
+                nickname = nickname,
+                profileUrl = profileUrl,
+            )
+            notificationRepository.save(notification)
+        }
+
         val response = if (tokens.isNotEmpty()) {
             sendExpoPushNotification(tokens, title, body, commentId, parentId, tripId, nickname, profileUrl)
         } else {
@@ -41,7 +82,6 @@ class NotificationService(
         return user?.expoPushToken
     }
 
-
     private fun sendExpoPushNotification(
         pushTokens: Set<String>,
         title: String,
@@ -52,7 +92,7 @@ class NotificationService(
         nickname: String? = null,
         sound: String? = "default",
         badge: Int? = 1,
-        profileUrl: String? = null
+        profileUrl: String? = null,
     ): Response {
         val jsonArray = JSONArray()
 

@@ -1,24 +1,23 @@
 package kr.kro.tripsketch.controllers
 
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.CommentChildrenCreateDto
+import kr.kro.tripsketch.dto.CommentCreateDto
 import kr.kro.tripsketch.dto.CommentDto
 import kr.kro.tripsketch.dto.CommentUpdateDto
-import kr.kro.tripsketch.dto.CommentCreateDto
 import kr.kro.tripsketch.services.CommentService
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/comment")
 class CommentController(private val commentService: CommentService) {
 
     @GetMapping("/admin/comments")
-    fun getAllComments(req: HttpServletRequest, pageable: Pageable): Page<CommentDto>{
+    fun getAllComments(req: HttpServletRequest, pageable: Pageable): Page<CommentDto> {
         return commentService.getAllComments(pageable)
     }
 
@@ -39,16 +38,16 @@ class CommentController(private val commentService: CommentService) {
     @GetMapping("/user/{tripId}")
     fun getIsLikedByTokenForTrip(
         req: HttpServletRequest,
-        @PathVariable tripId: String
+        @PathVariable tripId: String,
     ): List<CommentDto> {
         val memberId = req.getAttribute("memberId") as Long
         return commentService.getIsLikedByTokenForTrip(memberId, tripId)
     }
 
-
     @PostMapping("")
     fun createComment(
-        req: HttpServletRequest, @Validated @RequestBody commentCreateDto: CommentCreateDto
+        req: HttpServletRequest,
+        @Validated @RequestBody commentCreateDto: CommentCreateDto,
     ): CommentDto {
         val memberId = req.getAttribute("memberId") as Long
         return commentService.createComment(memberId, commentCreateDto)
@@ -56,7 +55,9 @@ class CommentController(private val commentService: CommentService) {
 
     @PostMapping("/{parentId}")
     fun createChildrenComment(
-        req: HttpServletRequest, @PathVariable parentId: String, @Validated @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto
+        req: HttpServletRequest,
+        @PathVariable parentId: String,
+        @Validated @RequestBody commentChildrenCreateDto: CommentChildrenCreateDto,
     ): CommentDto {
         val memberId = req.getAttribute("memberId") as Long
         return commentService.createChildrenComment(memberId, parentId, commentChildrenCreateDto)
@@ -66,7 +67,7 @@ class CommentController(private val commentService: CommentService) {
     fun updateCommentById(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @RequestBody updatedComment: CommentUpdateDto
+        @Validated @RequestBody updatedComment: CommentUpdateDto,
     ): CommentDto {
         val memberId = req.getAttribute("memberId") as Long
         return commentService.updateComment(memberId, id, updatedComment)
@@ -77,7 +78,7 @@ class CommentController(private val commentService: CommentService) {
         req: HttpServletRequest,
         @PathVariable parentId: String,
         @PathVariable id: String,
-        @Validated @RequestBody updatedComment: CommentUpdateDto
+        @Validated @RequestBody updatedComment: CommentUpdateDto,
     ): CommentDto {
         val memberId = req.getAttribute("memberId") as Long
         return commentService.updateChildrenComment(memberId, parentId, id, updatedComment)
@@ -94,7 +95,7 @@ class CommentController(private val commentService: CommentService) {
     fun deleteChildrenComment(
         req: HttpServletRequest,
         @PathVariable parentId: String,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<Any> {
         val memberId = req.getAttribute("memberId") as Long
         commentService.deleteChildrenComment(memberId, parentId, id)
@@ -104,9 +105,8 @@ class CommentController(private val commentService: CommentService) {
     @PatchMapping("/{id}/like")
     fun toggleLikeComment(
         req: HttpServletRequest,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<Any> {
-
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val updatedComment = commentService.toggleLikeComment(memberId, id)
@@ -120,9 +120,8 @@ class CommentController(private val commentService: CommentService) {
     fun toggleLikeChildrenComment(
         req: HttpServletRequest,
         @PathVariable parentId: String,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<Any> {
-
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val updatedChildrenComment = commentService.toggleLikeChildrenComment(memberId, parentId, id)

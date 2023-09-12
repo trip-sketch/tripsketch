@@ -3,14 +3,14 @@ package kr.kro.tripsketch.services
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.TokenResponse
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.stereotype.Service
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
-import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.exceptions.UnauthorizedException
 
 @Service
 class JwtService {

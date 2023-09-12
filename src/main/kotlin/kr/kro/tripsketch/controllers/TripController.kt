@@ -2,25 +2,32 @@ package kr.kro.tripsketch.controllers
 
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.BadRequestException
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
 
-    @PostMapping
+    @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
-        @Validated @RequestBody tripCreateDto: TripCreateDto
-    ): ResponseEntity<TripDto> {
-        val memberId = req.getAttribute("memberId") as Long
-        val createdTrip = tripService.createTrip(memberId, tripCreateDto)
-        return ResponseEntity.ok(createdTrip)
+        @Validated @RequestPart("tripCreateDto") tripCreateDto: TripCreateDto,
+        @RequestPart("images") images: List<MultipartFile>?
+    ): ResponseEntity<TripDto>  {
+        try {
+            val memberId = req.getAttribute("memberId") as Long
+            val createdTrip = tripService.createTrip(memberId, tripCreateDto, images) // 이미지를 서비스 함수로 전달
+            return ResponseEntity.ok(createdTrip)
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+        }
     }
 
     // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
@@ -76,7 +83,7 @@ class TripController(private val tripService: TripService) {
     fun getTripsCategorizedByCountryWithPagination(
         @RequestParam("nickname") nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -86,7 +93,7 @@ class TripController(private val tripService: TripService) {
     @GetMapping("/nickname/trips/country/{country}")
     fun getTripsInCountry(
         @RequestParam("nickname") nickname: String,
-        @PathVariable("country") country: String
+        @PathVariable("country") country: String,
     ): ResponseEntity<Set<TripDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -97,7 +104,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
@@ -124,7 +131,7 @@ class TripController(private val tripService: TripService) {
     @GetMapping("modify/{id}")
     fun getTripByMemberIdAndIdToUpdate(
         req: HttpServletRequest,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<TripUpdateResponseDto> {
         val memberId = req.getAttribute("memberId") as Long
         val findTrip = tripService.getTripByMemberIdAndIdToUpdate(memberId, id)
@@ -149,12 +156,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    // to-do : (메인페이지-모바일(회원))내가 구독한 여행자의 스케치(following 한 nickname 에 대한 카드 1개씩 조회 - 카드 갯수는 설정할 수 있게끔 하자)
-    // 구독 유무를 변수로 받아줄 수 있으면 그렇게 하자.
     @GetMapping("/list/following")
-    fun getListFollowingByUser(req: HttpServletRequest): ResponseEntity<Any> {
+    fun getListFollowingTrips(req: HttpServletRequest): ResponseEntity<Any> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getListFollowingByUser(memberId)
+        val findTrips = tripService.getListFollowingTrips(memberId)
         return try {
             if (findTrips.isNotEmpty()) {
                 ResponseEntity.ok(findTrips)
@@ -176,31 +181,31 @@ class TripController(private val tripService: TripService) {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
-        }  catch (ex: EntityNotFoundException) {
+        }  catch (ex: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @RequestBody tripUpdateDto: TripUpdateDto
-    )
-            : ResponseEntity<Any> {
+        @Validated @RequestPart("tripUpdateDto") tripUpdateDto: TripUpdateDto,
+        @RequestPart("images") images: List<MultipartFile>?
+    ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
-                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
+                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto, images)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: EntityNotFoundException) {
-            ResponseEntity.notFound().build()
-        } catch (ex: IllegalAccessException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정할 권한이 없습니다.")
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+        } catch (e: IllegalAccessException) {
+            throw ForbiddenException("수정할 권한이 없습니다. ${e.message}")
         }
     }
 
@@ -215,13 +220,12 @@ class TripController(private val tripService: TripService) {
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: EntityNotFoundException) {
-            ResponseEntity.notFound().build()
-        } catch (ex: IllegalAccessException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다.")
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
+        } catch (e: IllegalAccessException) {
+            throw ForbiddenException("삭제할 권한이 없습니다. ${e.message}")
         }
     }
-
 }
 
 private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
