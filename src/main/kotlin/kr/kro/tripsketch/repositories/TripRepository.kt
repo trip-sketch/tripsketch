@@ -18,8 +18,8 @@ interface TripRepository : MongoRepository<Trip, String> {
     // tripLikes 배열의 길이를 조회하는 메소드
     fun countByTripLikes(id: String): Long
 
-    // 게시글 조회
-    fun findByIsHiddenIsFalse(): Set<Trip>
+    // 삭제할 게시글 조회
+    fun findByIsHiddenIsFalseAndId(id: String): Trip?
 
     // 로그인 사용자가 작성한 게시글 조회 (userId 사용)
     fun findByIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
