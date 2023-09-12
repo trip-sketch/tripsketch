@@ -41,7 +41,6 @@ class TripService(
             images = uploadedImageUrls
         )
         val createdTrip = tripRepository.save(newTrip)
-
         val userId = userRepository.findByMemberId(memberId)?.id ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val follower = followRepository.findByFollowing(userId)
         val filteredFollower = follower.filter { it.follower != userId }
@@ -313,12 +312,12 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
 
         if (findTrip.userId == userId) {
-            tripUpdateDto.title?.let {
+            tripUpdateDto.title.let {
                 if (it != findTrip.title) {
                     findTrip.title = it
                 }
             }
-            tripUpdateDto.content?.let {
+            tripUpdateDto.content.let {
                 if (it != findTrip.content) {
                     findTrip.content = it
                 }
@@ -384,7 +383,7 @@ class TripService(
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        if (findTrip.userId == userId) { // 'findTrip.userId == user.id' 조건은 항상 false입니다 ?
+        if (findTrip.userId == userId) {
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
