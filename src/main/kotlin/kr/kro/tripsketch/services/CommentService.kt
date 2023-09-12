@@ -91,7 +91,8 @@ class CommentService(
     fun createComment(memberId: Long, commentCreateDto: CommentCreateDto): CommentDto {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         val comment = Comment(
             userId = commenter.id,
             tripId = commentCreateDto.tripId,
@@ -186,7 +187,8 @@ class CommentService(
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
         tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (comment.userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
@@ -221,7 +223,8 @@ class CommentService(
             throw IllegalArgumentException("해당 id에 대응하는 댓글이 children 존재하지 않습니다.")
         }
 
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (parentComment.children[childCommentIndex].userId != commenter.id) {
             throw ForbiddenException("해당 사용자만 접근 가능합니다.")
@@ -252,7 +255,8 @@ class CommentService(
         if (comment.isDeleted) {
             throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
@@ -286,7 +290,8 @@ class CommentService(
             throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
 
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
@@ -311,7 +316,8 @@ class CommentService(
 
     fun toggleLikeComment(memberId: Long, id: String): CommentDto {
 
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         val userId = commenter.id
 
@@ -360,7 +366,8 @@ class CommentService(
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(parentComment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        val commenter = userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
+        val commenter =
+            userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
             throw ForbiddenException("해당 댓글 접근 권한이 없습니다.")
@@ -422,7 +429,8 @@ class CommentService(
             return CommentDto(
                 id = comment.id,
                 userNickName = commenterProfile?.nickname ?: "알 수 없는 사용자", // 사용자가 없을 경우 대비
-                userProfileUrl = commenterProfile?.profileImageUrl ?: "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png", // 사용자가 없을 경우 대비
+                userProfileUrl = commenterProfile?.profileImageUrl
+                    ?: "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png", // 사용자가 없을 경우 대비
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
@@ -439,29 +447,34 @@ class CommentService(
 }
 
 fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
-    val commentsList = comments.toList()
-    val commentsSize = comments.size
-    val totalComments = commentsList.size
+    val paginatedComments = mutableListOf<CommentDto>()
+    val totalCommentsWithChildren = comments.sumOf { it.children.size + 1 }
     val startIndex = (page - 1) * pageSize
-    println("commentsList: $commentsList")
-    println("commentsSize: $commentsSize")
-    println("totalComments: $totalComments")
+    var addedComments = 0
+    var totalIndex = 0
+    var currentIndex = 0
 
-    val endIndex = if (startIndex + pageSize < totalComments) {
-        startIndex + pageSize
-    } else {
-        totalComments
+    while (startIndex < pageSize && totalIndex < totalCommentsWithChildren) {
+        val currentComment = comments[currentIndex]
+        paginatedComments.add(currentComment)
+        addedComments++
+        var toAddChildIndex = 0
+
+
+        // 대댓글 추가
+        currentComment.children.forEachIndexed { Index, childComment ->
+            if (addedComments < pageSize) {
+                paginatedComments[currentIndex].children.add(childComment)
+                addedComments++
+                toAddChildIndex++
+            }
+        }
+        totalIndex=currentIndex+toAddChildIndex
+
+        currentIndex++
     }
-    println("startIndex: $startIndex, endIndex: $endIndex")
 
-    val paginatedComments = if (startIndex < totalComments) {
-        comments.slice(startIndex until endIndex)
-    } else {
-        emptyList()
-    }
-
-    val totalPage = if (commentsList.isEmpty()) 0 else (totalComments + pageSize - 1) / pageSize
-
+    val totalPage = (totalCommentsWithChildren + pageSize - 1) / pageSize
 
     return mapOf(
         "comments" to paginatedComments,
@@ -469,8 +482,31 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
         "totalPage" to totalPage,
         "commentsPerPage" to pageSize
     )
-
 }
+
+
+//fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
+//    val totalCommentsWithChildren = comments.sumOf { it.children.size + 1 }
+//    val startIndex = (page - 1) * pageSize
+//    val endIndex = minOf(startIndex + pageSize, totalCommentsWithChildren)
+//
+//    val paginatedComments = mutableListOf<CommentDto>()
+//
+//    var currentIndex = startIndex
+//    var addedComments = 0
+//
+//
+//
+//    val totalPage = (totalCommentsWithChildren + pageSize - 1) / pageSize
+//
+//    return mapOf(
+//        "comments" to paginatedComments,
+//        "currentPage" to page,
+//        "totalPage" to totalPage,
+//        "commentsPerPage" to pageSize
+//    )
+//}
+
 
 
 
