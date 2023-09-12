@@ -36,12 +36,12 @@ class CommentController(private val commentService: CommentService) {
     }
 
     @GetMapping("/user/{tripId}")
-    fun getIsLikedByTokenForTrip(
+    fun getIsLikedByMemberIdForTrip(
         req: HttpServletRequest,
         @PathVariable tripId: String,
     ): List<CommentDto> {
         val memberId = req.getAttribute("memberId") as Long
-        return commentService.getIsLikedByTokenForTrip(memberId, tripId)
+        return commentService.getIsLikedByMemberIdForTrip(memberId, tripId)
     }
 
     @PostMapping("")
