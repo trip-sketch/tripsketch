@@ -91,7 +91,7 @@ class TripService(
         return findTrips.map { fromTrip(it, "") }.toSet()
     }
 
-    fun getTripByNickname(nickname: String): Set<TripDto> {
+    fun getTripsByNickname(nickname: String): Set<TripDto> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
