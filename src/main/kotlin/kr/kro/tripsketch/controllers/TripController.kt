@@ -58,10 +58,14 @@ class TripController(private val tripService: TripService) {
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int
     ): ResponseEntity<Map<String, Any>> {
-        val memberId = req.getAttribute("memberId") as Long
-        val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
-        val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
-        return ResponseEntity.ok(findTrips)
+        return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+                val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
+                ResponseEntity.ok(findTrips)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+        }
     }
 
     @GetMapping("/guest/trips")

@@ -92,6 +92,9 @@ class TripService(
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId, pageable)
+        if (findTrips.isEmpty) {
+            throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
+        }
         val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
