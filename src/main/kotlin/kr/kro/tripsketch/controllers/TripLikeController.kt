@@ -25,7 +25,7 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         return try {
             tripLikeService.likeTrip(memberId, tripIdDto.id)
             ResponseEntity.status(HttpStatus.OK).body("해당 게시물을 '좋아요'하였습니다.")
-        } catch (ex: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
         }
     }
@@ -39,9 +39,10 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
             tripLikeService.unlikeTrip(memberId, tripIdDto.id)
-            ResponseEntity.status(HttpStatus.OK).body("좋아요 취소")
-        } catch (ex: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.OK).body("좋아요를 취소하였습니다.")
+        } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
+//            throw (${e.message}")
         }
     }
 }
