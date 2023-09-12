@@ -62,7 +62,7 @@ class CommentService(
 
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
-    fun getIsLikedByTokenForTrip(memberId: Long, tripId: String): List<CommentDto> {
+    fun getIsLikedByMemberIdForTrip(memberId: Long, tripId: String): List<CommentDto> {
         val updatedComments = isLikedByTokenForComments(memberId, tripId)
 
         return updatedComments.map { fromComment(it, userService) }
@@ -462,7 +462,7 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
 
 
         // 대댓글 추가
-        currentComment.children.forEachIndexed { Index, childComment ->
+        currentComment.children.forEachIndexed { _, childComment ->
             if (addedComments < pageSize) {
                 paginatedComments[currentIndex].children.add(childComment)
                 addedComments++

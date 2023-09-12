@@ -1,8 +1,8 @@
 package kr.kro.tripsketch.services
 
-import kr.kro.tripsketch.domain.Comment
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
+import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
@@ -100,9 +100,20 @@ class TripService(
     }
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
-        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
+        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
         val commentDtoList = commentService.getCommentsByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
+    }
+
+    fun getTripAndCommentsIsLikedByTripIdGuest(id: String, memberId:Long): TripAndCommentResponseDto {
+        val userId = userRepository.findByMemberId(memberId)?.id
+            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        if(findTrip.isPublic==false&&findTrip.userId!=userId){
+            throw ForbiddenException("해당 게시물에 접근 권한이 없습니다.")
+        }
+        val commentDtoList = commentService.getIsLikedByMemberIdForTrip(memberId,id)
+        return fromTripAndComments(findTrip, commentDtoList, userId)
     }
 
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
