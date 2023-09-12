@@ -44,6 +44,7 @@ class TripLikeService(
                 }
             } else {
                 throw IllegalStateException("작성한 게시자 본인에게 알림이 가지 않습니다.")
+//                ResponseEntity.status(HttpStatus.OK).body("작성한 게시자 본인에게 알림이 가지 않습니다.")
             }
         } else {
             throw IllegalArgumentException("이미 좋아요한 게시물입니다.")
