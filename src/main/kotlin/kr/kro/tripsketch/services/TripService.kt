@@ -105,7 +105,7 @@ class TripService(
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
 
-    fun getTripAndCommentsIsLikedByTripIdGuest(id: String, memberId:Long): TripAndCommentResponseDto {
+    fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId:Long): TripAndCommentResponseDto {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
