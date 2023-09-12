@@ -63,31 +63,20 @@ class TripService(
         return fromTrip(createdTrip, userId)
     }
 
-//    fun getAllTrips(memberId: Long, pageable: Pageable): Page<Set<TripDto>> {
-//        val userId = userRepository.findByMemberId(memberId)?.id
-//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-//        val findTrips = tripRepository.findAll()
-////        return findTrips.map { fromTrip(it, userId) }.toSet()
-//        return findTrips.map { fromTrip(it, userId) }.toSet()
-//    }
-//
     fun getAllTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips = tripRepository.findAll(pageable)
         val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
-
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
-//        val totalPosts = findTrips.totalElements
 
         return mapOf(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
             "postsPerPage" to postsPerPage,
-            "totalPages" to totalPage,
-//            "totalElements" to totalPosts
+            "totalPages" to totalPage
         )
     }
 
@@ -95,9 +84,8 @@ class TripService(
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips =
-            tripRepository.findByIsHiddenIsFalseAndUserId(userId) + tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(
-                userId
-            )
+            tripRepository.findByIsHiddenIsFalseAndUserId(userId) +
+                    tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
         return findTrips.map { fromTrip(it, userId) }.toSet()
     }
 
