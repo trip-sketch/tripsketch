@@ -5,6 +5,9 @@ import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -30,11 +33,22 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    // trip 게시글 전체 조회 (isPublic, isHidden 값 상관없이)
+//    @GetMapping("/admin/trips")
+//    fun getAllTrips(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Map<String, Any>> {
+//        val memberId = req.getAttribute("memberId") as Long
+//        val findTrips = tripService.getAllTrips(memberId, pageable)
+//        return ResponseEntity.ok(findTrips)
+//    }
+
     @GetMapping("/admin/trips")
-    fun getAllTrips(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+    fun getAllTrips(
+        req: HttpServletRequest,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int
+    ): ResponseEntity<Map<String, Any>> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getAllTrips(memberId)
+        val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+        val findTrips = tripService.getAllTrips(memberId, pageable)
         return ResponseEntity.ok(findTrips)
     }
 
