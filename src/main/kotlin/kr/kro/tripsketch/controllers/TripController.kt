@@ -33,13 +33,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-//    @GetMapping("/admin/trips")
-//    fun getAllTrips(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Map<String, Any>> {
-//        val memberId = req.getAttribute("memberId") as Long
-//        val findTrips = tripService.getAllTrips(memberId, pageable)
-//        return ResponseEntity.ok(findTrips)
-//    }
-
     @GetMapping("/admin/trips")
     fun getAllTrips(
         req: HttpServletRequest,
@@ -60,9 +53,14 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/trips/myTrips")
-    fun getAllMyTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
+    fun getAllMyTripsByUser(
+        req: HttpServletRequest,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int
+    ): ResponseEntity<Map<String, Any>> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getAllMyTripsByUser(memberId)
+        val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+        val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
         return ResponseEntity.ok(findTrips)
     }
 
