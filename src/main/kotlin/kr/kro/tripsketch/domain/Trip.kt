@@ -35,6 +35,7 @@ data class Trip(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
+    var deletedUserId: String? = null,
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList()
