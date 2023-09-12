@@ -67,8 +67,8 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/nickname")
-    fun getTripByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
-        val findTrips = tripService.getTripByNickname(nickname)
+    fun getTripsByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
+        val findTrips = tripService.getTripsByNickname(nickname)
         return ResponseEntity.ok(findTrips)
     }
 
