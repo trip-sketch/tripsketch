@@ -72,6 +72,13 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(findTrips)
     }
 
+    // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터
+    @GetMapping("/guest/tripAndComments/{tripId}")
+    fun getTripAndCommentsByTripId(@PathVariable tripId: String,): ResponseEntity<TripAndCommentResponseDto> {
+        val findTripAndComment = tripService.getTripAndCommentsIsPublicByTripIdGuest(tripId)
+        return ResponseEntity.ok(findTripAndComment)
+    }
+
     // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
     @GetMapping("/nickname/trips/categories")
     fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
