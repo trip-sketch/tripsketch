@@ -325,21 +325,21 @@ class TripService(
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val followingUsers = followRepository.findByFollower(userId)
-            .filter { it.following != userId && it.following.isNotEmpty() }
+            .filter { it.following != userId }
             .map { it.following }
         if (followingUsers.isEmpty()) {
             return emptyList()
         }
-//        return tripRepository.findTripsByUserId(followingUsers).map { trip -> fromTrip(trip, userId, false) }
-        val latestTrips = mutableListOf<TripDto>()
-
-        for (followingUser in followingUsers) {
-            val latestTrip = tripRepository.findLatestTripByUserId(followingUser)
-            latestTrip?.let {
-                latestTrips.add(fromTrip(it, userId))
+        println(followingUsers)
+        val tripDtoList = mutableListOf<TripDto>()
+        followingUsers.forEach { followingUserId ->
+            val findLatestTrip = tripRepository.findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(followingUserId)
+            if (findLatestTrip != null) {
+                tripDtoList.add(fromTrip(findLatestTrip, userId))
             }
         }
-        return latestTrips
+        println(tripDtoList)
+        return tripDtoList
     }
 
     fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripDto> {

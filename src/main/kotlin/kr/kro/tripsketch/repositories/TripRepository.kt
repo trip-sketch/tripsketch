@@ -51,6 +51,9 @@ interface TripRepository : MongoRepository<Trip, String> {
 
     fun findLatestTripByUserId(userId: String): Trip?
 
+    // 최신 게시물 하나를 찾는 쿼리
+    fun findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(userId: String): Trip?
+
     @Query("{" +
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +

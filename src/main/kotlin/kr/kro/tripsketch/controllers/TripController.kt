@@ -200,9 +200,10 @@ class TripController(private val tripService: TripService) {
 
     @GetMapping("/list/following")
     fun getListFollowingTrips(req: HttpServletRequest): ResponseEntity<Any> {
-        val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getListFollowingTrips(memberId)
         return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val findTrips = tripService.getListFollowingTrips(memberId)
+            println(findTrips)
             if (findTrips.isNotEmpty()) {
                 ResponseEntity.ok(findTrips)
             } else {
