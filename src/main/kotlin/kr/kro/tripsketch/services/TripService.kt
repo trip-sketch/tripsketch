@@ -7,6 +7,7 @@ import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -116,7 +117,7 @@ class TripService(
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
         val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
-        val commentDtoList = commentService.getCommentsByTripId(id)
+        val commentDtoList = commentService.getCommentsGuestByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
 
@@ -420,7 +421,15 @@ class TripService(
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        if (findTrip.userId == userId) {
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
+        if (memberId in adminIds) {
+            findTrip.isHidden = true
+            findTrip.deletedAt = LocalDateTime.now()
+            tripRepository.save(findTrip)
+            return
+        }
+        if (findTrip.userId == userId) { // 'findTrip.userId == user.id' 조건은 항상 false입니다 ?
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)

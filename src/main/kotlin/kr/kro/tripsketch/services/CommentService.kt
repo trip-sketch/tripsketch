@@ -34,12 +34,19 @@ class CommentService(
     }
 
 
-    fun getCommentsByTripId(tripId: String): List<CommentDto> {
+    fun getCommentsGuestByTripId(tripId: String): List<CommentDto> {
         val trip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         if (trip.isPublic == false) {
             throw IllegalArgumentException("해당 게시글의 접근 권한이 없습니다. ")
         }
+        val comments = commentRepository.findAllByTripId(tripId)
+        return comments.map { fromComment(it, userService) }
+    }
+
+    fun getCommentsAdminByTripId(tripId: String): List<CommentDto> {
+        val trip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val comments = commentRepository.findAllByTripId(tripId)
         return comments.map { fromComment(it, userService) }
     }
