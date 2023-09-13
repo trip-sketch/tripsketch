@@ -11,6 +11,7 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -23,11 +24,25 @@ class NotificationService(
 
     private val client = OkHttpClient()
 
+    // Notification Service
     fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
         val userId = userService.getUserIdByMemberId(memberId)
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
-        return notificationRepository.findByReceiverId(userId, pageable)
+        val notificationsPage = notificationRepository.findByReceiverId(userId, pageable)
+
+        val updatedNotifications = notificationsPage.content.map { notification ->
+            notification.senderId?.let { senderId ->
+                val senderUser = userService.findUserById(senderId) // findUserById 메서드는 senderId로 사용자를 찾는 메서드입니다.
+                val currentNickname = senderUser?.nickname
+                notification.nickname = currentNickname  // 현재 닉네임으로 업데이트
+            }
+            notification
+        }
+
+        // 업데이트된 Notification 리스트로 새로운 Page 객체 생성
+        return PageImpl(updatedNotifications, pageable, notificationsPage.totalElements)
     }
+
 
     fun deleteNotificationById(notificationId: String, memberId: Long) {
         val userId = userService.getUserIdByMemberId(memberId)
@@ -45,6 +60,7 @@ class NotificationService(
         ids: List<String>,
         title: String,
         body: String,
+        senderId: String? = null,
         commentId: String? = null,
         parentId: String? = null,
         tripId: String? = null,
@@ -59,6 +75,7 @@ class NotificationService(
                 receiverId = receiverId,
                 title = title,
                 body = body,
+                senderId = senderId,
                 commentId = commentId,
                 parentId = parentId,
                 tripId = tripId,
