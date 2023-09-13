@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.services
 
+import kr.kro.tripsketch.domain.HashtagInfo
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.DataNotFoundException
@@ -8,6 +9,7 @@ import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Pageable
+import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -31,6 +33,19 @@ class TripService(
             throw IllegalArgumentException("시작일은 종료일보다 같거나 그 이전이어야 합니다.")
         }
         val uploadedImageUrls = images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+
+        val hashtagInfo = HashtagInfo(
+            countryCode = tripCreateDto.countryCode,
+            country = tripCreateDto.country,
+            city = tripCreateDto.city,
+            municipality = tripCreateDto.municipality,
+            name = tripCreateDto.name,
+            displayName = tripCreateDto.displayName,
+            road = tripCreateDto.road,
+            address = tripCreateDto.address,
+            etc = tripCreateDto.etc
+        )
+
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
@@ -40,10 +55,12 @@ class TripService(
             endAt = endAt,
             latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
-            hashtagInfo = tripCreateDto.hashtagInfo,
+            hashtagInfo = hashtagInfo,
             isPublic = tripCreateDto.isPublic,
-            images = uploadedImageUrls
+            images = uploadedImageUrls,
+
         )
+
         val createdTrip = tripRepository.save(newTrip)
         val userId = userRepository.findByMemberId(memberId)?.id ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val follower = followRepository.findByFollowing(userId)
@@ -129,7 +146,7 @@ class TripService(
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
         val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
-        val commentDtoList = commentService.getCommentsByTripId(id)
+        val commentDtoList = commentService.getCommentsGuestByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
 
@@ -429,17 +446,22 @@ class TripService(
     }
 
     fun deleteTripById(memberId: Long, id: String) {
-        val findTrip = tripRepository.findByIsHiddenIsFalseAndId(id)
+        val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
-        val findUser = userService.findUserByMemberId(memberId)
+        val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val userId = findUser.id
-        val userDto = userService.toDto(findUser, true)
-        val isAdmin = userDto.isAdmin
-        if (findTrip.userId == memberId.toString() || isAdmin == true) {    //memberId 수정 필요
+        val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
+        val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
+        if (memberId in adminIds) {
+            commentService.deleteAllCommentsAdminByTripId(id)
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
-            findTrip.deletedUserId = userId
+            tripRepository.save(findTrip)
+            return
+        }
+        if (findTrip.userId == userId) { // 'findTrip.userId == user.id' 조건은 항상 false입니다 ?
+            findTrip.isHidden = true
+            findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
         } else {
             throw IllegalAccessException("삭제할 권한이 없습니다.")
@@ -458,8 +480,8 @@ class TripService(
         val hashtags = mutableSetOf<String>()
         trip.hashtagInfo?.let { hashtagInfo ->
             with(hashtagInfo) {
-                val nonEmptyFields = listOf(countryCode, country, city, municipality, name, displayName, road, address)
-                hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() })
+                val nonEmptyFields = listOf( country, city, municipality, name, road, address)
+                hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() && it != "undefined" })
                 etc?.let {
                     hashtags.addAll(it)
                 }

@@ -12,6 +12,8 @@ data class Notification(
 
     var receiverId: String,
 
+    var senderId: String?,
+
     var title: String,
 
     var body: String,
