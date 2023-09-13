@@ -228,18 +228,17 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    @PatchMapping("/{id}", consumes = ["multipart/form-data"])
+    @PutMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @RequestPart("tripUpdateDto") tripUpdateDto: TripUpdateDto,
-        @RequestPart("images") images: List<MultipartFile>?
+        @Validated @ModelAttribute tripUpdateDto: TripUpdateDto
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
-                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto, images)
+                val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
                 ResponseEntity.notFound().build()
@@ -250,6 +249,7 @@ class TripController(private val tripService: TripService) {
             throw ForbiddenException("수정할 권한이 없습니다. ${e.message}")
         }
     }
+
 
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
