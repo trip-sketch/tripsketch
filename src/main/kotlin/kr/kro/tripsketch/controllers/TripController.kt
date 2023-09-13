@@ -44,9 +44,9 @@ class TripController(private val tripService: TripService) {
             val findTrips = tripService.getAllTrips(memberId, pageable)
             ResponseEntity.ok(findTrips)
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "") as Any))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: DataNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "") as Any))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
         }
     }
 
