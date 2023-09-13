@@ -323,7 +323,27 @@ class TripService(
         return fromTrip(findTrip, "")
     }
 
-    fun getListFollowingTrips(memberId: Long): List<TripCardDto> {
+//    fun getListFollowingTrips(memberId: Long): List<TripCardDto> {
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//        val followingUsers = followRepository.findByFollower(userId)
+//            .filter { it.following != userId }
+//            .map { it.following }
+//        if (followingUsers.isEmpty()) {
+//            throw DataNotFoundException("구독한 게시물이 없습니다.")
+//        }
+//        val tripDtoList = mutableListOf<TripCardDto>()
+//        followingUsers.forEach { followingUserId ->
+//            val findLatestTrip = tripRepository.findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(followingUserId)
+//            if (findLatestTrip != null) {
+//                tripDtoList.add(fromTripToTripCardDto(findLatestTrip, userId))
+//            }
+//        }
+//        tripDtoList.sortWith(compareBy<TripCardDto> { it.views }.thenByDescending { it.createdAt })
+//        return tripDtoList
+//    }
+
+    fun getListFollowingTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val followingUsers = followRepository.findByFollower(userId)
@@ -340,7 +360,29 @@ class TripService(
             }
         }
         tripDtoList.sortWith(compareBy<TripCardDto> { it.views }.thenByDescending { it.createdAt })
-        return tripDtoList
+
+        // 페이징 처리
+        val startIndex = pageable.pageNumber * pageable.pageSize
+        val endIndex = Math.min(startIndex + pageable.pageSize, tripDtoList.size)
+        val currentPage = pageable.pageNumber + 1
+        val totalPage = Math.ceil(tripDtoList.size.toDouble() / pageable.pageSize).toInt()
+        val postsPerPage = pageable.pageSize
+
+        if (currentPage <= totalPage && tripDtoList.isEmpty()) {
+            throw DataNotFoundException("작성한 게시글이 존재하지 않습니다.")
+        } else if (currentPage > totalPage) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
+
+        // 페이지 정보와 자른 결과를 반환합니다.
+        val pagedTripDtoList = tripDtoList.subList(startIndex, endIndex)
+
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to pagedTripDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage
+        )
     }
 
     fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripDto> {
@@ -435,7 +477,6 @@ class TripService(
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }
     }
-
 
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
