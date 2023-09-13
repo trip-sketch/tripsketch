@@ -238,13 +238,21 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam keyword: String,
         @RequestParam sorting: Int
-    ): ResponseEntity<List<TripDto>> {
+    ): ResponseEntity<Any> {
+//    ): ResponseEntity<List<TripDto>> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
-            ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            if (findTrips.isNotEmpty()) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+            }
         } catch (ex: IllegalArgumentException) {
+            println("에러 발생: ${ex.message}") // 예외 메시지 출력
             ResponseEntity.notFound().build()
+        } catch (e: DataNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         }
     }
 

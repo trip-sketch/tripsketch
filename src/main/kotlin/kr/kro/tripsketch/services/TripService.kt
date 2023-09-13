@@ -376,32 +376,26 @@ class TripService(
             "totalPages" to totalPage
         )
     }
-
     fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripDto> {
-        try {
-            val userId = userRepository.findByMemberId(memberId)?.id
-                ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-            val sort: Sort = when (sorting) {
-                1 -> Sort.by(Sort.Order.desc("createdAt"))
-                -1 -> Sort.by(Sort.Order.asc("createdAt"))
-                2 -> Sort.by(Sort.Order.desc("likes"))
-                else -> Sort.unsorted()
-            }
-
-            val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-            if (findTrips.isEmpty()) {
-                throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-            }
-
-            val tripDtoList = mutableListOf<TripDto>()
-            findTrips.forEach { trip ->
-                tripDtoList.add(fromTrip(trip, userId))
-            }
-            return tripDtoList
-        } catch (ex: Exception) {
-            println("에러 발생: ${ex.message}")
-            throw ex
+        val userId = userRepository.findByMemberId(memberId)?.id
+            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+        val sort: Sort = when (sorting) {
+            1 -> Sort.by(Sort.Order.desc("createdAt"))
+            -1 -> Sort.by(Sort.Order.asc("createdAt"))
+            2 -> Sort.by(Sort.Order.desc("likes"))
+            else -> Sort.unsorted()
         }
+
+        val findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//        if (findTrips.isEmpty()) {
+//            throw DataNotFoundException("조회되는 게시물이 없습니다.")
+//        }
+
+        val tripDtoList = mutableListOf<TripDto>()
+        findTrips.forEach { trip ->
+            tripDtoList.add(fromTrip(trip, userId))
+        }
+        return tripDtoList
     }
 
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
