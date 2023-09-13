@@ -8,6 +8,7 @@ data class TripCardDto(
     val profileImageUrl: String? = "" ,
     var title: String,
     var likes: Int?,
+    var views: Int?,
     var comments: Int?,
     var countryCode: String? = "",       // HashtagInfo
     var country: String? = "",            // HashtagInfo
