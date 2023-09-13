@@ -404,32 +404,32 @@ class TripService(
 
             findTrip.isPublic = tripUpdateDto.isPublic ?: findTrip.isPublic
 
-            // 이미지 처리 로직
-            tripUpdateDto.images?.let { images ->
-                // 기존 이미지와 새로운 이미지 리스트를 비교해서 삭제된 이미지를 찾습니다.
-                val removedImages = (findTrip.images ?: emptyList()).filter { it !in images }
-                for (oldImageUrl in removedImages) {
+            // 삭제될 이미지 처리
+            tripUpdateDto.deletedImageUrls?.let { deletedUrls ->
+                val currentImages = (findTrip.images ?: emptyList()).toMutableList()
+                for (url in deletedUrls) {
                     try {
-                        imageService.deleteImage(oldImageUrl)
+                        imageService.deleteImage(url)
+                        currentImages.remove(url)  // 이미지 URL을 리스트에서 제거합니다.
                     } catch (e: Exception) {
-                        println("이미지 삭제에 실패했습니다. URL: $oldImageUrl, 오류: ${e.message}")
+                        println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
                     }
                 }
+                findTrip.images = currentImages
+            }
 
-                // 새로 추가된 이미지를 스토리지에 업로드합니다.
+            // 새로운 이미지 처리
+            tripUpdateDto.images?.let { images ->
                 val updatedImages = (findTrip.images ?: emptyList()).toMutableList()
                 for (newImage in images) {
-                    if (newImage is MultipartFile && !updatedImages.contains(newImage.originalFilename)) {
-                        val newImageUrl = imageService.uploadImage("tripsketch/trip-sketching", newImage)
-                        updatedImages.add(newImageUrl)
-                    }
+                    val newImageUrl = imageService.uploadImage("tripsketch/trip-sketching", newImage)
+                    updatedImages.add(newImageUrl)
                 }
                 findTrip.images = updatedImages
             }
 
-
             val updatedTrip = tripRepository.save(findTrip)
-            return fromTrip(updatedTrip, userId) // 'fromTrip' 함수는 DTO를 생성하는 함수라고 가정합니다.
+            return fromTrip(updatedTrip, userId)
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }
