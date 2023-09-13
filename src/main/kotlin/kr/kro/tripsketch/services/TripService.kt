@@ -328,9 +328,8 @@ class TripService(
             .filter { it.following != userId }
             .map { it.following }
         if (followingUsers.isEmpty()) {
-            return emptyList()
+            throw DataNotFoundException("구독한 게시물이 없습니다.")
         }
-        println(followingUsers)
         val tripDtoList = mutableListOf<TripDto>()
         followingUsers.forEach { followingUserId ->
             val findLatestTrip = tripRepository.findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(followingUserId)
@@ -338,12 +337,7 @@ class TripService(
                 tripDtoList.add(fromTrip(findLatestTrip, userId))
             }
         }
-
-//        tripDtoList.sortByDescending { it.views }
-        // 조회수를 내림차순으로 정렬하고, 조회수가 같은 경우 createdAt을 내림차순으로 정렬
         tripDtoList.sortWith(compareBy<TripDto> { it.views }.thenByDescending { it.createdAt })
-
-        println(tripDtoList)
         return tripDtoList
     }
 

@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/trip")
@@ -203,14 +202,15 @@ class TripController(private val tripService: TripService) {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getListFollowingTrips(memberId)
-            println(findTrips)
             if (findTrips.isNotEmpty()) {
-                ResponseEntity.ok(findTrips)
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: IllegalAccessException) {
+        } catch (e: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
+        } catch (e: DataNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         }
     }
 
