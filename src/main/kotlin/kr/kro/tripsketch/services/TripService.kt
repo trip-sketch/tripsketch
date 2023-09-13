@@ -394,7 +394,7 @@ class TripService(
 //        return tripDtoList
 //    }
 
-    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripDto> {
+    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripCardDto> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
 
@@ -417,9 +417,10 @@ class TripService(
                 findTrips = tripRepository.findTripsByKeyword(keyword, sort)
             }
         }
-        val tripDtoList = mutableListOf<TripDto>()
+        val tripDtoList = mutableListOf<TripCardDto>()
         findTrips.forEach { trip ->
-            tripDtoList.add(fromTrip(trip, userId))
+//            tripDtoList.add(fromTrip(trip, userId))
+            tripDtoList.add(fromTripToTripCardDto(trip, userId))
         }
         return tripDtoList
     }
