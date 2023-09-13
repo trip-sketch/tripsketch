@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
-class S3Service(private val s3Client: S3Client, private val s3Presigner: S3Presigner) {
+class S3Service(private val s3Client: S3Client) {
 
     @Value("\${aws.region}")
     lateinit var region: String
