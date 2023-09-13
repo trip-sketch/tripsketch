@@ -323,7 +323,7 @@ class TripService(
         return fromTrip(findTrip, "")
     }
 
-    fun getListFollowingTrips(memberId: Long): List<TripDto> {
+    fun getListFollowingTrips(memberId: Long): List<TripCardDto> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val followingUsers = followRepository.findByFollower(userId)
@@ -332,14 +332,14 @@ class TripService(
         if (followingUsers.isEmpty()) {
             throw DataNotFoundException("구독한 게시물이 없습니다.")
         }
-        val tripDtoList = mutableListOf<TripDto>()
+        val tripDtoList = mutableListOf<TripCardDto>()
         followingUsers.forEach { followingUserId ->
             val findLatestTrip = tripRepository.findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(followingUserId)
             if (findLatestTrip != null) {
-                tripDtoList.add(fromTrip(findLatestTrip, userId))
+                tripDtoList.add(fromTripToTripCardDto(findLatestTrip, userId))
             }
         }
-        tripDtoList.sortWith(compareBy<TripDto> { it.views }.thenByDescending { it.createdAt })
+        tripDtoList.sortWith(compareBy<TripCardDto> { it.views }.thenByDescending { it.createdAt })
         return tripDtoList
     }
 
@@ -548,7 +548,7 @@ class TripService(
     fun fromTripToTripCardDto(trip: Trip, currentUserId: String): TripCardDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
-        val comments = commentRepository.countCommentsByTripId(trip.id!!)
+        val comments = commentRepository.countCommentsByTripId(trip.id!!) ?: 0
         val hashtags = trip.hashtagInfo
         val countryCode = hashtags?.countryCode ?: ""
         val country = hashtags?.country ?: ""
@@ -564,6 +564,7 @@ class TripService(
             profileImageUrl = profileImageUrl,
             title = trip.title,
             likes = trip.likes,
+            views = trip.views,
             comments = comments,
             countryCode = countryCode,
             country = country,
