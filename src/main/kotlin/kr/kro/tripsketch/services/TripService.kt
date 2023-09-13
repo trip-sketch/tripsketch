@@ -8,8 +8,8 @@ import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
-import org.springframework.data.domain.Pageable
 import kr.kro.tripsketch.utils.EnvLoader
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -505,7 +505,6 @@ class TripService(
             createdAt = trip.createdAt,
             updatedAt = trip.updatedAt,
             deletedAt = trip.deletedAt,
-            tripLikes = trip.tripLikes,
             isLiked = isLiked,
             images = trip.images
         )
