@@ -451,7 +451,7 @@ class TripService(
         val hashtags = mutableSetOf<String>()
         trip.hashtagInfo?.let { hashtagInfo ->
             with(hashtagInfo) {
-                val nonEmptyFields = listOf(countryCode, country, city, municipality, name, displayName, road, address)
+                val nonEmptyFields = listOf( country, city, municipality, name, road, address)
                 hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() })
                 etc?.let {
                     hashtags.addAll(it)
