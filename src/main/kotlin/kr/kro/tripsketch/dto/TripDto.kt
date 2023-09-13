@@ -29,7 +29,6 @@ data class TripDto(
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
-    var tripLikes: MutableSet<String> = mutableSetOf(),
     var images: List<String>? = emptyList(),
     var isLiked: Boolean,
 )
