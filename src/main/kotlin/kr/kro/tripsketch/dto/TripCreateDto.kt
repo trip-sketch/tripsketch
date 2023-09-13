@@ -19,7 +19,6 @@ data class TripCreateDto(
     var isPublic: Boolean? = true,
     var latitude: Double? = null,
     var longitude: Double? = null,
-    var hashtagInfo: HashtagInfo? = null,
     var images: List<MultipartFile>? = null,
     var countryCode: String? = null,
     var country: String? = null,
