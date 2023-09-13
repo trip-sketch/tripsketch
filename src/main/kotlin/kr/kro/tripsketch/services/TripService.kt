@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.services
 
+import kr.kro.tripsketch.domain.HashtagInfo
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.ForbiddenException
@@ -30,6 +31,19 @@ class TripService(
             throw IllegalArgumentException("시작일은 종료일보다 같거나 그 이전이어야 합니다.")
         }
         val uploadedImageUrls = images?.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
+
+        val hashtagInfo = HashtagInfo(
+            countryCode = tripCreateDto.countryCode,
+            country = tripCreateDto.country,
+            city = tripCreateDto.city,
+            municipality = tripCreateDto.municipality,
+            name = tripCreateDto.name,
+            displayName = tripCreateDto.displayName,
+            road = tripCreateDto.road,
+            address = tripCreateDto.address,
+            etc = tripCreateDto.etc
+        )
+
         val newTrip = Trip(
             userId = user.id!!,
             title = tripCreateDto.title,
@@ -39,12 +53,13 @@ class TripService(
             endAt = endAt,
             latitude = tripCreateDto.latitude,
             longitude = tripCreateDto.longitude,
-            hashtagInfo = tripCreateDto.hashtagInfo,
+            hashtagInfo = hashtagInfo,
             isPublic = tripCreateDto.isPublic,
-            images = uploadedImageUrls
-        )
-        val createdTrip = tripRepository.save(newTrip)
+            images = uploadedImageUrls,
 
+        )
+
+        val createdTrip = tripRepository.save(newTrip)
         val userId = userRepository.findByMemberId(memberId)?.id ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val follower = followRepository.findByFollowing(userId)
         val filteredFollower = follower.filter { it.follower != userId }

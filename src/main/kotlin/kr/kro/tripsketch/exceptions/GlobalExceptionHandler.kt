@@ -41,4 +41,9 @@ class GlobalExceptionHandler {
         }
         return ResponseEntity(errors, HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(DataNotFoundException::class)
+    fun handleDataNotFoundException(e: DataNotFoundException): ResponseEntity<String> {
+        return ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+    }
 }
