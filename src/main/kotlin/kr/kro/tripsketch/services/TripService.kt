@@ -424,6 +424,7 @@ class TripService(
         val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
         if (memberId in adminIds) {
+            commentService.deleteAllCommentsAdminByTripId(id)
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
