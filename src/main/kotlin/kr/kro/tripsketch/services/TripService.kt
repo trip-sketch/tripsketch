@@ -369,81 +369,72 @@ class TripService(
         }
     }
 
-    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto, images: List<MultipartFile>?): TripDto {
+    fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
 
         if (findTrip.userId == userId) {
-            tripUpdateDto.title.let {
-                if (it != findTrip.title) {
-                    findTrip.title = it
-                }
-            }
-            tripUpdateDto.content.let {
-                if (it != findTrip.content) {
-                    findTrip.content = it
-                }
-            }
-            tripUpdateDto.location?.let {
-                if (it != findTrip.location) {
-                    findTrip.location = it
-                }
-            }
-            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(
-                    tripUpdateDto.endAt
-                )
-            ) {
+            findTrip.title = tripUpdateDto.title
+            findTrip.content = tripUpdateDto.content
+            findTrip.location = tripUpdateDto.location ?: findTrip.location
+            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
-            tripUpdateDto.startedAt?.let {
-                if (it != findTrip.startedAt) {
-                    findTrip.startedAt = it
-                }
+            findTrip.startedAt = tripUpdateDto.startedAt
+            findTrip.endAt = tripUpdateDto.endAt
+            findTrip.latitude = tripUpdateDto.latitude ?: findTrip.latitude
+            findTrip.longitude = tripUpdateDto.longitude ?: findTrip.longitude
+
+            // HashtagInfo 업데이트 로직
+            tripUpdateDto.countryCode?.let {
+                findTrip.hashtagInfo = HashtagInfo(
+                    countryCode = tripUpdateDto.countryCode,
+                    country = tripUpdateDto.country,
+                    city = tripUpdateDto.city,
+                    municipality = tripUpdateDto.municipality,
+                    name = tripUpdateDto.name,
+                    displayName = tripUpdateDto.displayName,
+                    road = tripUpdateDto.road,
+                    address = tripUpdateDto.address,
+                    etc = tripUpdateDto.etc ?: emptySet()
+                )
             }
-            tripUpdateDto.endAt?.let {
-                if (it != findTrip.endAt) {
-                    findTrip.endAt = it
-                }
-            }
-            tripUpdateDto.latitude?.let {
-                if (it != findTrip.latitude) {
-                    findTrip.latitude = it
-                }
-            }
-            tripUpdateDto.longitude?.let {
-                if (it != findTrip.longitude) {
-                    findTrip.longitude = it
-                }
-            }
-            tripUpdateDto.hashtagInfo?.let {
-                if (it != findTrip.hashtagInfo) {
-                    findTrip.hashtagInfo = it
-                }
-            }
-            tripUpdateDto.isPublic?.let {
-                if (it != findTrip.isPublic) {
-                    findTrip.isPublic = it
-                }
-            }
-            images?.let { newImages ->
-                findTrip.images?.forEach { oldImageUrl ->
+
+            findTrip.isPublic = tripUpdateDto.isPublic ?: findTrip.isPublic
+
+            // 이미지 처리 로직
+            tripUpdateDto.images?.let { images ->
+                // 기존 이미지와 새로운 이미지 리스트를 비교해서 삭제된 이미지를 찾습니다.
+                val removedImages = (findTrip.images ?: emptyList()).filter { it !in images }
+                for (oldImageUrl in removedImages) {
                     try {
                         imageService.deleteImage(oldImageUrl)
                     } catch (e: Exception) {
-                        println("이미지 삭제에 실패하였습니다. URL: $oldImageUrl, 오류: {$e.message}")
+                        println("이미지 삭제에 실패했습니다. URL: $oldImageUrl, 오류: ${e.message}")
                     }
                 }
-                val uploadedImageUrls = newImages.map { imageService.uploadImage("tripsketch/trip-sketching", it) }
-                findTrip.images = uploadedImageUrls
+
+                // 새로 추가된 이미지를 스토리지에 업로드합니다.
+                val updatedImages = (findTrip.images ?: emptyList()).toMutableList()
+                for (newImage in images) {
+                    if (newImage is MultipartFile && !updatedImages.contains(newImage.originalFilename)) {
+                        val newImageUrl = imageService.uploadImage("tripsketch/trip-sketching", newImage)
+                        updatedImages.add(newImageUrl)
+                    }
+                }
+                findTrip.images = updatedImages
             }
+
+
             val updatedTrip = tripRepository.save(findTrip)
-            return fromTrip(updatedTrip, userId)
+            return fromTrip(updatedTrip, userId) // 'fromTrip' 함수는 DTO를 생성하는 함수라고 가정합니다.
         } else {
             throw IllegalAccessException("수정할 권한이 없습니다.")
         }
     }
+
 
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
