@@ -45,11 +45,25 @@ class CommentService(
     }
 
     fun getCommentsAdminByTripId(tripId: String): List<CommentDto> {
-        val trip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
+        tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val comments = commentRepository.findAllByTripId(tripId)
         return comments.map { fromComment(it, userService) }
     }
+
+    // 트립 id 로 모든 댓글 hardDelete
+    fun deleteAllCommentsAdminByTripId(tripId: String) {
+        val commentsToDelete = getCommentsAdminByTripId(tripId)
+
+        commentsToDelete.forEach { commentDto ->
+            // commentDto에서 댓글의 ID를 가져온다.
+            val commentId = commentDto.id
+
+            // 댓글을 삭제합니다.
+            commentId?.let { commentRepository.deleteById(it) }
+        }
+    }
+
 
 //    fun getCommentsByUserId(userId: String): List<CommentDto> {
 //        return commentRepository.findAllByUserId(userId).map { fromComment(it, userService) }
@@ -140,10 +154,6 @@ class CommentService(
         val mentionedUser =
             userRepository.findByNickname(commentChildrenCreateDto.replyToNickname)
                 ?: throw IllegalArgumentException("해당 언급 된 사용자 존재하지 않습니다.")
-
-//        if (mentionedUser.email.endsWith("@delete.com")) {
-//            throw BadRequestException("해당 언급 된 사용자는 없습니다.")
-//        }
 
         val childComment = Comment(
             id = ObjectId().toString(), // 새로운 ObjectId 생성
