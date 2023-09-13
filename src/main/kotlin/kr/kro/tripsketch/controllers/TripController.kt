@@ -6,6 +6,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
+import kr.kro.tripsketch.utils.PagenationUtil
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -222,7 +223,9 @@ class TripController(private val tripService: TripService) {
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val pageable: Pageable = PageRequest.of(page-1, size)
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
             val findTrips = tripService.getListFollowingTrips(memberId, pageable)
             if (findTrips.isNotEmpty()) {
                 ResponseEntity.status(HttpStatus.OK).body(findTrips)
