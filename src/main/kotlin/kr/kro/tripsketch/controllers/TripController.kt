@@ -198,23 +198,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-//    @GetMapping("/list/following")
-//    fun getListFollowingTrips(req: HttpServletRequest): ResponseEntity<Any> {
-//        return try {
-//            val memberId = req.getAttribute("memberId") as Long
-//            val findTrips = tripService.getListFollowingTrips(memberId)
-//            if (findTrips.isNotEmpty()) {
-//                ResponseEntity.status(HttpStatus.OK).body(findTrips)
-//            } else {
-//                ResponseEntity.notFound().build()
-//            }
-//        } catch (e: IllegalAccessException) {
-//            ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
-//        } catch (e: DataNotFoundException) {
-//            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
-//        }
-//    }
-
     @GetMapping("/list/following")
     fun getListFollowingTrips(
         req: HttpServletRequest,
