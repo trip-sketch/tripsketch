@@ -424,6 +424,7 @@ class TripService(
         val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
         if (memberId in adminIds) {
+            commentService.deleteAllCommentsAdminByTripId(id)
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
@@ -450,7 +451,7 @@ class TripService(
         val hashtags = mutableSetOf<String>()
         trip.hashtagInfo?.let { hashtagInfo ->
             with(hashtagInfo) {
-                val nonEmptyFields = listOf(countryCode, country, city, municipality, name, displayName, road, address)
+                val nonEmptyFields = listOf( country, city, municipality, name, road, address)
                 hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() })
                 etc?.let {
                     hashtags.addAll(it)
