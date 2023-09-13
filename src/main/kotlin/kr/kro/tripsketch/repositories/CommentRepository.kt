@@ -23,5 +23,5 @@ interface CommentRepository : MongoRepository<Comment, String> {
     fun findAllByParentId(parentId: String): List<Comment>
 
     @Query("{'tripId': ?0}")
-    fun countCommentsByTripId(tripId: String): Int
+    fun countCommentsByTripId(tripId: String): Int? = 0
 }
