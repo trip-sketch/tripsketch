@@ -64,4 +64,14 @@ interface TripRepository : MongoRepository<Trip, String> {
             "}",
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
+
+    @Query("{" +
+            "\$or: [" +
+            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
+            "   { 'content': { \$regex: ?0, \$options: 'i' } }" +
+            "]," +
+            "'isPublic': true, 'isHidden': false" +
+            "}")
+    fun findTripsByKeywordWithLikes(keyword: String, sorting: Sort = Sort.by(Sort.Order.desc("likes"))): List<Trip>
+
 }
