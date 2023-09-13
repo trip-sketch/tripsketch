@@ -139,11 +139,25 @@ class TripService(
         return findTrips.map { fromTrip(it, "") }.toSet()
     }
 
-    fun getTripsByNickname(nickname: String): Set<TripDto> {
+    fun getTripsByNickname(nickname: String, pageable: Pageable): Map<String, Any> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
-        val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsHiddenIsFalse(it) }
+        val findTrips = user.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(it, pageable) }
             ?: throw IllegalArgumentException("작성한 게시글이 존재하지 않습니다.")
-        return findTrips.map { fromTrip(it, "") }.toSet()
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, user.id) }
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+        if (currentPage <= totalPage && findTrips.isEmpty) {
+            throw DataNotFoundException("작성한 게시글이 존재하지 않습니다.")
+        } else if (currentPage > totalPage) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage
+        )
     }
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
