@@ -91,9 +91,20 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/nickname")
-    fun getTripsByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
-        val findTrips = tripService.getTripsByNickname(nickname)
-        return ResponseEntity.ok(findTrips)
+    fun getTripsByNickname(
+        @RequestParam nickname: String,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int
+    ): ResponseEntity<Any> {
+        return try {
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, Sort.by("createdAt").descending())
+            val findTrips = tripService.getTripsByNickname(nickname, pageable)
+            return ResponseEntity.ok(findTrips)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+        }
     }
 
     // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터

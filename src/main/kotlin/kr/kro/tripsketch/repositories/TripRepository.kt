@@ -46,6 +46,7 @@ interface TripRepository : MongoRepository<Trip, String> {
     // email 조건이 맞으면서 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
+    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String, pageable: Pageable): Page<Trip>
 
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
