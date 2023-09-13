@@ -476,7 +476,6 @@ class TripService(
             createdAt = trip.createdAt,
             updatedAt = trip.updatedAt,
             deletedAt = trip.deletedAt,
-            tripLikes = trip.tripLikes,
             isLiked = isLiked,
             images = trip.images
         )
