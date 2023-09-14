@@ -59,13 +59,19 @@ class CommentService(
             // commentDto에서 댓글의 ID를 가져온다.
             val commentId = commentDto.id
 
+            val childCommentsToDelete = commentId?.let { getChildCommentsByParentId(it) }
+
+            // 자식 댓글을 삭제합니다.
+            childCommentsToDelete?.forEach { childCommentDto ->
+                childCommentDto.id?.let { commentRepository.deleteById(it) }
+            }
             // 댓글을 삭제합니다.
             commentId?.let { commentRepository.deleteById(it) }
         }
     }
 
 
-//    fun getCommentsByUserId(userId: String): List<CommentDto> {
+    //    fun getCommentsByUserId(userId: String): List<CommentDto> {
 //        return commentRepository.findAllByUserId(userId).map { fromComment(it, userService) }
 //    }
 //
@@ -77,9 +83,9 @@ class CommentService(
 //        return commentRepository.findAllByLikedByContains(userId).map { fromComment(it, userService) }
 //    }
 //
-//    fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
-//        return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
-//    }
+    fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
+        return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
+    }
 
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
@@ -269,9 +275,6 @@ class CommentService(
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(comment.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
 
-        if (comment.isDeleted) {
-            throw ForbiddenException("이미 삭제 된 댓글 입니다.")
-        }
         val commenter =
             userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
 
@@ -279,7 +282,6 @@ class CommentService(
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
         if (memberId in adminIds) {
-            // Soft delete 처리 부분으로 넘어감
             val deletedComment = comment.copy(
                 content = "삭제 된 댓글입니다.",
                 isDeleted = true,
@@ -287,7 +289,15 @@ class CommentService(
                 numberOfLikes = 0
             )
             commentRepository.save(deletedComment)
+//            // Soft delete 처리 부분으로 넘어감
+//            val commentId = comment.id
+//            // 댓글을 삭제합니다.
+//            commentId?.let { commentRepository.deleteById(it) }
             return
+        }
+
+        if (comment.isDeleted) {
+            throw ForbiddenException("이미 삭제 된 댓글 입니다.")
         }
 
         if (findTrip.isPublic == false && findTrip.userId != commenter.id) {
@@ -519,7 +529,7 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
                 toAddChildIndex++
             }
         }
-        totalIndex=currentIndex+toAddChildIndex
+        totalIndex = currentIndex + toAddChildIndex
 
         currentIndex++
     }
@@ -534,28 +544,6 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
     )
 }
 
-
-//fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
-//    val totalCommentsWithChildren = comments.sumOf { it.children.size + 1 }
-//    val startIndex = (page - 1) * pageSize
-//    val endIndex = minOf(startIndex + pageSize, totalCommentsWithChildren)
-//
-//    val paginatedComments = mutableListOf<CommentDto>()
-//
-//    var currentIndex = startIndex
-//    var addedComments = 0
-//
-//
-//
-//    val totalPage = (totalCommentsWithChildren + pageSize - 1) / pageSize
-//
-//    return mapOf(
-//        "comments" to paginatedComments,
-//        "currentPage" to page,
-//        "totalPage" to totalPage,
-//        "commentsPerPage" to pageSize
-//    )
-//}
 
 
 
