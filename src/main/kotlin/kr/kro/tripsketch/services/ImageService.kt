@@ -1,62 +1,95 @@
 package kr.kro.tripsketch.services
 
+import com.drew.imaging.ImageMetadataReader
+import com.drew.metadata.Metadata
+import com.drew.metadata.exif.ExifIFD0Directory
+import org.im4java.core.ConvertCmd
+import org.im4java.core.IMOperation
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.awt.geom.AffineTransform
+import java.awt.image.AffineTransformOp
 import java.net.URI
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
-import javax.imageio.ImageIO
-import java.util.*
-import javax.imageio.IIOImage
-import javax.imageio.ImageWriteParam
 
 
 @Service
 class ImageService(private val s3Service: S3Service) {
 
+    private fun rotateImageIfNeeded(image: BufferedImage, file: MultipartFile): BufferedImage {
+        try {
+            val metadata: Metadata? = ImageMetadataReader.readMetadata(ByteArrayInputStream(file.bytes))
+            val orientation = metadata?.getFirstDirectoryOfType(ExifIFD0Directory::class.java)?.getInt(ExifIFD0Directory.TAG_ORIENTATION)
+
+            val transform = AffineTransform()
+            when (orientation) {
+                1 -> { /* Normal, no rotation needed. */ return image }
+                2 -> { /* Flipped horizontally. */ transform.scale(-1.0, 1.0) }
+                3 -> { /* Upside-down. */ transform.rotate(Math.PI) }
+                4 -> { /* Flipped vertically. */ transform.scale(1.0, -1.0) }
+                5 -> { transform.rotate(Math.PI / 2) ; transform.scale(-1.0, 1.0) }
+                6 -> { transform.rotate(Math.PI / 2) }
+                7 -> { transform.rotate(Math.PI / 2) ; transform.scale(1.0, -1.0) }
+                8 -> { transform.rotate(-Math.PI / 2) }
+                else -> { return image }
+            }
+
+            val op = AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR)
+            return op.filter(image, null)
+        } catch (e: Exception) {
+            return image
+        }
+    }
+
     fun compressImage(file: MultipartFile): ByteArray {
         try {
             val formatName = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
 
-            val originalImage: BufferedImage
-            ByteArrayInputStream(file.bytes).use { bis ->
-                originalImage = ImageIO.read(bis)
-            }
+            // Create a temporary file to store the original image
+            val tempOriginalFile = File.createTempFile("original_", ".$formatName")
+            file.transferTo(tempOriginalFile)
 
-            val width = Math.round(originalImage.width * 0.5).toInt()
-            val height = Math.round(originalImage.height * 0.5).toInt()
+            val outputPath = tempOriginalFile.absolutePath + "_compressed.$formatName"
 
-            val compressedImageType = if (formatName.lowercase(Locale.getDefault()) in listOf("jpg", "jpeg")) BufferedImage.TYPE_INT_RGB else BufferedImage.TYPE_INT_ARGB
-            val compressedImage = BufferedImage(width, height, compressedImageType)
-            compressedImage.createGraphics().drawImage(originalImage, 0, 0, width, height, null)
+            val imOperation = IMOperation()
+            imOperation.addImage(tempOriginalFile.absolutePath)
 
-            ByteArrayOutputStream().use { os ->
-                when (formatName.lowercase(Locale.getDefault())) {
-                    "jpg", "jpeg" -> {
-                        val writer = ImageIO.getImageWritersByFormatName("jpeg").next()
-                        val param = writer.defaultWriteParam
-                        param.compressionMode = ImageWriteParam.MODE_EXPLICIT
-                        param.compressionQuality = 0.45f
-                        writer.output = ImageIO.createImageOutputStream(os)
-                        writer.write(null, IIOImage(compressedImage, null, null), param)
-                    }
-                    "png" -> {
-                        ImageIO.write(compressedImage, "png", os)
-                    }
-                    else -> {
-                        ImageIO.write(compressedImage, formatName, os)
-                    }
+            // Auto correct orientation
+            imOperation.autoOrient()
+
+            // Resize the image
+            imOperation.resize(50, 50, "%")
+
+            when (formatName.lowercase()) {
+                "jpg", "jpeg" -> {
+                    imOperation.quality(30.0) // set compression quality for JPEG
                 }
-                return os.toByteArray()
+                "png" -> {
+                    imOperation.quality(30.0) // set compression quality for PNG (optional, but can be useful)
+                }
             }
+
+            imOperation.addImage(outputPath)
+            val convertCmd = ConvertCmd()
+            convertCmd.run(imOperation)
+
+            // Read compressed image bytes
+            val compressedBytes = File(outputPath).readBytes()
+
+            // Cleanup temporary files
+            tempOriginalFile.delete()
+            File(outputPath).delete()
+
+            return compressedBytes
+
         } catch (e: Exception) {
-            throw RuntimeException("이미지 압축 실패", e)
+            // 압축 중 예외가 발생하면 원본 이미지 바이트를 반환
+            return file.bytes
         }
     }
-
 
 
     fun uploadImage(dir: String, file: MultipartFile): String {
