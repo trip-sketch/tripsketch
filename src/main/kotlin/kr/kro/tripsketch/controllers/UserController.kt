@@ -40,7 +40,7 @@ class UserController(private val userService: UserService, private val imageServ
         val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
-// 사용자 ID가 관리자 ID 리스트에 있는지 확인
+        // 사용자 ID가 관리자 ID 리스트에 있는지 확인
         val isAdmin = memberId in adminIds
 
         return if (user != null) {
