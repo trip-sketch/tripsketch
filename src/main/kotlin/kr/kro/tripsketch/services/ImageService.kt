@@ -1,6 +1,5 @@
 package kr.kro.tripsketch.services
 
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.net.URI
@@ -9,10 +8,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
-import javax.imageio.IIOImage
 import javax.imageio.ImageIO
-import javax.imageio.ImageWriteParam
-import ar.com.hjg.pngj.*
+import java.util.*
 
 
 @Service
@@ -27,41 +24,31 @@ class ImageService(private val s3Service: S3Service) {
                 originalImage = ImageIO.read(bis)
             }
 
-            val width = originalImage.width / 2
-            val height = originalImage.height / 2
+            // Convert the image to RGB colorspace if it's not.
+            val convertedImage = if (originalImage.type != BufferedImage.TYPE_INT_RGB && originalImage.type != BufferedImage.TYPE_INT_ARGB) {
+                val rgbImage = BufferedImage(originalImage.width, originalImage.height, BufferedImage.TYPE_INT_RGB)
+                rgbImage.createGraphics().apply {
+                    drawImage(originalImage, 0, 0, null)
+                    dispose()
+                }
+                rgbImage
+            } else {
+                originalImage
+            }
 
-            val compressedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-            compressedImage.createGraphics().drawImage(originalImage, 0, 0, width, height, null)
+            val width = Math.round(convertedImage.width * 0.5).toInt()
+            val height = Math.round(convertedImage.height * 0.5).toInt()
+
+            val compressedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+            compressedImage.createGraphics().drawImage(convertedImage, 0, 0, width, height, null)
 
             ByteArrayOutputStream().use { os ->
-                when {
-                    formatName.equals("jpg", true) || formatName.equals("jpeg", true) -> {
-                        val writer = ImageIO.getImageWritersByFormatName(formatName).next()
-                        val writeParam = writer.defaultWriteParam
-
-                        if (writeParam is JPEGImageWriteParam) {
-                            writeParam.compressionMode = ImageWriteParam.MODE_EXPLICIT
-                            writeParam.compressionQuality = 0.5f
-                        }
-
-                        ImageIO.createImageOutputStream(os).use { ios ->
-                            writer.output = ios
-                            writer.write(null, IIOImage(compressedImage, null, null), writeParam)
-                        }
+                when (formatName.lowercase(Locale.getDefault())) {
+                    "jpg", "jpeg" -> {
+                        ImageIO.write(compressedImage, "jpg", os)
                     }
-                    formatName.equals("png", true) -> {
-                        // PNG 압축 로직
-                        val imi = ImageInfo(width, height, 8, false)
-                        val pngWriter = PngWriter(os, imi)
-                        val db = ImageLineInt(imi)
-                        for (row in 0 until height) {
-                            for (col in 0 until width) {
-                                val pixel = compressedImage.getRGB(col, row)
-                                db.scanline[col] = pixel
-                            }
-                            pngWriter.writeRow(db, row)
-                        }
-                        pngWriter.end()
+                    "png" -> {
+                        ImageIO.write(compressedImage, "png", os)
                     }
                     else -> {
                         ImageIO.write(compressedImage, formatName, os)
@@ -74,6 +61,7 @@ class ImageService(private val s3Service: S3Service) {
             throw RuntimeException("Image compression failed", e)
         }
     }
+
 
     fun uploadImage(dir: String, file: MultipartFile): String {
         val compressedImageBytes = compressImage(file)
