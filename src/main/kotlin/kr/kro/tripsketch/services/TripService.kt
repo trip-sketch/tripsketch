@@ -407,6 +407,36 @@ class TripService(
         return tripDtoList
     }
 
+//    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripCardDto> {
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//
+//        val findTrips: List<Trip>
+//        when (sorting) {
+//            1 -> {
+//                val sort = Sort.by(Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//            -1 -> {
+//                val sort = Sort.by(Sort.Order.asc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//            2 -> {
+//                val sort = Sort.by(Sort.Order.desc("likes"), Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeywordWithLikes(keyword, sort)
+//            }
+//            else -> {
+//                val sort = Sort.by(Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//        }
+//        val tripDtoList = mutableListOf<TripCardDto>()
+//        findTrips.forEach { trip ->
+//            tripDtoList.add(fromTripToTripCardDto(trip, userId))
+//        }
+//        return tripDtoList
+//    }
+
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
