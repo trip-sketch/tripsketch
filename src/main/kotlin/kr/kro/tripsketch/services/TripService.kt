@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
+import kotlin.math.ceil
 
 @Service
 class TripService(
@@ -356,9 +357,9 @@ class TripService(
         tripDtoList.sortWith(compareBy<TripCardDto> { it.views }.thenByDescending { it.createdAt })
 
         val startIndex = pageable.pageNumber * pageable.pageSize
-        val endIndex = Math.min(startIndex + pageable.pageSize, tripDtoList.size)
+        val endIndex = (startIndex + pageable.pageSize).coerceAtMost(tripDtoList.size)
         val currentPage = pageable.pageNumber + 1
-        val totalPage = Math.ceil(tripDtoList.size.toDouble() / pageable.pageSize).toInt()
+        val totalPage = ceil(tripDtoList.size.toDouble() / pageable.pageSize).toInt()
         val postsPerPage = pageable.pageSize
 
         if (currentPage <= totalPage && tripDtoList.isEmpty()) {
