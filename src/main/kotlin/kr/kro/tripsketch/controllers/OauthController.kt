@@ -30,10 +30,10 @@ class OauthController(
             set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
         }
 
-        val resource = resourceLoader.getResource("classpath:/static/index.html")
-        val responseBody = resource.inputStream.bufferedReader().readText()
+//        val resource = resourceLoader.getResource("classpath:/static/index.html")
+//        val responseBody = resource.inputStream.bufferedReader().readText()
 
-        return ResponseEntity.ok().headers(headers).body(responseBody)
+        return ResponseEntity.ok().headers(headers).build()
     }
 
     @PostMapping("/refreshToken")
