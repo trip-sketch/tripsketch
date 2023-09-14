@@ -65,10 +65,7 @@ class ImageService(private val s3Service: S3Service) {
 
             when (formatName.lowercase()) {
                 "jpg", "jpeg" -> {
-                    imOperation.quality(30.0) // set compression quality for JPEG
-                }
-                "png" -> {
-                    imOperation.quality(30.0) // set compression quality for PNG (optional, but can be useful)
+                    imOperation.quality(25.0) // set compression quality for JPEG
                 }
             }
 
