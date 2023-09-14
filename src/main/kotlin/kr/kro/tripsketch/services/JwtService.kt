@@ -25,7 +25,7 @@ class JwtService {
         val now = Date()
 
         // memberId null 체크
-        user.memberId ?: throw UnauthorizedException("유저의 memberId가 없습니다.")
+        user.memberId
 
         // Access Token 생성
         val accessTokenValidity = Date(now.time + accessTokenValidityInMilliseconds)
