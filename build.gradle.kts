@@ -100,8 +100,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
     // 이미지 압축 기능
-    implementation("com.twelvemonkeys.imageio:imageio-core:3.9.4")
-    implementation("com.twelvemonkeys.imageio:imageio-jpeg:3.9.4")
+    implementation("ar.com.hjg:pngj:2.1.0")
 }
 
 tasks.withType<KotlinCompile> {
