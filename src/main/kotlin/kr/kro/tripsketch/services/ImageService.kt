@@ -10,6 +10,8 @@ import java.io.File
 import java.io.InputStream
 import javax.imageio.ImageIO
 import java.util.*
+import javax.imageio.IIOImage
+import javax.imageio.ImageWriteParam
 
 
 @Service
@@ -24,28 +26,22 @@ class ImageService(private val s3Service: S3Service) {
                 originalImage = ImageIO.read(bis)
             }
 
-            // Convert the image to RGB colorspace if it's not.
-            val convertedImage = if (originalImage.type != BufferedImage.TYPE_INT_RGB && originalImage.type != BufferedImage.TYPE_INT_ARGB) {
-                val rgbImage = BufferedImage(originalImage.width, originalImage.height, BufferedImage.TYPE_INT_RGB)
-                rgbImage.createGraphics().apply {
-                    drawImage(originalImage, 0, 0, null)
-                    dispose()
-                }
-                rgbImage
-            } else {
-                originalImage
-            }
+            val width = Math.round(originalImage.width * 0.5).toInt()
+            val height = Math.round(originalImage.height * 0.5).toInt()
 
-            val width = Math.round(convertedImage.width * 0.5).toInt()
-            val height = Math.round(convertedImage.height * 0.5).toInt()
-
-            val compressedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-            compressedImage.createGraphics().drawImage(convertedImage, 0, 0, width, height, null)
+            val compressedImageType = if (formatName.lowercase(Locale.getDefault()) in listOf("jpg", "jpeg")) BufferedImage.TYPE_INT_RGB else BufferedImage.TYPE_INT_ARGB
+            val compressedImage = BufferedImage(width, height, compressedImageType)
+            compressedImage.createGraphics().drawImage(originalImage, 0, 0, width, height, null)
 
             ByteArrayOutputStream().use { os ->
                 when (formatName.lowercase(Locale.getDefault())) {
                     "jpg", "jpeg" -> {
-                        ImageIO.write(compressedImage, "jpg", os)
+                        val writer = ImageIO.getImageWritersByFormatName("jpeg").next()
+                        val param = writer.defaultWriteParam
+                        param.compressionMode = ImageWriteParam.MODE_EXPLICIT
+                        param.compressionQuality = 0.85f
+                        writer.output = ImageIO.createImageOutputStream(os)
+                        writer.write(null, IIOImage(compressedImage, null, null), param)
                     }
                     "png" -> {
                         ImageIO.write(compressedImage, "png", os)
@@ -54,13 +50,13 @@ class ImageService(private val s3Service: S3Service) {
                         ImageIO.write(compressedImage, formatName, os)
                     }
                 }
-
                 return os.toByteArray()
             }
         } catch (e: Exception) {
-            throw RuntimeException("Image compression failed", e)
+            throw RuntimeException("이미지 압축 실패", e)
         }
     }
+
 
 
     fun uploadImage(dir: String, file: MultipartFile): String {
