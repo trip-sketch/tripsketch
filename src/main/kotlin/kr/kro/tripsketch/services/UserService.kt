@@ -22,7 +22,7 @@ class UserService(
 ) {
 
     companion object {
-        const val DEFAULT_IMAGE_URL = "https://objectstorage.ap-osaka-1.oraclecloud.com/p/_EncCFAsYOUIwlJqRN7blRAETL9_l-fpCH-D07N4qig261ob7VHU8VIgtZaP-Thz/n/ax6izwmsuv9c/b/image-tripsketch/o/default-02.png"
+        const val DEFAULT_IMAGE_URL = "https://ax6izwmsuv9c.objectstorage.ap-osaka-1.oci.customer-oci.com/n/ax6izwmsuv9c/b/tripsketch/o/profile.png"
     }
 
     fun registerOrUpdateUser(memberId: Long): User {
