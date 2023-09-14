@@ -95,9 +95,10 @@ dependencies {
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
-    implementation("com.sun.mail:jakarta.mail:2.0.1")
+    implementation("org.im4java:im4java:1.4.0")
+    implementation("com.drewnoakes:metadata-extractor:2.18.0")
 
-    implementation("org.springframework.boot:spring-boot-starter-mail")
+
 
 }
 
