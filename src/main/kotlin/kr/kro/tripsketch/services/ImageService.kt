@@ -39,7 +39,7 @@ class ImageService(private val s3Service: S3Service) {
                         val writer = ImageIO.getImageWritersByFormatName("jpeg").next()
                         val param = writer.defaultWriteParam
                         param.compressionMode = ImageWriteParam.MODE_EXPLICIT
-                        param.compressionQuality = 0.3f
+                        param.compressionQuality = 0.45f
                         writer.output = ImageIO.createImageOutputStream(os)
                         writer.write(null, IIOImage(compressedImage, null, null), param)
                     }
