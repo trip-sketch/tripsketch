@@ -25,7 +25,7 @@ class TripLikeService(
                 val findUser = userRepository.findById(userId)
                 if (findUser.isPresent) {
                     val user = findUser.get()
-                    val userNickname = user.nickname ?: "Unknown user"
+                    val userNickname = user.nickname
                     val userProfileUrl = user.profileImageUrl ?: ""
                     notificationService.sendPushNotification(
                         listOf(findTrip.userId),

@@ -47,7 +47,7 @@ class TripController(private val tripService: TripService) {
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: DataNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to e.message))
         }
     }
 
@@ -72,7 +72,7 @@ class TripController(private val tripService: TripService) {
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: DataNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to e.message))
         }
     }
 
