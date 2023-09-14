@@ -2,7 +2,7 @@ package kr.kro.tripsketch.services
 
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.net.URL
+import java.net.URI
 
 @Service
 class ImageService(private val s3Service: S3Service) {
@@ -18,7 +18,7 @@ class ImageService(private val s3Service: S3Service) {
     }
 
     private fun extractDirAndKeyFromUrl(url: String): Pair<String, String> {
-        val path = URL(url).path
+        val path = URI(url).path
         val parts = path.split('/')
 
         val dir = "${parts[4]}/${parts[6]}"
