@@ -24,7 +24,6 @@ class NotificationService(
 
     private val client = OkHttpClient()
 
-    // Notification Service
     fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
         val userId = userService.getUserIdByMemberId(memberId)
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
@@ -32,7 +31,7 @@ class NotificationService(
 
         val updatedNotifications = notificationsPage.content.map { notification ->
             notification.senderId?.let { senderId ->
-                val senderUser = userService.findUserById(senderId) // findUserById 메서드는 senderId로 사용자를 찾는 메서드입니다.
+                val senderUser = userService.findUserById(senderId)
                 val currentNickname = senderUser?.nickname
                 notification.nickname = currentNickname  // 현재 닉네임으로 업데이트
             }
