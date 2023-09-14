@@ -70,7 +70,7 @@ class ImageService(private val s3Service: S3Service) {
     ) : MultipartFile {
         override fun getName(): String = fileName
 
-        override fun getOriginalFilename(): String? = originalFileName
+        override fun getOriginalFilename(): String = originalFileName
 
         override fun getContentType(): String? = contentType
 
