@@ -6,6 +6,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.services.TripService
+import kr.kro.tripsketch.utils.PagenationUtil
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/trip")
@@ -91,9 +91,20 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/nickname")
-    fun getTripsByNickname(@RequestParam nickname: String): ResponseEntity<Set<TripDto>> {
-        val findTrips = tripService.getTripsByNickname(nickname)
-        return ResponseEntity.ok(findTrips)
+    fun getTripsByNickname(
+        @RequestParam nickname: String,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int
+    ): ResponseEntity<Any> {
+        return try {
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, Sort.by("createdAt").descending())
+            val findTrips = tripService.getTripsByNickname(nickname, pageable)
+            return ResponseEntity.ok(findTrips)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+        }
     }
 
     // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터
@@ -199,34 +210,73 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/list/following")
-    fun getListFollowingTrips(req: HttpServletRequest): ResponseEntity<Any> {
-        val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getListFollowingTrips(memberId)
+    fun getListFollowingTrips(
+        req: HttpServletRequest,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int
+    ): ResponseEntity<Any> {
         return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
+            val findTrips = tripService.getListFollowingTrips(memberId, pageable)
             if (findTrips.isNotEmpty()) {
-                ResponseEntity.ok(findTrips)
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
             } else {
                 ResponseEntity.notFound().build()
             }
-        } catch (ex: IllegalAccessException) {
+        } catch (e: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
+        } catch (e: DataNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         }
     }
+
 
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
         req: HttpServletRequest,
         @RequestParam keyword: String,
         @RequestParam sorting: Int
-    ): ResponseEntity<List<TripDto>> {
+    ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting)
-            ResponseEntity.status(HttpStatus.OK).body(findTrips)
-        } catch (ex: IllegalArgumentException) {
-            ResponseEntity.notFound().build()
+            if (findTrips.isNotEmpty()) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+            }
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
+
+
+//    @GetMapping("/search")
+//    fun getSearchTripsByKeyword(
+//        req: HttpServletRequest,
+//        @RequestParam keyword: String,
+//        @RequestParam sorting: Int,
+//        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+//        @RequestParam("size", required = false, defaultValue = "10") size: Int
+//    ): ResponseEntity<Any> {
+//        return try {
+//            val memberId = req.getAttribute("memberId") as Long
+//            val pagenationUtil = PagenationUtil()
+//            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+//            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
+//            val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, sorting, pageable)
+//            if (findTrips.isNotEmpty()) {
+//                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+//            } else {
+//                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+//            }
+//        } catch (e: IllegalArgumentException) {
+//            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+//        }
+//    }
 
     @PutMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
