@@ -59,7 +59,6 @@ class TripController(private val tripService: TripService) {
         @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
     ): ResponseEntity<Map<String, Any>> {
         return try {
-            println(sortType)
             val memberId = req.getAttribute("memberId") as Long
             val sort = when (sortType) {
                 1 -> Sort.by(Sort.Direction.DESC, "createdAt")
