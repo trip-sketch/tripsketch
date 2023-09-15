@@ -32,6 +32,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * @see JwtService
  * @see JwtTokenInterceptor
  * @see WebMvcConfigurer
+ * @author Hojun Song
  */
 
 @Configuration

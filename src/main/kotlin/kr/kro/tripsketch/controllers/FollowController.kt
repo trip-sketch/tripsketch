@@ -24,8 +24,8 @@ class FollowController(
     fun follow(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
         val memberId = req.getAttribute("memberId") as Long?
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
-        val responseFromExpo = followService.follow(memberId, followDto.nickname)
-        return ResponseEntity.status(HttpStatus.OK).body(responseFromExpo)
+        followService.follow(memberId, followDto.nickname)
+        return ResponseEntity.status(HttpStatus.OK).body("구독에 성공했습니다.")
     }
 
     @DeleteMapping
