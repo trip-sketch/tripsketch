@@ -81,7 +81,7 @@ class UserService(
             if (user.profileImageUrl != defaultImageUrl) {
                 user.profileImageUrl?.let { oldImageUrl ->
                     try {
-                        imageService.deleteImage(oldImageUrl) // `ImageService`의 `deleteImage` 함수를 사용하여 URL을 삭제합니다.
+                        imageService.deleteImage(oldImageUrl)
                     } catch (e: Exception) {
                         // 오류 로깅
                         println("이미지 삭제에 실패했습니다. URL: $oldImageUrl, 오류: ${e.message}")
@@ -154,7 +154,9 @@ class UserService(
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
 
-        // 랜덤 닉네임 생성
+        /**
+         * 랜덤닉네임 생성
+         */
         var newNickname: String
         do {
             newNickname = nicknameService.generateRandomNickname()
@@ -191,7 +193,7 @@ class UserService(
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
                 followingCount = followingCount,
-                isAdmin = null, // 관리자 여부를 노출하지 않음
+                isAdmin = null,
             )
         }
     }

@@ -33,12 +33,11 @@ class NotificationService(
             notification.senderId?.let { senderId ->
                 val senderUser = userService.findUserById(senderId)
                 val currentNickname = senderUser?.nickname
-                notification.nickname = currentNickname // 현재 닉네임으로 업데이트
+                notification.nickname = currentNickname
             }
             notification
         }
 
-        // 업데이트된 Notification 리스트로 새로운 Page 객체 생성
         return PageImpl(updatedNotifications, pageable, notificationsPage.totalElements)
     }
 
