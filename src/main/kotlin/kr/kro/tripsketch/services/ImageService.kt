@@ -5,6 +5,7 @@ import com.drew.metadata.Metadata
 import com.drew.metadata.exif.ExifIFD0Directory
 import org.im4java.core.ConvertCmd
 import org.im4java.core.IMOperation
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.geom.AffineTransform
@@ -14,76 +15,47 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
+import java.nio.file.Files
 
 
 @Service
-class ImageService(private val s3Service: S3Service) {
-
-    private fun rotateImageIfNeeded(image: BufferedImage, file: MultipartFile): BufferedImage {
-        try {
-            val metadata: Metadata? = ImageMetadataReader.readMetadata(ByteArrayInputStream(file.bytes))
-            val orientation = metadata?.getFirstDirectoryOfType(ExifIFD0Directory::class.java)?.getInt(ExifIFD0Directory.TAG_ORIENTATION)
-
-            val transform = AffineTransform()
-            when (orientation) {
-                1 -> { /* Normal, no rotation needed. */ return image }
-                2 -> { /* Flipped horizontally. */ transform.scale(-1.0, 1.0) }
-                3 -> { /* Upside-down. */ transform.rotate(Math.PI) }
-                4 -> { /* Flipped vertically. */ transform.scale(1.0, -1.0) }
-                5 -> { transform.rotate(Math.PI / 2) ; transform.scale(-1.0, 1.0) }
-                6 -> { transform.rotate(Math.PI / 2) }
-                7 -> { transform.rotate(Math.PI / 2) ; transform.scale(1.0, -1.0) }
-                8 -> { transform.rotate(-Math.PI / 2) }
-                else -> { return image }
-            }
-
-            val op = AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR)
-            return op.filter(image, null)
-        } catch (e: Exception) {
-            return image
-        }
-    }
-
+class ImageService(private val s3Service: S3Service, private val resourceLoader: ResourceLoader) {
+    
     fun compressImage(file: MultipartFile): ByteArray {
         try {
             val formatName = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
 
-            // Create a temporary file to store the original image
-            val tempOriginalFile = File.createTempFile("original_", ".$formatName")
+            // Use ResourceLoader to access the static folder
+            val resource = resourceLoader.getResource("classpath:/static/")
+            val staticDirPath = resource.file.absolutePath + "/"
+
+            val tempOriginalFileName = "original_${System.currentTimeMillis()}.$formatName"
+            val tempOriginalFilePath = staticDirPath + tempOriginalFileName
+            val tempOriginalFile = File(tempOriginalFilePath)
             file.transferTo(tempOriginalFile)
 
-            val outputPath = tempOriginalFile.absolutePath + "_compressed.$formatName"
+            val outputPath = staticDirPath + tempOriginalFileName.substringBeforeLast('.') + "_compressed.$formatName"
 
             val imOperation = IMOperation()
             imOperation.addImage(tempOriginalFile.absolutePath)
-
-            // Auto correct orientation
             imOperation.autoOrient()
-
-            // Resize the image
             imOperation.resize(50, 50, "%")
-
             when (formatName.lowercase()) {
-                "jpg", "jpeg" -> {
-                    imOperation.quality(25.0) // set compression quality for JPEG
-                }
+                "jpg", "jpeg" -> imOperation.quality(25.0)
             }
-
             imOperation.addImage(outputPath)
+
             val convertCmd = ConvertCmd()
             convertCmd.run(imOperation)
 
-            // Read compressed image bytes
-            val compressedBytes = File(outputPath).readBytes()
+            val compressedBytes = Files.readAllBytes(File(outputPath).toPath())
 
-            // Cleanup temporary files
             tempOriginalFile.delete()
             File(outputPath).delete()
 
             return compressedBytes
 
         } catch (e: Exception) {
-            // 압축 중 예외가 발생하면 원본 이미지 바이트를 반환
             return file.bytes
         }
     }
