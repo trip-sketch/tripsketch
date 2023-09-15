@@ -56,16 +56,24 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort", required = false, defaultValue = "createdAt,desc") sort: String
+        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
     ): ResponseEntity<Map<String, Any>> {
         return try {
+            println(sortType)
             val memberId = req.getAttribute("memberId") as Long
-            val sortProperties = sort.split(",")[0]
-            val sortDirection = if (sort.split(",").getOrNull(1) == "asc") Sort.Direction.ASC else Sort.Direction.DESC
-            val sort = Sort.by(
-                Sort.Order(sortDirection, sortProperties),
-                Sort.Order(Sort.Direction.DESC, "createdAt")
-            )
+            val sort = when (sortType) {
+                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+                2 -> Sort.by(
+                    Sort.Order(Sort.Direction.DESC, "views"),
+                    Sort.Order(Sort.Direction.DESC, "createdAt")
+                )
+                -2 -> Sort.by(
+                    Sort.Order(Sort.Direction.ASC, "views"),
+                    Sort.Order(Sort.Direction.DESC, "createdAt")
+                )
+                else -> throw IllegalArgumentException("Invalid sort type")
+            }
             val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val findTrips = tripService.getAllTrips(memberId, pageable)
             ResponseEntity.ok(findTrips)
