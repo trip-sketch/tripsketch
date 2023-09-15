@@ -108,13 +108,27 @@ class TripService(
         )
     }
 
-    fun getAllTripsByUser(memberId: Long): Set<TripDto> {
+    fun getAllTripsByUser(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrips =
-            tripRepository.findByIsHiddenIsFalseAndUserId(userId) +
-                tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
-        return findTrips.map { fromTrip(it, userId) }.toSet()
+//        val findTrips =
+//            tripRepository.findByIsHiddenIsFalseAndUserId(userId) +
+//                tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
+//        return findTrips.map { fromTrip(it, userId) }.toSet()
+        val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(pageable)
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, userId) }
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+        if (currentPage > totalPage) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage,
+        )
     }
 
     fun getAllMyTripsByUser(memberId: Long, pageable: Pageable): Map<String, Any> {
