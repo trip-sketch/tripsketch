@@ -43,7 +43,7 @@ class OauthController(
     /**
      * Kakao 토큰을 갱신하는 메서드입니다.
      */
-    @PostMapping("/refreshToken")
+    @PostMapping("/refreshtoken")
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
