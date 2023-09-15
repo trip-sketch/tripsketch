@@ -60,4 +60,16 @@ class S3Service(private val s3Client: S3Client) {
         s3Client.deleteObject(deleteObjectRequest)
     }
 
+    fun downloadBytes(dir: String, fileName: String): ByteArray {
+        val getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key("$dir/$fileName")
+            .build()
+
+        val response = s3Client.getObject(getObjectRequest)
+
+        return response.readAllBytes()
+    }
+
+
 }

@@ -1,64 +1,45 @@
 package kr.kro.tripsketch.services
 
-import com.drew.imaging.ImageMetadataReader
-import com.drew.metadata.Metadata
-import com.drew.metadata.exif.ExifIFD0Directory
-import org.im4java.core.ConvertCmd
-import org.im4java.core.IMOperation
-import org.springframework.core.io.ResourceLoader
+import net.coobird.thumbnailator.Thumbnails
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.awt.geom.AffineTransform
-import java.awt.image.AffineTransformOp
 import java.net.URI
-import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
-import java.nio.file.Files
 
 
 @Service
-class ImageService(private val s3Service: S3Service, private val resourceLoader: ResourceLoader) {
+class ImageService(private val s3Service: S3Service) {
 
     fun compressImage(file: MultipartFile): ByteArray {
         try {
-            val formatName = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
+            val formatName = file.originalFilename?.substringAfterLast('.', "")?.lowercase() ?: "jpg"
 
-            // Use ResourceLoader to access the static folder
-            val resource = resourceLoader.getResource("classpath:/static/")
-            val staticDirPath = resource.file.absolutePath + "/"
+            val outputStream = ByteArrayOutputStream()
 
-            val tempOriginalFileName = "original_${System.currentTimeMillis()}.$formatName"
-            val tempOriginalFilePath = staticDirPath + tempOriginalFileName
-            val tempOriginalFile = File(tempOriginalFilePath)
-            file.transferTo(tempOriginalFile)
+            // Thumbnails 로직은 크게 변하지 않으나, 이미지 형식에 따라 품질을 조절합니다.
+            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(0.5)  // 크기 변경 없이 원본 크기 유지
 
-            val outputPath = staticDirPath + tempOriginalFileName.substringBeforeLast('.') + "_compressed.$formatName"
-
-            val imOperation = IMOperation()
-            imOperation.addImage(tempOriginalFile.absolutePath)
-            imOperation.autoOrient()
-            imOperation.resize(50, 50, "%")
-            when (formatName.lowercase()) {
-                "jpg", "jpeg" -> imOperation.quality(25.0)
+            when (formatName) {
+                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.25)  // JPG, JPEG는 25% 품질로 설정
+                else -> thumbnailBuilder.outputQuality(0.5)  // 다른 형식은 50% 품질로 설정
             }
-            imOperation.addImage(outputPath)
 
-            val convertCmd = ConvertCmd()
-            convertCmd.run(imOperation)
+            thumbnailBuilder
+                .outputFormat(formatName)
+                .toOutputStream(outputStream)
 
-            val compressedBytes = Files.readAllBytes(File(outputPath).toPath())
-
-            tempOriginalFile.delete()
-            File(outputPath).delete()
-
-            return compressedBytes
+            return outputStream.toByteArray()
 
         } catch (e: Exception) {
+            e.printStackTrace()
             return file.bytes
         }
     }
+
+
 
 
     fun uploadImage(dir: String, file: MultipartFile): String {
