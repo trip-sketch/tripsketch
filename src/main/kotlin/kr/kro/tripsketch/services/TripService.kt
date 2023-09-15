@@ -511,14 +511,23 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
-        if (memberId in adminIds) {
-            commentService.deleteAllCommentsAdminByTripId(id)
-            findTrip.isHidden = true
-            findTrip.deletedAt = LocalDateTime.now()
-            tripRepository.save(findTrip)
-            return
-        }
-        if (findTrip.userId == userId) { // 'findTrip.userId == user.id' 조건은 항상 false입니다 ?
+
+        if (memberId in adminIds || findTrip.userId == userId) {
+            val images = findTrip.images
+            if (images != null) {
+                val currentImages = images.toMutableList()
+                for (url in images) {
+                    try {
+                        imageService.deleteImage(url)
+                        currentImages.remove(url)
+                    } catch (e: Exception) {
+                        println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
+                    }
+                }
+                findTrip.images = currentImages
+            } else {
+                throw IllegalAccessException("삭제할 권한이 없습니다.")
+            }
             findTrip.isHidden = true
             findTrip.deletedAt = LocalDateTime.now()
             tripRepository.save(findTrip)
