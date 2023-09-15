@@ -84,10 +84,12 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         return userInfo?.get("id") as? Long
     }
 
-    fun revokeServiceAndWithdraw(accessToken: String?): Boolean {
-        if (accessToken == null) return false
+    fun unlinkUser(accessToken: String?): Boolean {
+        if (accessToken == null) {
+            return false
+        }
 
-        val url = "https://kapi.kakao.com/v2/user/revoke/service_terms"
+        val url = "https://kapi.kakao.com/v1/user/unlink"
         val headers = HttpHeaders().apply {
             add("Authorization", "Bearer $accessToken")
             add("Content-Type", "application/x-www-form-urlencoded")
@@ -99,7 +101,6 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
             val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
             response.statusCode.is2xxSuccessful
         } catch (e: RestClientException) {
-            println("Error while revoking service and withdrawing on Kakao: ${e.message}")
             false
         }
     }
