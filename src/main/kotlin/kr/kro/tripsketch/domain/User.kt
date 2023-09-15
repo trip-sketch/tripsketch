@@ -8,6 +8,21 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
+/**
+ * 사용자 정보를 나타내는 데이터 클래스입니다.
+ *
+ * @property id 사용자 ID
+ * @property memberId 사용자 회원번호
+ * @property nickname 사용자 닉네임
+ * @property introduction 사용자 소개
+ * @property profileImageUrl 사용자 프로필 이미지 URL
+ * @property createdAt 계정 생성 일시
+ * @property updatedAt 계정 업데이트 일시
+ * @property kakaoRefreshToken 카카오 API의 Refresh Token
+ * @property ourRefreshToken 자체 서비스의 Refresh Token
+ * @property expoPushToken Expo 푸시 알림 토큰
+ * @author Hojun Song
+ */
 @Document(collection = "users")
 data class User(
     @Id val id: String? = null,
