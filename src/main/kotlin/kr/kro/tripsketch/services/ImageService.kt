@@ -8,8 +8,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
-import javax.imageio.ImageIO
-
+d
 
 @Service
 class ImageService(private val s3Service: S3Service) {
@@ -20,25 +19,7 @@ class ImageService(private val s3Service: S3Service) {
 
             val outputStream = ByteArrayOutputStream()
 
-            // 이미지의 가로와 세로 크기를 알아내기 위해 ImageReader를 사용합니다.
-            val readers = ImageIO.getImageReadersByFormatName(formatName)
-            val reader = readers.next()
-            val iis = ImageIO.createImageInputStream(file.inputStream)
-            reader.setInput(iis, true)
-            val width = reader.getWidth(reader.minIndex).toDouble()
-            val height = reader.getHeight(reader.minIndex).toDouble()
-            iis.close()
-
-            var scale: Double = 1.0
-            if (width > 1050 || height > 1050) {
-                scale = if (width > height) {
-                    1050 / width
-                } else {
-                    1050 / height
-                }
-            }
-
-            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(scale)
+            val thumbnailBuilder = Thumbnails.of(file.inputStream).size(1080, 1080).keepAspectRatio(true)
 
             when (formatName) {
                 "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.25)  // JPG, JPEG는 25% 품질로 설정
@@ -56,9 +37,6 @@ class ImageService(private val s3Service: S3Service) {
             return file.bytes
         }
     }
-
-
-
 
 
 
