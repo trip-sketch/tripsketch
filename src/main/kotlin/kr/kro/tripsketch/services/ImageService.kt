@@ -20,11 +20,15 @@ class ImageService(private val s3Service: S3Service) {
 
             val outputStream = ByteArrayOutputStream()
 
-            val bufferedImage = ImageIO.read(file.inputStream)
-            val width = bufferedImage.width.toDouble()
-            val height = bufferedImage.height.toDouble()
+            // 이미지의 가로와 세로 크기를 알아내기 위해 ImageReader를 사용합니다.
+            val readers = ImageIO.getImageReadersByFormatName(formatName)
+            val reader = readers.next()
+            val iis = ImageIO.createImageInputStream(file.inputStream)
+            reader.setInput(iis, true)
+            val width = reader.getWidth(reader.minIndex).toDouble()
+            val height = reader.getHeight(reader.minIndex).toDouble()
+            iis.close()
 
-            // 이미지의 가로 혹은 세로의 픽셀이 1050이 넘는지 확인합니다.
             var scale: Double = 1.0
             if (width > 1050 || height > 1050) {
                 scale = if (width > height) {
@@ -34,10 +38,10 @@ class ImageService(private val s3Service: S3Service) {
                 }
             }
 
-            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(scale) // 계산된 scale을 적용
+            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(scale)
 
             when (formatName) {
-                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.4)  // JPG, JPEG는 25% 품질로 설정
+                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.25)  // JPG, JPEG는 25% 품질로 설정
                 else -> thumbnailBuilder.outputQuality(0.5)  // 다른 형식은 50% 품질로 설정
             }
 
@@ -52,6 +56,7 @@ class ImageService(private val s3Service: S3Service) {
             return file.bytes
         }
     }
+
 
 
 
