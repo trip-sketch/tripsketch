@@ -20,7 +20,7 @@ import java.nio.file.Files
 
 @Service
 class ImageService(private val s3Service: S3Service, private val resourceLoader: ResourceLoader) {
-    
+
     fun compressImage(file: MultipartFile): ByteArray {
         try {
             val formatName = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
