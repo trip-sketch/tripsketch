@@ -1,52 +1,14 @@
 package kr.kro.tripsketch.services
 
-import net.coobird.thumbnailator.Thumbnails
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.io.*
 import java.net.URI
 
 @Service
 class ImageService(private val s3Service: S3Service) {
 
-    fun compressImage(file: MultipartFile): ByteArray {
-        try {
-            val formatName = file.originalFilename?.substringAfterLast('.', "")?.lowercase() ?: "jpg"
-            val outputStream = ByteArrayOutputStream()
-            val bufferedOutputStream = BufferedOutputStream(outputStream)
-
-            val thumbnailBuilder = Thumbnails.of(file.inputStream).size(1080, 1080).keepAspectRatio(true)
-
-            when (formatName) {
-                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.3)  // JPG, JPEG는 30% 품질로 설정
-                else -> thumbnailBuilder.outputQuality(0.5)  // 다른 형식은 50% 품질로 설정
-            }
-
-            thumbnailBuilder
-                .outputFormat(formatName)
-                .toOutputStream(bufferedOutputStream)
-
-            bufferedOutputStream.flush()
-
-            return outputStream.toByteArray()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return file.bytes
-        }
-    }
-
-
     fun uploadImage(dir: String, file: MultipartFile): String {
-        val compressedImageBytes = compressImage(file)
-
-        val compressedFile = ByteArrayMultipartFile(
-            file.name,
-            file.originalFilename ?: "",
-            file.contentType,
-            compressedImageBytes
-        )
-
-        val (url, _) = s3Service.uploadFile(dir, compressedFile)
+        val (url, _) = s3Service.uploadFile(dir, file)
         return url
     }
 
@@ -63,31 +25,6 @@ class ImageService(private val s3Service: S3Service) {
         val key = parts[7]
 
         return Pair(dir, key)
-    }
-
-    class ByteArrayMultipartFile(
-        private val fileName: String,
-        private val originalFileName: String,
-        private val contentType: String?,
-        private val content: ByteArray
-    ) : MultipartFile {
-        override fun getName(): String = fileName
-
-        override fun getOriginalFilename(): String = originalFileName
-
-        override fun getContentType(): String? = contentType
-
-        override fun isEmpty(): Boolean = content.isEmpty()
-
-        override fun getSize(): Long = content.size.toLong()
-
-        override fun getBytes(): ByteArray = content
-
-        override fun getInputStream(): InputStream = ByteArrayInputStream(content)
-
-        override fun transferTo(dest: File) {
-            dest.writeBytes(content)
-        }
     }
 
 }
