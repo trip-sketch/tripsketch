@@ -3,7 +3,6 @@ package kr.kro.tripsketch.services
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.exceptions.UnauthorizedException

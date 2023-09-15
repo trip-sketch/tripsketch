@@ -8,9 +8,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.InternalServerException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.ImageService
 import kr.kro.tripsketch.services.KakaoOAuthService
-import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Page
@@ -18,8 +16,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.services.s3.model.S3Exception
+
 
 /**
  * 사용자와 관련된 요청을 처리하는 컨트롤러입니다.
