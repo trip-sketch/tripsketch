@@ -497,11 +497,13 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
     val totalComments = formattedComments.size
     val totalPage = (totalComments + pageSize - 1) / pageSize
 
+    val sortedComments = formattedComments.sortedByDescending { it.updatedAt }
+
     val startIndex = (page - 1) * pageSize
     val endIndex = min(startIndex + pageSize, totalComments)
 
     for (i in startIndex until endIndex) {
-        paginatedComments.add(formattedComments[i])
+        paginatedComments.add(sortedComments[i])
     }
 
     return mapOf(
