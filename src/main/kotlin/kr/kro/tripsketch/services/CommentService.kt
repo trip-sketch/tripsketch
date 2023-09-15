@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kotlin.math.min
 
 @Service
 class CommentService(
@@ -69,18 +70,6 @@ class CommentService(
         }
     }
 
-    //    fun getCommentsByUserId(userId: String): List<CommentDto> {
-//        return commentRepository.findAllByUserId(userId).map { fromComment(it, userService) }
-//    }
-//
-//    fun getActiveComments(): List<CommentDto> {
-//        return commentRepository.findAllByIsDeletedFalse().map { fromComment(it, userService) }
-//    }
-//
-//    fun getLikedCommentsByUserId(userId: String): List<CommentDto> {
-//        return commentRepository.findAllByLikedByContains(userId).map { fromComment(it, userService) }
-//    }
-//
     fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
         return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
     }
@@ -285,10 +274,6 @@ class CommentService(
                 numberOfLikes = 0,
             )
             commentRepository.save(deletedComment)
-//            // Soft delete 처리 부분으로 넘어감
-//            val commentId = comment.id
-//            // 댓글을 삭제합니다.
-//            commentId?.let { commentRepository.deleteById(it) }
             return
         }
 
@@ -501,32 +486,19 @@ class CommentService(
 
 fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
     val paginatedComments = mutableListOf<CommentDto>()
-    val totalCommentsWithChildren = comments.sumOf { it.children.size + 1 }
+    val formattedComments = formattingCommentsWithChildren(comments)
+
+    val totalComments = formattedComments.size
+    val totalPage = (totalComments + pageSize - 1) / pageSize
+
+    val sortedComments = formattedComments.sortedByDescending { it.updatedAt }
+
     val startIndex = (page - 1) * pageSize
-    var addedComments = 0
-    var totalIndex = 0
-    var currentIndex = 0
+    val endIndex = min(startIndex + pageSize, totalComments)
 
-    while (startIndex < pageSize && totalIndex < totalCommentsWithChildren) {
-        val currentComment = comments[currentIndex]
-        paginatedComments.add(currentComment)
-        addedComments++
-        var toAddChildIndex = 0
-
-        // 대댓글 추가
-        currentComment.children.forEachIndexed { _, childComment ->
-            if (addedComments < pageSize) {
-                paginatedComments[currentIndex].children.add(childComment)
-                addedComments++
-                toAddChildIndex++
-            }
-        }
-        totalIndex = currentIndex + toAddChildIndex
-
-        currentIndex++
+    for (i in startIndex until endIndex) {
+        paginatedComments.add(sortedComments[i])
     }
-
-    val totalPage = (totalCommentsWithChildren + pageSize - 1) / pageSize
 
     return mapOf(
         "comments" to paginatedComments,
@@ -535,3 +507,32 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
         "commentsPerPage" to pageSize,
     )
 }
+
+
+fun formattingCommentsWithChildren(comments: List<CommentDto>): List<CommentDto> {
+    val commentsList = mutableListOf<CommentDto>()
+
+    comments.forEach { comment ->
+        val updatedComment = comment.copy(children = mutableListOf())
+        commentsList.add(updatedComment)
+
+        // 대댓글 추가
+        comment.children.let { children ->
+            children.forEach { childComment ->
+                commentsList.add(childComment)
+            }
+        }
+    }
+
+    return commentsList
+}
+
+
+
+
+
+
+
+
+
+
