@@ -5,6 +5,11 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
+/**
+ * 알림 정보를 나타내는 데이터 클래스입니다.
+ *
+ * @author Hojun Song
+ */
 @Document(collection = "notifications")
 data class Notification(
     @Id

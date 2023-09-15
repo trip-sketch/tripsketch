@@ -11,6 +11,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
+/**
+ * 구독(Follow) 기능을 처리하는 컨트롤러
+ *
+ * @author Hojun Song
+ */
 @Validated
 @RestController
 @RequestMapping("api/follow")

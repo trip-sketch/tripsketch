@@ -3,6 +3,10 @@ package kr.kro.tripsketch.dto
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Length
 
+/**
+ * @author Hojun Song
+ */
+
 data class UserProfileDto(
     @field:Size(min = 3, max = 50, message = "별명은 3자에서 50자 사이여야 합니다.")
     val nickname: String?,
