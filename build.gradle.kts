@@ -97,6 +97,7 @@ dependencies {
 
     implementation("org.im4java:im4java:1.4.0")
     implementation("com.drewnoakes:metadata-extractor:2.18.0")
+    implementation("net.coobird:thumbnailator:0.4.20")
 
 
 
