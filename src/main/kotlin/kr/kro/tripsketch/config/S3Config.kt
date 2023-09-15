@@ -8,6 +8,11 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
 
+/**
+ * S3 Bucket 설정을 위한 값 설정
+ *
+ * @author Hojun Song
+ */
 @Configuration
 class S3Config {
 
