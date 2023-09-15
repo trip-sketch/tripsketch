@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
  * 이 클래스는 @Configuration으로 주석 처리되어 있어, 서비스 레이어에서 스프링의 애플리케이션 컨텍스트를
  * 설정하는 데 사용될 것임을 나타냅니다.
  *
- * @author [Hojun Song]
+ * @author Hojun Song
  */
 
 @Configuration
@@ -26,6 +26,7 @@ class ServletFilterConfig {
      *
      * @param simpleLoggingFilter 미리 설정된 SimpleLoggingFilter
      * @return 필터를 등록할 준비가 된 설정된 FilterRegistrationBean
+     * @author Hojun Song
      *
      */
 
