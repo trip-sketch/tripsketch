@@ -45,9 +45,7 @@ class WebMvcConfig(
             .excludePathPatterns(
                 "/swagger-ui/**",
                 "/v3/**",
-                "/hello",
-                "/api/user/nickname",
-                "/api/user/send",
+                "/api/user/nickname/guest",
                 "/api/follow/guest/followings",
                 "/api/follow/guest/followers",
                 "/api/oauth/kakao/**",
@@ -55,10 +53,6 @@ class WebMvcConfig(
                 "/api/trip/nickname/**",
                 "/api/trip/guest/**",
                 "/api/geocode",
-                "/api/user/upload",
-                "/api/user/uploads",
-                "/api/user/delete",
-                "/api/user/email",
                 "/favicon.ico",
                 "/api/comment/admin/commentsWithPagination/**",
             )

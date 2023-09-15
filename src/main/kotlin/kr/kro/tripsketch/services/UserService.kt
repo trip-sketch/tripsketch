@@ -163,14 +163,6 @@ class UserService(
         userRepository.save(user)
     }
 
-    /** 사용자의 팔로우 정보 (팔로워 수, 팔로잉 수)를 조회하는 메소드. */
-    fun getUserFollowInfo(id: String): Pair<Long, Long> {
-        val followingCount = followRepository.countByFollower(id)
-        val followersCount = followRepository.countByFollowing(id)
-
-        return Pair(followersCount, followingCount)
-    }
-
     /** 활동하지 않는 사용자들을 삭제하는 스케쥴 함수. */
     @Scheduled(cron = "0 30 15 * * ?")
     fun softDeleteInactiveUsers() {
@@ -215,11 +207,39 @@ class UserService(
         softDeleteUser(user)
     }
 
-    /** 사용자 정보를 DTO로 변환하는 메소드. */
-    fun toDto(user: User, includeMemberID: Boolean = true, isAdmin: Boolean? = null): UserDto {
-        val (followersCount, followingCount) = getUserFollowInfo(user.id.toString())
+    /**
+     * 현재 사용자가 특정 닉네임을 팔로우하는지 확인한다.
+     *
+     * @param currentUserMemberId 현재 사용자의 멤버 ID.
+     * @param nickname 팔로우 여부를 확인하고자 하는 사용자의 닉네임.
+     * @return 현재 사용자가 해당 닉네임의 사용자를 팔로우하는지 여부.
+     */
+    fun isFollowing(currentUserMemberId: Long?, nickname: String): Boolean {
+        if (currentUserMemberId == null) return false
 
-        return if (includeMemberID) {
+        val followingId = getUserIdByMemberId(
+            findUserByNickname(nickname)?.memberId
+                ?: return false,
+        )
+        val currentUserId = getUserIdByMemberId(currentUserMemberId)
+
+        return followRepository.existsByFollowerAndFollowing(currentUserId, followingId)
+    }
+
+    /** 사용자의 팔로우 정보 (팔로워 수, 팔로잉 수)를 조회하는 메소드. */
+    fun getUserFollowInfo(id: String): Pair<Long, Long> {
+        val followingCount = followRepository.countByFollower(id)
+        val followersCount = followRepository.countByFollowing(id)
+
+        return Pair(followersCount, followingCount)
+    }
+
+    /** 사용자 정보를 DTO로 변환하는 메소드. */
+    fun toDto(user: User, includeAdmin: Boolean = true, isAdmin: Boolean? = null, currentUserId: Long? = null): UserDto {
+        val (followersCount, followingCount) = getUserFollowInfo(user.id.toString())
+        val isCurrentUserFollowing = if (currentUserId != null) isFollowing(currentUserId, user.nickname) else null
+
+        return if (includeAdmin) {
             UserDto(
                 nickname = user.nickname,
                 introduction = user.introduction,
@@ -227,6 +247,7 @@ class UserService(
                 followersCount = followersCount,
                 followingCount = followingCount,
                 isAdmin = isAdmin,
+                isFollowing = null,
             )
         } else {
             UserDto(
@@ -235,8 +256,10 @@ class UserService(
                 profileImageUrl = user.profileImageUrl,
                 followersCount = followersCount,
                 followingCount = followingCount,
+                isFollowing = isCurrentUserFollowing,
                 isAdmin = null,
             )
         }
     }
+
 }

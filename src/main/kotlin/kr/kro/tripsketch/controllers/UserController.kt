@@ -8,6 +8,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.InternalServerException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.services.FollowService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*
 class UserController(
     private val userService: UserService,
     private val kakaoOAuthService: KakaoOAuthService,
+    private val followService: FollowService,
 ) {
 
     /**
@@ -50,22 +52,36 @@ class UserController(
         val isAdmin = memberId in adminIds
 
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, true, isAdmin))
+            ResponseEntity.ok(userService.toDto(user, includeAdmin = true, isAdmin = isAdmin, currentUserId = memberId))
         } else {
             ResponseEntity.notFound().build()
         }
     }
 
     /**
-     * 닉네임으로 사용자 정보를 가져오는 메서드입니다.
+     * 회원이 닉네임으로 사용자 정보를 가져오는 메서드입니다.
      */
     @GetMapping("/nickname")
-    @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
-    @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
-    fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
+    fun getUserByNicknameForUser(req: HttpServletRequest, @RequestParam nickname: String): ResponseEntity<UserDto> {
+        val currentUserMemberId = req.getAttribute("memberId") as Long?
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, false))
+            ResponseEntity.ok(userService.toDto(user, includeAdmin = false, currentUserId = currentUserMemberId))
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    /**
+     * 비회원 사용자가 닉네임으로 사용자 정보를 가져오는 메서드입니다.
+     */
+    @GetMapping("/nickname/guest")
+    @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
+    @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
+    fun getUserByNicknameForGuest(@RequestParam nickname: String): ResponseEntity<UserDto> {
+        val user = userService.findUserByNickname(nickname)
+        return if (user != null) {
+            ResponseEntity.ok(userService.toDto(user, includeAdmin = false))
         } else {
             ResponseEntity.notFound().build()
         }
