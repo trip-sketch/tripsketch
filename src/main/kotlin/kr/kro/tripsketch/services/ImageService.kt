@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import javax.imageio.ImageIO
 
 
 @Service
@@ -19,11 +20,24 @@ class ImageService(private val s3Service: S3Service) {
 
             val outputStream = ByteArrayOutputStream()
 
-            // Thumbnails 로직은 크게 변하지 않으나, 이미지 형식에 따라 품질을 조절합니다.
-            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(0.5)  // 크기 변경 없이 원본 크기 유지
+            val bufferedImage = ImageIO.read(file.inputStream)
+            val width = bufferedImage.width.toDouble()
+            val height = bufferedImage.height.toDouble()
+
+            // 이미지의 가로 혹은 세로의 픽셀이 1050이 넘는지 확인합니다.
+            var scale: Double = 1.0
+            if (width > 1050 || height > 1050) {
+                scale = if (width > height) {
+                    1050 / width
+                } else {
+                    1050 / height
+                }
+            }
+
+            val thumbnailBuilder = Thumbnails.of(file.inputStream).scale(scale) // 계산된 scale을 적용
 
             when (formatName) {
-                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.25)  // JPG, JPEG는 25% 품질로 설정
+                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.4)  // JPG, JPEG는 25% 품질로 설정
                 else -> thumbnailBuilder.outputQuality(0.5)  // 다른 형식은 50% 품질로 설정
             }
 
@@ -38,6 +52,7 @@ class ImageService(private val s3Service: S3Service) {
             return file.bytes
         }
     }
+
 
 
 
