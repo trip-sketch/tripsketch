@@ -35,7 +35,6 @@ class AuthService(
         val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null
         if (kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) == null) return null
 
-        // Update last login time for user
         user.updateLastLogin()
         userService.saveOrUpdate(user)
 

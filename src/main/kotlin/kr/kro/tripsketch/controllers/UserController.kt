@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
+import kr.kro.tripsketch.exceptions.DataNotFoundException
+import kr.kro.tripsketch.exceptions.InternalServerException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.ImageService
-import kr.kro.tripsketch.services.NotificationService
+import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.S3Service
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
@@ -21,7 +23,12 @@ import software.amazon.awssdk.services.s3.model.S3Exception
 
 @RestController
 @RequestMapping("api/user")
-class UserController(private val userService: UserService, private val imageService: ImageService, private val s3Service: S3Service) {
+class UserController(
+    private val userService: UserService,
+    private val kakaoOAuthService: KakaoOAuthService,
+    private val imageService: ImageService,
+    private val s3Service: S3Service,
+) {
 
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
@@ -36,15 +43,13 @@ class UserController(private val userService: UserService, private val imageServ
 
         userService.storeUserPushToken(memberId, token)
 
-        // 관리자 이메일 리스트를 환경 변수에서 가져오기
         val adminIdsStrings = EnvLoader.getProperty("ADMIN_IDS")?.split(",") ?: listOf()
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
-        // 사용자 ID가 관리자 ID 리스트에 있는지 확인
         val isAdmin = memberId in adminIds
 
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, true, isAdmin)) // 관리자 여부 추가
+            ResponseEntity.ok(userService.toDto(user, true, isAdmin))
         } else {
             ResponseEntity.notFound().build()
         }
@@ -56,7 +61,7 @@ class UserController(private val userService: UserService, private val imageServ
     fun getUserByNickname(@RequestParam nickname: String): ResponseEntity<UserDto> {
         val user = userService.findUserByNickname(nickname)
         return if (user != null) {
-            ResponseEntity.ok(userService.toDto(user, false)) // 이메일 미포함, 관리자 여부 미포함
+            ResponseEntity.ok(userService.toDto(user, false))
         } else {
             ResponseEntity.notFound().build()
         }
@@ -87,6 +92,29 @@ class UserController(private val userService: UserService, private val imageServ
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
 
+    @DeleteMapping("/unlink")
+    @ApiResponse(responseCode = "200", description = "카카오 연동 해제 및 회원 탈퇴 처리가 성공적으로 이루어졌습니다.")
+    @ApiResponse(responseCode = "401", description = "해당 사용자가 존재하지 않습니다.")
+    @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없습니다.")
+    @ApiResponse(responseCode = "400", description = "카카오 Refresh Token이 없습니다.")
+    @ApiResponse(responseCode = "500", description = "카카오 연동 해제에 실패했습니다.")
+    fun unlinkKakaoUser(req: HttpServletRequest): ResponseEntity<Any> {
+        val memberId = req.getAttribute("memberId") as Long?
+            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
+
+        val user = userService.findUserByMemberId(memberId)
+            ?: throw DataNotFoundException("회원 정보를 찾을 수 없습니다.")
+
+        val accessToken = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!)
+            ?: throw BadRequestException("카카오 Refresh Token이 없습니다.")
+
+        if (!kakaoOAuthService.unlinkUser(accessToken)) {
+            throw InternalServerException("카카오 연동 해제에 실패했습니다")
+        }
+
+        userService.softDeleteUserByMemberId(memberId)
+        return ResponseEntity.ok(mapOf("message" to "회원 탈퇴가 성공적으로 처리되었습니다."))
+    }
 
     @PostMapping("/upload", consumes = ["multipart/form-data"])
     fun uploadFile(
