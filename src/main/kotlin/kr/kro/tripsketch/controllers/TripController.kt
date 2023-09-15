@@ -233,7 +233,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
         req: HttpServletRequest,
@@ -252,7 +251,6 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
-
 
 //    @GetMapping("/search")
 //    fun getSearchTripsByKeyword(
@@ -300,7 +298,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         return try {
@@ -308,9 +305,9 @@ class TripController(private val tripService: TripService) {
             val findTrip = tripService.getTripById(id)
             if (findTrip != null) {
                 tripService.deleteTripById(memberId, id)
-                ResponseEntity.status(HttpStatus.OK).body("게시물이 삭제되었습니다.")
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "게시물이 삭제되었습니다."))
             } else {
-                ResponseEntity.notFound().build()
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to "해당 게시글이 존재하지 않습니다."))
             }
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
