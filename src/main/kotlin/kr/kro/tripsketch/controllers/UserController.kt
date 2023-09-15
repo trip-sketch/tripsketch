@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*
 class UserController(
     private val userService: UserService,
     private val kakaoOAuthService: KakaoOAuthService,
-    private val followService: FollowService,
 ) {
 
     /**
