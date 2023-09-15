@@ -1,3 +1,5 @@
+@file:Suppress("KDocUnresolvedReference", "KDocUnresolvedReference")
+
 package kr.kro.tripsketch.services
 
 import kr.kro.tripsketch.domain.Follow
@@ -6,6 +8,7 @@ import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
 
+@Suppress("KDocUnresolvedReference", "KDocUnresolvedReference")
 @Service
 class FollowService(
     private val followRepository: FollowRepository,
@@ -42,7 +45,7 @@ class FollowService(
                 listOf(followingId),
                 "새로운 여행의 시작, 트립스케치",
                 "$followerNickname 님이 당신을 구독했습니다. ",
-                senderId = followerId.toString(),
+                senderId = followerId,
                 nickname = followerNickname,
                 profileUrl = followerProfileUrl,
             )
