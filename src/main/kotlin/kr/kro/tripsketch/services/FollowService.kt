@@ -7,8 +7,6 @@ import kr.kro.tripsketch.dto.ProfileDto
 import kr.kro.tripsketch.repositories.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.stereotype.Service
-
-@Suppress("KDocUnresolvedReference", "KDocUnresolvedReference")
 @Service
 class FollowService(
     private val followRepository: FollowRepository,
