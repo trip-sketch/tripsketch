@@ -24,6 +24,11 @@ class NotificationService(
 
     private val client = OkHttpClient()
 
+    /**
+     * 특정 회원(receiver)에게 온 알림을 페이지별로 조회합니다.
+     * @author Hojun Song
+     */
+
     fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
         val userId = userService.getUserIdByMemberId(memberId)
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
@@ -41,6 +46,9 @@ class NotificationService(
         return PageImpl(updatedNotifications, pageable, notificationsPage.totalElements)
     }
 
+    /**
+     * 회원이 받은 특정 알림을 삭제합니다. 해당 회원이 알림의 수신자가 아닌 경우 예외가 발생합니다.
+     */
     fun deleteNotificationById(notificationId: String, memberId: Long) {
         val userId = userService.getUserIdByMemberId(memberId)
         val notification = notificationRepository.findById(notificationId).orElse(null)
@@ -53,6 +61,9 @@ class NotificationService(
         }
     }
 
+    /**
+     * 특정 회원들에게 푸시 알림을 전송합니다. 해당 알림은 또한 데이터베이스에 저장됩니다.
+     */
     fun sendPushNotification(
         ids: List<String>,
         title: String,
@@ -91,11 +102,17 @@ class NotificationService(
         return response.body?.string() ?: "No response body from Expo"
     }
 
+    /**
+     * 사용자의 푸시 토큰을 가져옵니다.
+     */
     private fun getUserToken(id: String): String? {
         val user = userService.findUserById(id)
         return user?.expoPushToken
     }
 
+    /**
+     * Expo 서비스를 사용하여 푸시 알림을 전송합니다.
+     */
     private fun sendExpoPushNotification(
         pushTokens: Set<String>,
         title: String,

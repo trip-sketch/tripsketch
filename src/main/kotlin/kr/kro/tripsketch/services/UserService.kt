@@ -75,7 +75,23 @@ class UserService(
         return userRepository.findAll(pageable)
     }
 
-    /** 사용자 정보를 업데이트하는 메소드. */
+    /**
+     * 사용자 정보를 업데이트 합니다.
+     *
+     * 1. memberId를 기반으로 사용자를 찾습니다.
+     * 2. 새로운 닉네임이 제공되고, 기존 닉네임과 다르며, 이미 사용 중인 닉네임이 아닌 경우에 닉네임을 업데이트 합니다.
+     * 3. 새로운 프로필 이미지 URL이 제공되면:
+     *    a. 기존 프로필 이미지가 기본 이미지가 아니면, 기존 이미지를 삭제합니다.
+     *    b. 새로운 이미지를 업로드하고, 그 URL을 사용자의 프로필 이미지 URL로 설정합니다.
+     * 4. 새로운 소개 메시지가 제공되면, 해당 메시지로 업데이트 합니다.
+     * 5. 변경된 사용자 정보를 저장합니다.
+     *
+     * @param memberId 업데이트할 사용자의 memberId
+     * @param userUpdateDto 업데이트할 사용자 정보를 포함하는 DTO
+     * @return 업데이트된 사용자 객체
+     * @throws BadRequestException 사용자를 찾을 수 없거나, 이미 사용 중인 닉네임을 사용하려 할 때 발생
+     * @author Hojun Song
+     */
     fun updateUser(memberId: Long, userUpdateDto: UserUpdateDto): User {
         val user = userRepository.findByMemberId(memberId) ?: throw BadRequestException("해당 이메일을 가진 사용자가 존재하지 않습니다.")
 
@@ -167,7 +183,7 @@ class UserService(
         }
     }
 
-    /** 사용자 정보를 소프트 딜리트하는 함수. */
+    /** 사용자 정보를 소프트 딜리트하는 메소드. */
     fun softDeleteUser(user: User) {
         user.profileImageUrl = DEFAULT_IMAGE_URL
         user.kakaoRefreshToken = "DELETED"
@@ -192,7 +208,7 @@ class UserService(
         userRepository.save(user)
     }
 
-    /** memberId를 이용하여 사용자 정보를 소프트 딜리트하는 함수. */
+    /** memberId를 이용하여 사용자 정보를 소프트 딜리트하는 메소드. */
     fun softDeleteUserByMemberId(memberId: Long) {
         val user = userRepository.findByMemberId(memberId)
             ?: throw IllegalArgumentException("해당 멤버 아이디를 가진 사용자가 존재하지 않습니다.")
@@ -200,7 +216,7 @@ class UserService(
         softDeleteUser(user)
     }
 
-    /** 사용자 정보를 DTO로 변환하는 함수. */
+    /** 사용자 정보를 DTO로 변환하는 메소드. */
     fun toDto(user: User, includeMemberID: Boolean = true, isAdmin: Boolean? = null): UserDto {
         val (followersCount, followingCount) = getUserFollowInfo(user.id.toString())
 
