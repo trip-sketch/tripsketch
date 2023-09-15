@@ -95,10 +95,37 @@ class TripController(private val tripService: TripService) {
 //    }
 
     @GetMapping("/trips")
-    fun getAllTripsByUser(req: HttpServletRequest): ResponseEntity<Set<TripDto>> {
-        val memberId = req.getAttribute("memberId") as Long
-        val findTrips = tripService.getAllTripsByUser(memberId)
-        return ResponseEntity.ok(findTrips)
+    fun getAllTripsByUser(
+        req: HttpServletRequest,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
+        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+    ): ResponseEntity<Any> {
+        return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val sort = when (sortType) {
+                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+                2 -> Sort.by(
+                    Sort.Order(Sort.Direction.DESC, "views"),
+                    Sort.Order(Sort.Direction.DESC, "createdAt")
+                )
+                -2 -> Sort.by(
+                    Sort.Order(Sort.Direction.ASC, "views"),
+                    Sort.Order(Sort.Direction.DESC, "createdAt")
+                )
+                else -> throw IllegalArgumentException("Invalid sort type")
+            }
+            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+            val findTrips = tripService.getAllTripsByUser(memberId, pageable)
+            if (findTrips.isNotEmpty()) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+            }
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+        }
     }
 
     @GetMapping("/trips/mytrips")
