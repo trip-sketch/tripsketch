@@ -3,7 +3,6 @@ package kr.kro.tripsketch.services
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.TokenResponse
 import kr.kro.tripsketch.exceptions.UnauthorizedException
@@ -14,13 +13,20 @@ import javax.crypto.spec.SecretKeySpec
 
 @Service
 class JwtService {
-    private val secretKeyString = EnvLoader.getProperty("SECRET_KEY") ?: ""
+    private val secretKeyString = EnvLoader.getProperty("SECRET_KEY") ?: UUID.randomUUID().toString()
     private val secretKey = SecretKeySpec(secretKeyString.toByteArray(), SignatureAlgorithm.HS256.jcaName)
     private val accessTokenValidityInMilliseconds: Long =
-        EnvLoader.getProperty("ACCESS_TOKEN_VALIDITY")?.toLong() ?: 3600000 // 1h
+        EnvLoader.getPropertyOrDefault("ACCESS_TOKEN_VALIDITY", "3600000").toLong()
     private val refreshTokenValidityInMilliseconds: Long =
-        EnvLoader.getProperty("REFRESH_TOKEN_VALIDITY")?.toLong() ?: 2592000000 // 30 days
-
+        EnvLoader.getPropertyOrDefault("REFRESH_TOKEN_VALIDITY", "2592000000").toLong()
+    /**
+     * 사용자 정보를 바탕으로 Access Token과 Refresh Token을 생성합니다.
+     *
+     * @param user 사용자 정보 객체.
+     * @return 생성된 토큰에 대한 응답 객체 ([TokenResponse]).
+     * @author Hojun Song
+     *
+     */
     fun createTokens(user: User): TokenResponse {
         val now = Date()
 
@@ -51,6 +57,16 @@ class JwtService {
         return TokenResponse(accessToken, refreshToken, refreshTokenValidity.time)
     }
 
+    /**
+     * 제공된 토큰의 유효성을 검사합니다.
+     *
+     * 만료된 토큰 또는 유효하지 않은 토큰에 대해 예외를 발생시킵니다.
+     *
+     * @param token 검사할 토큰 문자열.
+     * @return 토큰의 유효성 결과 (유효한 경우 true, 그렇지 않은 경우 false).
+     * @throws UnauthorizedException 유효하지 않은 토큰의 경우 발생.
+     */
+
     fun validateToken(token: String): Boolean {
         return try {
             val claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body
@@ -63,6 +79,13 @@ class JwtService {
         }
     }
 
+    /**
+     * 제공된 토큰에서 사용자의 memberId를 추출합니다.
+     *
+     * @param token memberId를 추출할 토큰 문자열.
+     * @return 토큰에서 추출된 memberId.
+     * @throws UnauthorizedException 토큰에 memberId가 없는 경우 발생.
+     */
     fun getMemberIdFromToken(token: String): Long {
         val subject = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
         subject?.let {
@@ -70,12 +93,4 @@ class JwtService {
         } ?: throw UnauthorizedException("토큰에 memberId가 없습니다.")
     }
 
-    fun resolveToken(req: HttpServletRequest): String? {
-        val bearerToken = req.getHeader("Authorization")
-        return if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            bearerToken.substring(7, bearerToken.length)
-        } else {
-            null
-        }
-    }
 }

@@ -6,9 +6,13 @@ import org.springframework.context.annotation.Configuration
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import java.net.URI
 
+/**
+ * S3 Bucket 설정을 위한 값 설정
+ *
+ * @author Hojun Song
+ */
 @Configuration
 class S3Config {
 
@@ -32,14 +36,4 @@ class S3Config {
             .build()
     }
 
-    @Bean
-    fun s3Presigner(): S3Presigner {
-        return S3Presigner.builder()
-            .region(Region.of(region))
-            .credentialsProvider {
-                AwsBasicCredentials.create(accessKey, secretKey)
-            }
-            .endpointOverride(URI.create("https://compat.objectstorage.ap-osaka-1.oraclecloud.com"))
-            .build()
-    }
 }
