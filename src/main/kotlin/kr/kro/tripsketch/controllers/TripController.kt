@@ -83,7 +83,7 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(findTrips)
     }
 
-    @GetMapping("/trips/myTrips")
+    @GetMapping("/trips/mytrips")
     fun getAllMyTripsByUser(
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
