@@ -3,11 +3,8 @@ package kr.kro.tripsketch.services
 import net.coobird.thumbnailator.Thumbnails
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.io.*
 import java.net.URI
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
 
 @Service
 class ImageService(private val s3Service: S3Service) {
@@ -15,28 +12,28 @@ class ImageService(private val s3Service: S3Service) {
     fun compressImage(file: MultipartFile): ByteArray {
         try {
             val formatName = file.originalFilename?.substringAfterLast('.', "")?.lowercase() ?: "jpg"
-
             val outputStream = ByteArrayOutputStream()
+            val bufferedOutputStream = BufferedOutputStream(outputStream)
 
             val thumbnailBuilder = Thumbnails.of(file.inputStream).size(1080, 1080).keepAspectRatio(true)
 
             when (formatName) {
-                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.25)  // JPG, JPEG는 25% 품질로 설정
+                "jpg", "jpeg" -> thumbnailBuilder.outputQuality(0.3)  // JPG, JPEG는 30% 품질로 설정
                 else -> thumbnailBuilder.outputQuality(0.5)  // 다른 형식은 50% 품질로 설정
             }
 
             thumbnailBuilder
                 .outputFormat(formatName)
-                .toOutputStream(outputStream)
+                .toOutputStream(bufferedOutputStream)
+
+            bufferedOutputStream.flush()
 
             return outputStream.toByteArray()
-
         } catch (e: Exception) {
             e.printStackTrace()
             return file.bytes
         }
     }
-
 
 
     fun uploadImage(dir: String, file: MultipartFile): String {
