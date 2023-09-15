@@ -24,6 +24,8 @@ class JwtService {
      *
      * @param user 사용자 정보 객체.
      * @return 생성된 토큰에 대한 응답 객체 ([TokenResponse]).
+     * @author Hojun Song
+     *
      */
     fun createTokens(user: User): TokenResponse {
         val now = Date()
