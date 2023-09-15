@@ -18,7 +18,7 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
     @PostMapping("/like")
     fun likeTrip(
         req: HttpServletRequest,
-        @RequestBody tripIdDto: TripIdDto
+        @RequestBody tripIdDto: TripIdDto,
     ): ResponseEntity<String> {
         val memberId = req.getAttribute("memberId") as Long?
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
@@ -33,7 +33,7 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
     @PostMapping("/unlike")
     fun unlikeTrip(
         req: HttpServletRequest,
-        @RequestBody tripIdDto: TripIdDto
+        @RequestBody tripIdDto: TripIdDto,
     ): ResponseEntity<String> {
         val memberId = req.getAttribute("memberId") as Long?
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
