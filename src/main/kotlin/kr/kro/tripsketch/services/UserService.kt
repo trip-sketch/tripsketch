@@ -154,17 +154,21 @@ class UserService(
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
 
-        /**
-         * 랜덤닉네임 생성
-         */
+        /** 랜덤닉네임 생성 */
         var newNickname: String
         do {
             newNickname = nicknameService.generateRandomNickname()
-        } while (isNicknameExist(newNickname))
+        } while (userRepository.existsByNickname(newNickname))
         user.nickname = newNickname
 
+        /** 음수로 memberId 난수 생성 및 중복 검증 */
+        var newMemberId: Long
+        do {
+            newMemberId = -1L * kotlin.random.Random.nextLong(Long.MAX_VALUE)
+        } while (userRepository.existsByMemberId(newMemberId))
+        user.memberId = newMemberId
+
         userRepository.save(user)
-        println("User with ID ${user.id} has been soft deleted.")
     }
 
     fun softDeleteUserByMemberId(memberId: Long) {

@@ -10,6 +10,7 @@ interface UserRepository : MongoRepository<User, String> {
     fun findByMemberId(memberId: Long): User?
     fun findByNickname(nickname: String): User?
     fun existsByNickname(nickname: String): Boolean
+    fun existsByMemberId(memberId: Long): Boolean
     fun findByOurRefreshToken(ourRefreshToken: String): User?
     fun findUsersByUpdatedAtBefore(cutoffDate: LocalDateTime): List<User>
 }
