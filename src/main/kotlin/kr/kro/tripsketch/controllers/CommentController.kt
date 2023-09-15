@@ -24,7 +24,7 @@ class CommentController(private val commentService: CommentService) {
     @GetMapping("/admin/commentsWithPagination")
     fun getAllComments(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int
+        @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
         val paginatedComments = commentService.getAllCommentsWithPagination(page, pageSize)
         return ResponseEntity.ok(paginatedComments)

@@ -1,7 +1,6 @@
 package kr.kro.tripsketch.dto
 
 import jakarta.validation.constraints.NotBlank
-import kr.kro.tripsketch.domain.HashtagInfo
 import org.hibernate.validator.constraints.Length
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
@@ -33,5 +32,5 @@ data class TripUpdateDto(
     var road: String? = null,
     var address: String? = null,
     var etc: Set<String>? = null,
-    var updatedAt: LocalDateTime? = LocalDateTime.now()
+    var updatedAt: LocalDateTime? = LocalDateTime.now(),
 )

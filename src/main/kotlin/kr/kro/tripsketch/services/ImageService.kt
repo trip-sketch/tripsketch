@@ -26,7 +26,4 @@ class ImageService(private val s3Service: S3Service) {
 
         return Pair(dir, key)
     }
-
-
-
 }

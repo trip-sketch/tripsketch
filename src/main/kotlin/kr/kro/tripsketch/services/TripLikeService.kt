@@ -9,7 +9,7 @@ class TripLikeService(
     private val tripRepository: TripRepository,
     private val userRepository: UserRepository,
     private val userService: UserService,
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
 ) {
     fun likeTrip(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
@@ -35,7 +35,7 @@ class TripLikeService(
                         null,
                         findTrip.id,
                         userNickname,
-                        userProfileUrl
+                        userProfileUrl,
                     )
                 } else {
                     throw IllegalArgumentException("조회되는 사용자가 없습니다.")
