@@ -22,7 +22,7 @@ class TripController(private val tripService: TripService) {
     @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
-        @Validated @ModelAttribute tripCreateDto: TripCreateDto
+        @Validated @ModelAttribute tripCreateDto: TripCreateDto,
     ): ResponseEntity<TripDto> {
         try {
             val memberId = req.getAttribute("memberId") as Long
@@ -37,11 +37,11 @@ class TripController(private val tripService: TripService) {
     fun getAllTrips(
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("size", required = false, defaultValue = "10") size: Int
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
     ): ResponseEntity<Map<String, Any>> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
             val findTrips = tripService.getAllTrips(memberId, pageable)
             ResponseEntity.ok(findTrips)
         } catch (e: IllegalArgumentException) {
@@ -62,11 +62,11 @@ class TripController(private val tripService: TripService) {
     fun getAllMyTripsByUser(
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("size", required = false, defaultValue = "10") size: Int
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
     ): ResponseEntity<Map<String, Any>> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val pageable: Pageable = PageRequest.of(page-1, size, Sort.by("createdAt").descending())
+            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
             val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
             ResponseEntity.ok(findTrips)
         } catch (e: IllegalArgumentException) {
@@ -94,7 +94,7 @@ class TripController(private val tripService: TripService) {
     fun getTripsByNickname(
         @RequestParam nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("size", required = false, defaultValue = "10") size: Int
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
     ): ResponseEntity<Any> {
         return try {
             val pagenationUtil = PagenationUtil()
@@ -121,7 +121,7 @@ class TripController(private val tripService: TripService) {
         @PathVariable tripId: String,
     ): ResponseEntity<TripAndCommentResponseDto> {
         val memberId = req.getAttribute("memberId") as Long
-        val findTripAndComment = tripService.getTripAndCommentsIsLikedByTripIdMember(tripId,memberId)
+        val findTripAndComment = tripService.getTripAndCommentsIsLikedByTripIdMember(tripId, memberId)
         return ResponseEntity.ok(findTripAndComment)
     }
 
@@ -213,7 +213,7 @@ class TripController(private val tripService: TripService) {
     fun getListFollowingTrips(
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
-        @RequestParam("size", required = false, defaultValue = "10") size: Int
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -233,12 +233,11 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
         req: HttpServletRequest,
         @RequestParam keyword: String,
-        @RequestParam sorting: Int
+        @RequestParam sorting: Int,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -252,7 +251,6 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
-
 
 //    @GetMapping("/search")
 //    fun getSearchTripsByKeyword(
@@ -282,7 +280,7 @@ class TripController(private val tripService: TripService) {
     fun updateTrip(
         req: HttpServletRequest,
         @PathVariable id: String,
-        @Validated @ModelAttribute tripUpdateDto: TripUpdateDto
+        @Validated @ModelAttribute tripUpdateDto: TripUpdateDto,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -299,7 +297,6 @@ class TripController(private val tripService: TripService) {
             throw ForbiddenException("수정할 권한이 없습니다. ${e.message}")
         }
     }
-
 
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
@@ -323,7 +320,7 @@ class TripController(private val tripService: TripService) {
 private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
     val responseBody = mapOf(
         "message" to message,
-        "trip" to returnedTripDto
+        "trip" to returnedTripDto,
     )
     return this.body(responseBody)
 }

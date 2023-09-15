@@ -97,9 +97,6 @@ dependencies {
 
     implementation("com.drewnoakes:metadata-extractor:2.18.0")
     implementation("net.coobird:thumbnailator:0.4.20")
-
-
-
 }
 
 tasks.withType<KotlinCompile> {
