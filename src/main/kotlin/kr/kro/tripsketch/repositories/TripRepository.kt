@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
 
-
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
 
@@ -55,7 +54,8 @@ interface TripRepository : MongoRepository<Trip, String> {
     // 최신 게시물 하나를 찾는 쿼리
     fun findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(userId: String): Trip?
 
-    @Query("{" +
+    @Query(
+        "{" +
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }, " +
@@ -65,13 +65,15 @@ interface TripRepository : MongoRepository<Trip, String> {
     )
     fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
 
-    @Query("{" +
+    @Query(
+        "{" +
             "\$or: [" +
             "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
             "   { 'content': { \$regex: ?0, \$options: 'i' } }" +
             "]," +
             "'isPublic': true, 'isHidden': false" +
-            "}")
+            "}",
+    )
     fun findTripsByKeywordWithLikes(keyword: String, sorting: Sort = Sort.by(Sort.Order.desc("likes"))): List<Trip>
 
 //    @Query("{" +

@@ -46,4 +46,9 @@ class GlobalExceptionHandler {
     fun handleDataNotFoundException(e: DataNotFoundException): ResponseEntity<String> {
         return ResponseEntity(e.message, HttpStatus.NOT_FOUND)
     }
+
+    @ExceptionHandler(InternalServerException::class)
+    fun handleInternalServerException(e: InternalServerException): ResponseEntity<String> {
+        return ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
 }

@@ -24,10 +24,11 @@ class JwtService {
     fun createTokens(user: User): TokenResponse {
         val now = Date()
 
-        // memberId null 체크
         user.memberId
 
-        // Access Token 생성
+        /**
+         * Access Token 생성
+         */
         val accessTokenValidity = Date(now.time + accessTokenValidityInMilliseconds)
         val accessToken = Jwts.builder()
             .setSubject(user.memberId.toString())
@@ -37,7 +38,7 @@ class JwtService {
             .signWith(secretKey)
             .compact()
 
-        // Refresh Token 생성
+        /** Refresh Token 생성 */
         val refreshTokenValidity = Date(now.time + refreshTokenValidityInMilliseconds)
         val refreshToken = Jwts.builder()
             .setSubject(user.memberId.toString())

@@ -5,7 +5,6 @@ import org.hibernate.validator.constraints.Length
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -27,8 +26,8 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDate? = LocalDate.now(),
     var endAt: LocalDate? = LocalDate.now(),
-    var isPublic: Boolean? = true,        // 게시글 전체공개 또는 비공개 여부
-    var isHidden: Boolean = false,        // 게시글 삭제 여부
+    var isPublic: Boolean? = true, // 게시글 전체공개 또는 비공개 여부
+    var isHidden: Boolean = false, // 게시글 삭제 여부
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,
@@ -37,7 +36,7 @@ data class Trip(
     var deletedAt: LocalDateTime? = null,
     var tripLikes: MutableSet<String> = mutableSetOf(),
     var tripViews: MutableSet<String> = mutableSetOf(),
-    var images: List<String>? = emptyList()
+    var images: List<String>? = emptyList(),
 )
 
 data class HashtagInfo(
@@ -49,5 +48,5 @@ data class HashtagInfo(
     val displayName: String? = null,
     val road: String? = null,
     val address: String? = null,
-    val etc: Set<String>? = null
+    val etc: Set<String>? = null,
 )
