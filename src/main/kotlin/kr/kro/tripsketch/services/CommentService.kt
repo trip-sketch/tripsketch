@@ -70,19 +70,6 @@ class CommentService(
         }
     }
 
-
-    //    fun getCommentsByUserId(userId: String): List<CommentDto> {
-//        return commentRepository.findAllByUserId(userId).map { fromComment(it, userService) }
-//    }
-//
-//    fun getActiveComments(): List<CommentDto> {
-//        return commentRepository.findAllByIsDeletedFalse().map { fromComment(it, userService) }
-//    }
-//
-//    fun getLikedCommentsByUserId(userId: String): List<CommentDto> {
-//        return commentRepository.findAllByLikedByContains(userId).map { fromComment(it, userService) }
-//    }
-//
     fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
         return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
     }
@@ -289,10 +276,6 @@ class CommentService(
                 numberOfLikes = 0
             )
             commentRepository.save(deletedComment)
-//            // Soft delete 처리 부분으로 넘어감
-//            val commentId = comment.id
-//            // 댓글을 삭제합니다.
-//            commentId?.let { commentRepository.deleteById(it) }
             return
         }
 
