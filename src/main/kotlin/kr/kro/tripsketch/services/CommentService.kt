@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kotlin.math.min
 
 @Service
 class CommentService(
@@ -491,33 +492,17 @@ class CommentService(
 
 fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
     val paginatedComments = mutableListOf<CommentDto>()
-    val totalCommentsWithChildren = comments.sumOf { it.children.size + 1 }
+    val formattedComments = formattingCommentsWithChildren(comments)
+
+    val totalComments = formattedComments.size
+    val totalPage = (totalComments + pageSize - 1) / pageSize
+
     val startIndex = (page - 1) * pageSize
-    var addedComments = 0
-    var totalIndex = 0
-    var currentIndex = 0
+    val endIndex = min(startIndex + pageSize, totalComments)
 
-    while (startIndex < pageSize && totalIndex < totalCommentsWithChildren) {
-        val currentComment = comments[currentIndex]
-        paginatedComments.add(currentComment)
-        addedComments++
-        var toAddChildIndex = 0
-
-
-        // 대댓글 추가
-        currentComment.children.forEachIndexed { _, childComment ->
-            if (addedComments < pageSize) {
-                paginatedComments[currentIndex].children.add(childComment)
-                addedComments++
-                toAddChildIndex++
-            }
-        }
-        totalIndex = currentIndex + toAddChildIndex
-
-        currentIndex++
+    for (i in startIndex until endIndex) {
+        paginatedComments.add(formattedComments[i])
     }
-
-    val totalPage = (totalCommentsWithChildren + pageSize - 1) / pageSize
 
     return mapOf(
         "comments" to paginatedComments,
@@ -526,6 +511,30 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
         "commentsPerPage" to pageSize
     )
 }
+
+
+fun formattingCommentsWithChildren(comments: List<CommentDto>): List<CommentDto> {
+    val commentsList = mutableListOf<CommentDto>()
+
+    comments.forEach { comment ->
+        val updatedComment = comment.copy(children = mutableListOf())
+        commentsList.add(updatedComment)
+
+        // 대댓글 추가
+        comment.children.let { children ->
+            children.forEach { childComment ->
+                commentsList.add(childComment)
+            }
+        }
+    }
+
+    return commentsList
+}
+
+
+
+
+
 
 
 
