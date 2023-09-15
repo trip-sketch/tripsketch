@@ -32,14 +32,4 @@ class S3Config {
             .build()
     }
 
-    @Bean
-    fun s3Presigner(): S3Presigner {
-        return S3Presigner.builder()
-            .region(Region.of(region))
-            .credentialsProvider {
-                AwsBasicCredentials.create(accessKey, secretKey)
-            }
-            .endpointOverride(URI.create("https://compat.objectstorage.ap-osaka-1.oraclecloud.com"))
-            .build()
-    }
 }

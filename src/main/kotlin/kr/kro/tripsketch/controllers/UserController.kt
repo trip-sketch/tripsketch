@@ -21,15 +21,19 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.services.s3.model.S3Exception
 
+/**
+ * 사용자와 관련된 요청을 처리하는 컨트롤러입니다.
+ */
 @RestController
 @RequestMapping("api/user")
 class UserController(
     private val userService: UserService,
     private val kakaoOAuthService: KakaoOAuthService,
-    private val imageService: ImageService,
-    private val s3Service: S3Service,
 ) {
 
+    /**
+     * 사용자 정보를 가져오는 메서드입니다.
+     */
     @GetMapping
     @ApiResponse(responseCode = "200", description = "사용자 정보를 성공적으로 반환합니다.")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 또는 유효하지 않은 토큰.")
@@ -55,6 +59,9 @@ class UserController(
         }
     }
 
+    /**
+     * 닉네임으로 사용자 정보를 가져오는 메서드입니다.
+     */
     @GetMapping("/nickname")
     @ApiResponse(responseCode = "200", description = "사용자의 닉네임으로 정보를 성공적으로 반환합니다.")
     @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
@@ -67,6 +74,9 @@ class UserController(
         }
     }
 
+    /**
+     * 사용자 정보를 업데이트하는 메서드입니다.
+     */
     @PatchMapping(consumes = ["multipart/form-data"])
     @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트가 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
@@ -85,6 +95,9 @@ class UserController(
         }
     }
 
+    /**
+     * 모든 사용자의 정보를 가져오는 메서드입니다.
+     */
     @GetMapping("/admin/users")
     @ApiResponse(responseCode = "200", description = "모든 사용자의 정보를 성공적으로 반환합니다.")
     fun getAllUsers(req: HttpServletRequest, pageable: Pageable): ResponseEntity<Page<UserDto>> {
@@ -92,6 +105,9 @@ class UserController(
         return ResponseEntity.ok(users.map { userService.toDto(it) })
     }
 
+    /**
+     * 카카오 연동을 해제하고 사용자를 탈퇴하는 메서드입니다.
+     */
     @DeleteMapping("/unlink")
     @ApiResponse(responseCode = "200", description = "카카오 연동 해제 및 회원 탈퇴 처리가 성공적으로 이루어졌습니다.")
     @ApiResponse(responseCode = "401", description = "해당 사용자가 존재하지 않습니다.")
@@ -116,48 +132,4 @@ class UserController(
         return ResponseEntity.ok(mapOf("message" to "회원 탈퇴가 성공적으로 처리되었습니다."))
     }
 
-    @PostMapping("/upload", consumes = ["multipart/form-data"])
-    fun uploadFile(
-        @RequestParam("dir", required = false, defaultValue = "") dir: String,
-        @RequestParam("file") file: MultipartFile,
-    ): ResponseEntity<Any> {
-        return try {
-            val (url, response) = s3Service.uploadFile(dir, file)
-            ResponseEntity.ok(mapOf("url" to url, "eTag" to response.eTag()))
-        } catch (e: S3Exception) {
-            ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
-        }
-    }
-
-    @PostMapping("/uploads", consumes = ["multipart/form-data"])
-    fun uploadFiles(
-        @RequestParam("dir", required = false, defaultValue = "") dir: String?,
-        @RequestParam("files") files: Array<MultipartFile>,
-    ): ResponseEntity<Any> {
-        val directory = dir ?: ""
-
-        return try {
-            val results = files.map { file ->
-                val (url, response) = s3Service.uploadFile(directory, file)
-                mapOf("url" to url, "eTag" to response.eTag())
-            }
-            ResponseEntity.ok(results)
-        } catch (e: S3Exception) {
-            ResponseEntity.badRequest().body(mapOf("message" to "파일 업로드 실패", "awsError" to e.message))
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().body(mapOf("message" to "알 수 없는 오류 발생", "error" to e.message))
-        }
-    }
-
-    @DeleteMapping("/delete")
-    fun deleteImage(@RequestParam url: String): ResponseEntity<String> {
-        return try {
-            imageService.deleteImage(url)
-            ResponseEntity.ok("Image successfully deleted!")
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().body("Failed to delete the image. Error: ${e.message}")
-        }
-    }
 }
