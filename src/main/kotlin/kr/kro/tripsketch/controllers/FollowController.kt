@@ -52,7 +52,7 @@ class FollowController(
     /**
      * 나를 팔로우 한 사용자의 나에 대한 구독을 취소하는 메서드입니다.
      */
-    @DeleteMapping("/unfollowme")
+    @DeleteMapping("/unfollow-me")
     @ApiResponse(responseCode = "200", description = "해당 사용자의 구독을 취소했습니다.")
     @ApiResponse(responseCode = "401", description = "이메일이 존재하지 않습니다.")
     fun unfollowMe(req: HttpServletRequest, @Validated @RequestBody followDto: FollowDto): ResponseEntity<String> {
