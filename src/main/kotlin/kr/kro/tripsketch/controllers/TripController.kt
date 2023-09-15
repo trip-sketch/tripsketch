@@ -33,15 +33,40 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+//    @GetMapping("/admin/trips")
+//    fun getAllTrips(
+//        req: HttpServletRequest,
+//        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+//        @RequestParam("size", required = false, defaultValue = "10") size: Int,
+//    ): ResponseEntity<Map<String, Any>> {
+//        return try {
+//            val memberId = req.getAttribute("memberId") as Long
+//            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
+//            val findTrips = tripService.getAllTrips(memberId, pageable)
+//            ResponseEntity.ok(findTrips)
+//        } catch (e: IllegalArgumentException) {
+//            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+//        } catch (e: DataNotFoundException) {
+//            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to e.message))
+//        }
+//    }
+
     @GetMapping("/admin/trips")
     fun getAllTrips(
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
+        @RequestParam("sort", required = false, defaultValue = "createdAt,desc") sort: String
     ): ResponseEntity<Map<String, Any>> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
+            val sortProperties = sort.split(",")[0]
+            val sortDirection = if (sort.split(",").getOrNull(1) == "asc") Sort.Direction.ASC else Sort.Direction.DESC
+            val sort = Sort.by(
+                Sort.Order(sortDirection, sortProperties),
+                Sort.Order(Sort.Direction.DESC, "createdAt")
+            )
+            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val findTrips = tripService.getAllTrips(memberId, pageable)
             ResponseEntity.ok(findTrips)
         } catch (e: IllegalArgumentException) {
