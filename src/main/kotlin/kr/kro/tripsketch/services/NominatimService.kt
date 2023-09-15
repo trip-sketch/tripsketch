@@ -19,8 +19,6 @@ class NominatimService(private val objectMapper: ObjectMapper) {
         val response = httpClient.newCall(request).execute()
         val jsonResponse = response.body?.string()
 
-        println("JSON Response: $jsonResponse") // 디버깅용 출력
-
         // JSON 파싱 및 변환
         return try {
             parseJsonToGeocodeResponse(jsonResponse)
