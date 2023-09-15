@@ -153,6 +153,7 @@ class UserService(
         user.kakaoRefreshToken = "DELETED"
         user.ourRefreshToken = "DELETED"
         user.expoPushToken = "DELETED"
+        user.introduction = ""
 
         /** 랜덤닉네임 생성 */
         var newNickname: String
