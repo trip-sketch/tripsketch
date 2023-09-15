@@ -26,7 +26,7 @@ class TripService(
     private val userService: UserService,
     private val notificationService: NotificationService,
     private val imageService: ImageService,
-    private val commentService: CommentService
+    private val commentService: CommentService,
 ) {
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>?): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
@@ -46,7 +46,7 @@ class TripService(
             displayName = tripCreateDto.displayName,
             road = tripCreateDto.road,
             address = tripCreateDto.address,
-            etc = tripCreateDto.etc
+            etc = tripCreateDto.etc,
         )
 
         val newTrip = Trip(
@@ -79,7 +79,7 @@ class TripService(
             null,
             createdTrip.id,
             followingNickname,
-            followingProfileUrl
+            followingProfileUrl,
         )
         return fromTrip(createdTrip, userId)
     }
@@ -101,7 +101,7 @@ class TripService(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
             "postsPerPage" to postsPerPage,
-            "totalPages" to totalPage
+            "totalPages" to totalPage,
         )
     }
 
@@ -110,7 +110,7 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips =
             tripRepository.findByIsHiddenIsFalseAndUserId(userId) +
-                    tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
+                tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId)
         return findTrips.map { fromTrip(it, userId) }.toSet()
     }
 
@@ -131,7 +131,7 @@ class TripService(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
             "postsPerPage" to postsPerPage,
-            "totalPages" to totalPage
+            "totalPages" to totalPage,
         )
     }
 
@@ -157,24 +157,24 @@ class TripService(
             "currentPage" to currentPage,
             "trips" to tripsDtoList,
             "postsPerPage" to postsPerPage,
-            "totalPages" to totalPage
+            "totalPages" to totalPage,
         )
     }
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
-        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
         val commentDtoList = commentService.getCommentsGuestByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
 
-    fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId:Long): TripAndCommentResponseDto {
+    fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId: Long): TripAndCommentResponseDto {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
-        if(findTrip.isPublic==false&&findTrip.userId!=userId){
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        if (findTrip.isPublic == false && findTrip.userId != userId) {
             throw ForbiddenException("해당 게시물에 접근 권한이 없습니다.")
         }
-        val commentDtoList = commentService.getIsLikedByMemberIdForTrip(memberId,id)
+        val commentDtoList = commentService.getIsLikedByMemberIdForTrip(memberId, id)
         return fromTripAndComments(findTrip, commentDtoList, userId)
     }
 
@@ -374,7 +374,7 @@ class TripService(
             "currentPage" to currentPage,
             "trips" to pagedTripDtoList,
             "postsPerPage" to postsPerPage,
-            "totalPages" to totalPage
+            "totalPages" to totalPage,
         )
     }
 
@@ -467,7 +467,7 @@ class TripService(
                     displayName = tripUpdateDto.displayName,
                     road = tripUpdateDto.road,
                     address = tripUpdateDto.address,
-                    etc = tripUpdateDto.etc ?: emptySet()
+                    etc = tripUpdateDto.etc ?: emptySet(),
                 )
             }
 
@@ -479,7 +479,7 @@ class TripService(
                 for (url in deletedUrls) {
                     try {
                         imageService.deleteImage(url)
-                        currentImages.remove(url)  // 이미지 URL을 리스트에서 제거합니다.
+                        currentImages.remove(url) // 이미지 URL을 리스트에서 제거합니다.
                     } catch (e: Exception) {
                         println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
                     }
@@ -539,7 +539,7 @@ class TripService(
         val hashtags = mutableSetOf<String>()
         trip.hashtagInfo?.let { hashtagInfo ->
             with(hashtagInfo) {
-                val nonEmptyFields = listOf( country, city, municipality, name, road, address)
+                val nonEmptyFields = listOf(country, city, municipality, name, road, address)
                 hashtags.addAll(nonEmptyFields.filterNotNull().filter { it.isNotBlank() && it != "undefined" })
                 etc?.let {
                     hashtags.addAll(it)
@@ -565,7 +565,7 @@ class TripService(
             updatedAt = trip.updatedAt,
             deletedAt = trip.deletedAt,
             isLiked = isLiked,
-            images = trip.images
+            images = trip.images,
         )
     }
 
@@ -600,7 +600,7 @@ class TripService(
             deletedAt = trip.deletedAt,
             tripLikes = trip.tripLikes,
             isLiked = isLiked,
-            images = trip.images
+            images = trip.images,
         )
     }
 
@@ -608,7 +608,8 @@ class TripService(
         return TripAndCommentResponseDto(
             tripAndCommentPairDataByTripId = Pair(
                 fromTrip(trip, currentUserId),
-                comments)
+                comments,
+            ),
         )
     }
 
@@ -637,11 +638,10 @@ class TripService(
             country = country,
             createdAt = trip.createdAt,
             image = trip.images?.firstOrNull(),
-            isLiked = isLiked
+            isLiked = isLiked,
         )
     }
 }
-
 
 fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
@@ -660,6 +660,6 @@ fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, An
         "posts" to paginatedTrips,
         "currentPage" to page,
         "totalPage" to totalPage,
-        "postsPerPage" to pageSize
+        "postsPerPage" to pageSize,
     )
 }

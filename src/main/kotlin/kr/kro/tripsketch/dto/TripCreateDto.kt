@@ -1,7 +1,6 @@
 package kr.kro.tripsketch.dto
 
 import jakarta.validation.constraints.NotBlank
-import kr.kro.tripsketch.domain.HashtagInfo
 import org.hibernate.validator.constraints.Length
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate

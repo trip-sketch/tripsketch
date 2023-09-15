@@ -5,14 +5,14 @@ import java.time.LocalDateTime
 data class TripCardDto(
     var id: String? = null,
     var nickname: String?,
-    val profileImageUrl: String? = "" ,
+    val profileImageUrl: String? = "",
     var title: String,
     var likes: Int?,
     var views: Int?,
     var comments: Int?,
-    var countryCode: String? = "",       // HashtagInfo
-    var country: String? = "",            // HashtagInfo
+    var countryCode: String? = "", // HashtagInfo
+    var country: String? = "", // HashtagInfo
     val createdAt: LocalDateTime? = null,
-    var image: String? = "" ,
-    var isLiked: Boolean
+    var image: String? = "",
+    var isLiked: Boolean,
 )
