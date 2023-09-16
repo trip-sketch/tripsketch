@@ -395,6 +395,23 @@ class TripService(
         )
     }
 
+    fun getSearchTripsByKeywordAsGuest(keyword: String, pageable: Pageable): Map<String, Any> {
+        val findTrips = tripRepository.findTripsByKeyword(keyword, pageable)
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, "") }
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+        if (currentPage > totalPage && findTrips.content.isNotEmpty()) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage,
+        )
+    }
+
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
