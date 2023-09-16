@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * 게시물 좋아요와 관련된 요청을 처리하는 컨트롤러입니다.
+ */
 @RestController
 @RequestMapping("api/trip")
 class TripLikeController(private val tripLikeService: TripLikeService) {
