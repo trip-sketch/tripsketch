@@ -356,7 +356,7 @@ class TripController(private val tripService: TripService) {
 //            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
-            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
             val findTrips = tripService.getSearchTripsByKeyword(memberId, keyword, pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
