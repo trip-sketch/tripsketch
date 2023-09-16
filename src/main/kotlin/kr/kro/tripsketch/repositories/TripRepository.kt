@@ -10,49 +10,69 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TripRepository : MongoRepository<Trip, String> {
 
-    // userId를 기반으로 여행을 검색하는 메소드
-    fun findTripByUserId(userId: String): Set<Trip>
-
-    // tripLikes 배열의 길이를 조회하는 메소드
-    fun countByTripLikes(id: String): Long
-
-    // 삭제할 게시글 조회
-    fun findByIsHiddenIsFalseAndId(id: String): Trip?
-
-    // 로그인 사용자가 작성한 게시글 조회 (userId 사용)
-    fun findByIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
+    /**
+     * userId를 기준으로 사용자가 작성한 게시글 조회합니다.
+     * @param userId 사용자 ID
+     * @return 페이지네이션된 결과
+     * */
     fun findByIsHiddenIsFalseAndUserId(userId: String, pageable: Pageable): Page<Trip>
 
-    // trip id가 일치하는 게시글 조회
+    /**
+     * tripId를 기준으로 일치하는 게시글을 조회합니다.
+     *  - 단, 비공개 게시글도 포함합니다.
+     * @param id 게시물 ID
+     * @return 해당 게시글에 해당하는 정보 또는 null
+     * */
     fun findByIdAndIsHiddenIsFalse(id: String): Trip?
 
-    // trip id가 일치하는 전체공개 게시글 조회
+    /**
+     * tripId를 기준으로 일치하는 전체공개 게시글을 조회합니다.
+     * @param id 게시물 ID
+     * @return 해당 게시글에 해당하는 정보 또는 null
+     * */
     fun findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id: String): Trip?
 
-    // 로그인 사용자 외 작성자가 작성한 게시글 조회
-    fun findByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
-
-    // isHidden 값이 false인 게시물 조회
-    fun findTripByUserIdAndIsHiddenIsFalse(userId: String): Set<Trip>
-
-    // 유저 아이디로 공개 + 삭제x 인 글들 조회
+    /**
+     * userId를 기준으로 일치하는 전체공개인 게시글을 조회합니다.
+     * @param userId 사용자 Id
+     * @return 해당 게시글에 해당하는 정보
+     * */
     fun findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(userId: String): Set<Trip>
 
-    // 전체공개 게시글 조회
-    fun findByIsPublicIsTrueAndIsHiddenIsFalse(userId: String = ""): Set<Trip>
+    /**
+     * 전체공개인 게시글 조회합니다.
+     * @param pageable 페이지네이션
+     * @return 해당 게시물 목록에 해당하는 정보
+     * */
     fun findByIsPublicIsTrueAndIsHiddenIsFalse(pageable: Pageable): Page<Trip>
 
-    // email 조건이 맞으면서 전체공개 게시글 조회
-    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String): Set<Trip>
-    fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
+    /**
+     * userId를 기준으로 사용자가 작성한 게시글 조회합니다.
+     * @param userId 사용자 Id
+     * @param pageable 페이지네이션
+     * @return 해당 게시물 목록에 해당하는 정보
+     * */
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String, pageable: Pageable): Page<Trip>
 
-    // 내가 작성한 글을 제외한 전체공개 게시글 조회
+    /**
+     * 내가 작성한 글을 제외한 전체공개 게시글 목록을  조회합니다.
+     * @param userId 사용자 ID
+     * @return 해당 게시물에 해당하는 게시물 정보 또는 null
+     */
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
 
-    // 최신 게시물 하나를 찾는 쿼리
+    /**
+     * 최신 게시물 하나를 찾는 쿼리입니다.
+     * @param userId 사용자 ID
+     * @return 해당 게시물에 해당하는 게시물 정보 또는 null
+     */
     fun findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(userId: String): Trip?
 
+    /**
+     * 검색어를 통하여 게시물을 검색합니다.
+     * @param keyword 검색어
+     * @return 해당 게시물에 해당하는 페이지네이션된 게시물의 정보
+     */
     @Query(
         "{" +
             "\$or: [" +
