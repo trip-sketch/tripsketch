@@ -111,7 +111,10 @@ class TripController(private val tripService: TripService) {
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
+//            val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize,Sort.by("createdAt").descending())
             val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
