@@ -435,7 +435,7 @@ class TripController(private val tripService: TripService) {
                 val updatedTrip = tripService.updateTrip(memberId, tripUpdateDto)
                 ResponseEntity.status(HttpStatus.OK).body(updatedTrip, "게시물이 수정되었습니다.")
             } else {
-                ResponseEntity.notFound().build()
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to "해당 게시글이 존재하지 않습니다."))
             }
         } catch (e: IllegalArgumentException) {
             throw BadRequestException("요청이 잘못되었습니다. ${e.message}")
