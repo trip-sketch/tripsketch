@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("api/trip")
 class TripLikeController(private val tripLikeService: TripLikeService) {
 
+    /**
+     * 게시물을 '좋아요' 합니다.
+     * */
     @PostMapping("/like")
     fun likeTrip(
         req: HttpServletRequest,
@@ -30,6 +33,9 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         }
     }
 
+    /**
+     * 게시물을 '좋아요 취소' 합니다.
+     * */
     @PostMapping("/unlike")
     fun unlikeTrip(
         req: HttpServletRequest,
@@ -45,6 +51,9 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         }
     }
 
+    /**
+     * 게시물을 '좋아요', '좋아요 취소' 모두 할 수 있습니다.
+     * */
     @PostMapping("/toggle-like")
     fun toggleTripLike(
         req: HttpServletRequest,
