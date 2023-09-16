@@ -322,16 +322,16 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/guest/{id}")
-    fun getTripById(@PathVariable id: String): ResponseEntity<TripDto> {
-        val findTrip = tripService.getTripIsPublicById(id)
-        return if (findTrip != null) {
-            if (!findTrip.isHidden) {
-                ResponseEntity.ok(findTrip)
+    fun getTripById(@PathVariable id: String): ResponseEntity<Any> {
+        return try {
+            val findTrip = tripService.getTripById(id)
+            if (findTrip != null) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrip)
             } else {
                 ResponseEntity.notFound().build()
             }
-        } else {
-            ResponseEntity.notFound().build()
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 

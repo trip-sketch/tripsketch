@@ -356,11 +356,14 @@ class TripService(
     }
 
     fun getTripIsPublicById(id: String): TripDto? {
-        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
+//        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
+//            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+//        if (findTrip.isPublic == false) {
+//            throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+//        }
+//        return fromTrip(findTrip, "")
+        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        if (findTrip.isPublic == false) {
-            throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        }
         return fromTrip(findTrip, "")
     }
 
