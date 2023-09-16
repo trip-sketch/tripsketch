@@ -417,3 +417,19 @@ private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: S
     )
     return this.body(responseBody)
 }
+
+private fun getSort(sortType: Int): Sort {
+    return when (sortType) {
+        1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+        -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+        2 -> Sort.by(
+            Sort.Order(Sort.Direction.DESC, "views"),
+            Sort.Order(Sort.Direction.DESC, "createdAt")
+        )
+        -2 -> Sort.by(
+            Sort.Order(Sort.Direction.ASC, "views"),
+            Sort.Order(Sort.Direction.DESC, "createdAt")
+        )
+        else -> throw IllegalArgumentException("Invalid sort type")
+    }
+}
