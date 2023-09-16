@@ -15,6 +15,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
+
+/**
+ * 게시물과 관련된 요청을 처리하는 컨트롤러입니다.
+ */
 @RestController
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
