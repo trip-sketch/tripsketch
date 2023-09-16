@@ -11,16 +11,20 @@ import java.time.LocalDateTime
 @Document(collection = "trips")
 data class Trip(
     @Id val id: String? = null,
+
     @field:NotBlank(message = "userId 는 필수 항목입니다.")
     var userId: String,
+
     @field:NotBlank(message = "제목을 입력하세요.")
     @field:Length(min = 5, max = 100, message = "텍스트 길이는 5자 이상 50자이내여야 합니다.")
     @TextIndexed
     var title: String,
+
     @field:NotBlank(message = "내용을 입력하세요.")
     @field:Length(min = 5, max = 100, message = "텍스트 길이가 5자 이상이어야 합니다.")
     @TextIndexed
     var content: String,
+
     var likes: Int = 0,
     var views: Int = 0,
     var location: String? = null,

@@ -42,19 +42,20 @@ class TripController(private val tripService: TripService) {
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val sort = when (sortType) {
-                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
-                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
-                2 -> Sort.by(
-                    Sort.Order(Sort.Direction.DESC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                -2 -> Sort.by(
-                    Sort.Order(Sort.Direction.ASC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                else -> throw IllegalArgumentException("Invalid sort type")
-            }
+//            val sort = when (sortType) {
+//                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+//                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+//                2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.DESC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                -2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.ASC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                else -> throw IllegalArgumentException("Invalid sort type")
+//            }
+            val sort = getSort(sortType)
 //            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
@@ -80,23 +81,24 @@ class TripController(private val tripService: TripService) {
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val sort = when (sortType) {
-                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
-                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
-                2 -> Sort.by(
-                    Sort.Order(Sort.Direction.DESC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                -2 -> Sort.by(
-                    Sort.Order(Sort.Direction.ASC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                else -> throw IllegalArgumentException("Invalid sort type")
-            }
-//            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
-            val pagenationUtil = PagenationUtil()
-            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
-            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
+//            val sort = when (sortType) {
+//                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+//                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+//                2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.DESC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                -2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.ASC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                else -> throw IllegalArgumentException("Invalid sort type")
+//            }
+            val sort = getSort(sortType)
+            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+//            val pagenationUtil = PagenationUtil()
+//            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+//            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
             val findTrips = tripService.getAllTripsByUser(memberId, pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
@@ -142,19 +144,20 @@ class TripController(private val tripService: TripService) {
         @RequestParam("sortType", required = false, defaultValue = "2") sortType: Int
     ): ResponseEntity<Any> {
         return try {
-            val sort = when (sortType) {
-                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
-                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
-                2 -> Sort.by(
-                    Sort.Order(Sort.Direction.DESC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                -2 -> Sort.by(
-                    Sort.Order(Sort.Direction.ASC, "views"),
-                    Sort.Order(Sort.Direction.DESC, "createdAt")
-                )
-                else -> throw IllegalArgumentException("Invalid sort type")
-            }
+//            val sort = when (sortType) {
+//                1 -> Sort.by(Sort.Direction.DESC, "createdAt")
+//                -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
+//                2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.DESC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                -2 -> Sort.by(
+//                    Sort.Order(Sort.Direction.ASC, "views"),
+//                    Sort.Order(Sort.Direction.DESC, "createdAt")
+//                )
+//                else -> throw IllegalArgumentException("Invalid sort type")
+//            }
+            val sort = getSort(sortType)
 //            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
