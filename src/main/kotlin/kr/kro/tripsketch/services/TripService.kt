@@ -160,7 +160,7 @@ class TripService(
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
-        if (currentPage > totalPage) {
+        if (currentPage > totalPage && findTrips.content.isNotEmpty()) {
             throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
         }
         return mapOf(
