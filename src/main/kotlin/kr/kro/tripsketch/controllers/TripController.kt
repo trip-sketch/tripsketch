@@ -118,7 +118,13 @@ class TripController(private val tripService: TripService) {
             }
             val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val findTrips = tripService.getAllTripsByUser(memberId, pageable)
-            if (findTrips.isNotEmpty()) {
+//            if (findTrips.isNotEmpty()) {
+//                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+//            } else {
+//                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+//            }
+            val tripsList = findTrips["trips"] as List<*>
+            if (tripsList.isNotEmpty()) {
                 ResponseEntity.status(HttpStatus.OK).body(findTrips)
             } else {
                 ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
