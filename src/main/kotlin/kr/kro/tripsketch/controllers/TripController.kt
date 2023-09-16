@@ -133,12 +133,17 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-    ): ResponseEntity<Map<String, Any>> {
+    ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
             val pageable: Pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending())
             val findTrips = tripService.getAllMyTripsByUser(memberId, pageable)
-            ResponseEntity.ok(findTrips)
+            val tripsList = findTrips["trips"] as List<*>
+            if (tripsList.isNotEmpty()) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+            }
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: DataNotFoundException) {
