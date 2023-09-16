@@ -3,7 +3,6 @@ package kr.kro.tripsketch.services
 import kr.kro.tripsketch.domain.HashtagInfo
 import kr.kro.tripsketch.domain.Trip
 import kr.kro.tripsketch.dto.*
-import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.FollowRepository
@@ -371,9 +370,6 @@ class TripService(
         val followingUsers = followRepository.findByFollower(userId)
             .filter { it.following != userId }
             .map { it.following }
-        if (followingUsers.isEmpty()) {
-            throw DataNotFoundException("구독한 게시물이 없습니다.")
-        }
         val tripDtoList = mutableListOf<TripCardDto>()
         followingUsers.forEach { followingUserId ->
             val findLatestTrip = tripRepository.findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(followingUserId)
@@ -389,13 +385,10 @@ class TripService(
         val totalPage = ceil(tripDtoList.size.toDouble() / pageable.pageSize).toInt()
         val postsPerPage = pageable.pageSize
 
-        if (currentPage <= totalPage && tripDtoList.isEmpty()) {
-            throw DataNotFoundException("작성한 게시글이 존재하지 않습니다.")
-        } else if (currentPage > totalPage) {
+        val pagedTripDtoList = tripDtoList.subList(startIndex, endIndex)
+        if (currentPage > totalPage && tripDtoList.isNotEmpty()) {
             throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
         }
-
-        val pagedTripDtoList = tripDtoList.subList(startIndex, endIndex)
 
         return mapOf(
             "currentPage" to currentPage,

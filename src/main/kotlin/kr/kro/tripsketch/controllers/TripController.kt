@@ -347,15 +347,14 @@ class TripController(private val tripService: TripService) {
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
             val findTrips = tripService.getListFollowingTrips(memberId, pageable)
-            if (findTrips.isNotEmpty()) {
+            val tripsList = findTrips["trips"] as List<*>
+            if (tripsList.isNotEmpty()) {
                 ResponseEntity.status(HttpStatus.OK).body(findTrips)
             } else {
-                ResponseEntity.notFound().build()
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "구독하는 게시물이 없습니다."))
             }
         } catch (e: IllegalAccessException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("조회할 권한이 없습니다.")
-        } catch (e: DataNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 
