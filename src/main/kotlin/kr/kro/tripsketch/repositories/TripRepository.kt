@@ -3,7 +3,6 @@ package kr.kro.tripsketch.repositories
 import kr.kro.tripsketch.domain.Trip
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
@@ -48,9 +47,8 @@ interface TripRepository : MongoRepository<Trip, String> {
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdIn(userIds: Set<String>): Set<Trip>
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(userId: String, pageable: Pageable): Page<Trip>
 
+    // 내가 작성한 글을 제외한 전체공개 게시글 조회
     fun findByIsPublicIsTrueAndIsHiddenIsFalseAndUserIdNot(userId: String): Set<Trip>
-
-    fun findLatestTripByUserId(userId: String): Trip?
 
     // 최신 게시물 하나를 찾는 쿼리
     fun findFirstByUserIdAndIsHiddenIsFalseOrderByCreatedAtDesc(userId: String): Trip?
@@ -65,15 +63,4 @@ interface TripRepository : MongoRepository<Trip, String> {
             "}",
     )
     fun findTripsByKeyword(keyword: String, pageable: Pageable): Page<Trip>
-
-    @Query(
-        "{" +
-            "\$or: [" +
-            "   { 'title': { \$regex: ?0, \$options: 'i' } }, " +
-            "   { 'content': { \$regex: ?0, \$options: 'i' } }" +
-            "]," +
-            "'isPublic': true, 'isHidden': false" +
-            "}",
-    )
-    fun findTripsByKeywordWithLikes(keyword: String, sorting: Sort = Sort.by(Sort.Order.desc("likes"))): List<Trip>
 }
