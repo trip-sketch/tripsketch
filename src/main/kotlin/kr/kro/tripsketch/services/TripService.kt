@@ -355,18 +355,6 @@ class TripService(
         return fromTrip(findTrip, "")
     }
 
-    fun getTripIsPublicById(id: String): TripDto? {
-//        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
-//            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-//        if (findTrip.isPublic == false) {
-//            throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-//        }
-//        return fromTrip(findTrip, "")
-        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id)
-            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
-        return fromTrip(findTrip, "")
-    }
-
     fun getListFollowingTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
