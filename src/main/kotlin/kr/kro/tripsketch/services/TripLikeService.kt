@@ -11,6 +11,9 @@ class TripLikeService(
     private val userService: UserService,
     private val notificationService: NotificationService,
 ) {
+    /**
+     * memberId 와 tripId 로 '좋아요' 상태를 저장합니다.
+     * */
     fun likeTrip(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
@@ -46,6 +49,9 @@ class TripLikeService(
         }
     }
 
+    /**
+     * memberId 와 tripId 로 '좋아요 취소' 상태를 저장합니다.
+     * */
     fun unlikeTrip(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
@@ -60,6 +66,9 @@ class TripLikeService(
         }
     }
 
+    /**
+     * memberId 와 tripId 로 '좋아요' '좋아요 취소' 상태를 저장합니다.
+     * */
     fun toggleTripLike(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
@@ -96,6 +105,9 @@ class TripLikeService(
         tripRepository.save(findTrip)
     }
 
+    /**
+     * memberId 와 tripId 로 좋아요 유무를 확인합니다.
+     * */
     fun isTripLiked(memberId: Long, tripId: String): Boolean {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
