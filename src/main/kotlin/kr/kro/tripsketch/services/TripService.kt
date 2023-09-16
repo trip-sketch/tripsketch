@@ -11,7 +11,6 @@ import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
@@ -135,7 +134,7 @@ class TripService(
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val findTrips = tripRepository.findByIsHiddenIsFalseAndUserId(userId, pageable)
-        val tripsDtoList = findTrips.content.map { fromTrip(it, userId) }
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, userId) }
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
@@ -412,42 +411,42 @@ class TripService(
         )
     }
 
-    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripCardDto> {
-        val userId = userRepository.findByMemberId(memberId)?.id
-            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-
-        val findTrips: List<Trip>
-        when (sorting) {
-            1 -> {
-                val sort = Sort.by(Sort.Order.desc("createdAt"))
-                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-            }
-            -1 -> {
-                val sort = Sort.by(Sort.Order.asc("createdAt"))
-                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-            }
-            2 -> {
-                val sort = Sort.by(Sort.Order.desc("likes"), Sort.Order.desc("createdAt"))
-                findTrips = tripRepository.findTripsByKeywordWithLikes(keyword, sort)
-            }
-            else -> {
-                val sort = Sort.by(Sort.Order.desc("createdAt"))
-                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-            }
-        }
-        val tripDtoList = mutableListOf<TripCardDto>()
-        findTrips.forEach { trip ->
-            tripDtoList.add(fromTripToTripCardDto(trip, userId))
-        }
-        return tripDtoList
-    }
-
 //    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sorting: Int): List<TripCardDto> {
 //        val userId = userRepository.findByMemberId(memberId)?.id
 //            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
 //
 //        val findTrips: List<Trip>
 //        when (sorting) {
+//            1 -> {
+//                val sort = Sort.by(Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//            -1 -> {
+//                val sort = Sort.by(Sort.Order.asc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//            2 -> {
+//                val sort = Sort.by(Sort.Order.desc("likes"), Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeywordWithLikes(keyword, sort)
+//            }
+//            else -> {
+//                val sort = Sort.by(Sort.Order.desc("createdAt"))
+//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
+//            }
+//        }
+//        val tripDtoList = mutableListOf<TripCardDto>()
+//        findTrips.forEach { trip ->
+//            tripDtoList.add(fromTripToTripCardDto(trip, userId))
+//        }
+//        return tripDtoList
+//    }
+
+//    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sortType: Int, pageable: Pageable): List<TripCardDto> {
+//        val userId = userRepository.findByMemberId(memberId)?.id
+//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+//
+//        val findTrips: List<Trip>
+//        val sort = when (sortType) {
 //            1 -> {
 //                val sort = Sort.by(Sort.Order.desc("createdAt"))
 //                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
