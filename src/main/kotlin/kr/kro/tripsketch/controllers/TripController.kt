@@ -306,6 +306,30 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    @GetMapping("/guest/search")
+    fun getSearchTripsByKeywordAsGuest(
+        @RequestParam keyword: String,
+        @RequestParam("page", required = false, defaultValue = "1") page: Int,
+        @RequestParam("size", required = false, defaultValue = "10") size: Int,
+        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+    ): ResponseEntity<Any> {
+        return try {
+            val sort = getSort(sortType)
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
+            val findTrips = tripService.getSearchTripsByKeywordAsGuest(keyword, pageable)
+            val tripsList = findTrips["trips"] as List<*>
+            if (tripsList.isNotEmpty()) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+            }
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+        }
+    }
+
     @PutMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
