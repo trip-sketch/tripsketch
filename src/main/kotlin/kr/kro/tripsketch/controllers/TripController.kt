@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/trip")
 class TripController(private val tripService: TripService) {
 
+    /**
+     * 게시물을 작성합니다.
+     * */
     @PostMapping(consumes = ["multipart/form-data"])
     fun createTrip(
         req: HttpServletRequest,
@@ -33,6 +36,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 관리자 권한으로 전체 게시물을 조회합니다.
+     * */
     @GetMapping("/admin/trips")
     fun getAllTrips(
         req: HttpServletRequest,
@@ -58,6 +64,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 사용자 권한으로 전체 게시물을 조회합니다.
+     * */
     @GetMapping("/trips")
     fun getAllTripsByUser(
         req: HttpServletRequest,
@@ -81,6 +90,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+
+    /**
+     * 사용자가 작성한 전체 게시물을 조회합니다.
+     * */
     @GetMapping("/trips/mytrips")
     fun getAllMyTripsByUser(
         req: HttpServletRequest,
@@ -106,6 +119,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 게스트 권한으로 전체 게시물을 조회합니다.
+     * */
     @GetMapping("/guest/trips")
     fun getAllTripsByGuest(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
@@ -129,6 +145,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 닉네임을 기준으로 전체 게시물을 조회합니다.
+     * */
     @GetMapping("/nickname")
     fun getTripsByNickname(
         @RequestParam nickname: String,
@@ -243,6 +262,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+
+    /**
+     * 게스트 권한, 트립id 를 기준으로 게시물을 조회합니다.
+     * */
     @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<Any> {
         return try {
@@ -257,6 +280,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 내가 구독한 게시물을 조회합니다.
+     * 정렬방식은 구독하는 사람 각각의 게시글 중 가장 높은 조회수를 기준으로 1개씩 정렬됩니다.
+     * */
     @GetMapping("/list/following")
     fun getListFollowingTrips(
         req: HttpServletRequest,
@@ -280,6 +307,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 검색어를 입력하여 게시물을 조회합니다.
+     * 검색 조건은 게시글의 제목과 내용이며, sortType 에 따라 정렬합니다.
+     * */
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
         req: HttpServletRequest,
@@ -306,6 +337,10 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 게스트 권한으로 검색어를 입력하여 게시물을 조회합니다.
+     * 검색 조건은 게시글의 제목과 내용이며, sortType 에 따라 정렬합니다.
+     * */
     @GetMapping("/guest/search")
     fun getSearchTripsByKeywordAsGuest(
         @RequestParam keyword: String,
@@ -330,6 +365,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 게시물을 수정합니다.
+     * */
     @PutMapping("/{id}", consumes = ["multipart/form-data"])
     fun updateTrip(
         req: HttpServletRequest,
@@ -352,6 +390,9 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 게시물을 삭제합니다(soft delete).
+     * */
     @DeleteMapping("/{id}")
     fun deleteTrip(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         return try {
@@ -371,6 +412,10 @@ class TripController(private val tripService: TripService) {
     }
 }
 
+
+/**
+ * 에러메세지와 반환형태를 전달해주는 함수입니다.
+ * */
 private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: String): ResponseEntity<Any> {
     val responseBody = mapOf(
         "message" to message,
@@ -379,6 +424,9 @@ private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: S
     return this.body(responseBody)
 }
 
+/**
+ * sortType 에 따른 정렬방식을 정해주는 함수입니다.
+ * */
 private fun getSort(sortType: Int): Sort {
     return when (sortType) {
         1 -> Sort.by(Sort.Direction.DESC, "createdAt")
