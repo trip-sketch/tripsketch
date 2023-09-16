@@ -297,13 +297,17 @@ class TripController(private val tripService: TripService) {
     }
 
     @GetMapping("/{id}")
-    fun getTripByMemberIdAndId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<TripDto> {
-        val memberId = req.getAttribute("memberId") as Long
-        val findTrip = tripService.getTripByMemberIdAndId(memberId, id)
-        return if (findTrip != null) {
-            ResponseEntity.ok(findTrip)
-        } else {
-            ResponseEntity.notFound().build()
+    fun getTripByIdWithMemberId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
+        return try {
+            val memberId = req.getAttribute("memberId") as Long
+            val findTrip = tripService.getTripByIdWithMemberId(memberId, id)
+            if (findTrip != null) {
+                ResponseEntity.status(HttpStatus.OK).body(findTrip)
+            } else {
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "해당 게시글이 존재하지 않습니다."))
+            }
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 
@@ -328,7 +332,7 @@ class TripController(private val tripService: TripService) {
             if (findTrip != null) {
                 ResponseEntity.status(HttpStatus.OK).body(findTrip)
             } else {
-                ResponseEntity.notFound().build()
+                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "해당 게시글이 존재하지 않습니다."))
             }
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))

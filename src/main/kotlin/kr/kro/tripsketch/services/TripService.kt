@@ -328,7 +328,7 @@ class TripService(
         return countryInfoList
     }
 
-    fun getTripByMemberIdAndId(memberId: Long, id: String): TripDto? {
+    fun getTripByIdWithMemberId(memberId: Long, id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
