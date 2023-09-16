@@ -55,7 +55,10 @@ class TripController(private val tripService: TripService) {
                 )
                 else -> throw IllegalArgumentException("Invalid sort type")
             }
-            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+//            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
             val findTrips = tripService.getAllTrips(memberId, pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
@@ -90,7 +93,10 @@ class TripController(private val tripService: TripService) {
                 )
                 else -> throw IllegalArgumentException("Invalid sort type")
             }
-            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+//            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
             val findTrips = tripService.getAllTripsByUser(memberId, pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
@@ -149,7 +155,10 @@ class TripController(private val tripService: TripService) {
                 )
                 else -> throw IllegalArgumentException("Invalid sort type")
             }
-            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+//            val pageable: Pageable = PageRequest.of(page - 1, size, sort)
+            val pagenationUtil = PagenationUtil()
+            val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
+            val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
             val findTrips = tripService.getAllTripsByGuest(pageable)
             val tripsList = findTrips["trips"] as List<*>
             if (tripsList.isNotEmpty()) {
