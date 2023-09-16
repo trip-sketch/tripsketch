@@ -40,12 +40,9 @@ class TripLikeService(
                 } else {
                     throw IllegalArgumentException("조회되는 사용자가 없습니다.")
                 }
-            } else {
-                throw IllegalStateException("작성한 게시자 본인에게 알림이 가지 않습니다.")
-//                ResponseEntity.status(HttpStatus.OK).body("작성한 게시자 본인에게 알림이 가지 않습니다.")
             }
         } else {
-            throw IllegalArgumentException("이미 좋아요한 게시물입니다.")
+            throw IllegalArgumentException("이미 '좋아요'한 게시물입니다.")
         }
     }
 
@@ -59,10 +56,9 @@ class TripLikeService(
             findTrip.likes--
             tripRepository.save(findTrip)
         } else {
-            throw IllegalStateException("이미 좋아요 취소한 게시물입니다.")
+            throw IllegalStateException("이미 '좋아요'를 취소한 게시물입니다.")
         }
     }
-
 
     fun toggleTripLike(memberId: Long, tripId: String) {
         val userId = userRepository.findByMemberId(memberId)?.id

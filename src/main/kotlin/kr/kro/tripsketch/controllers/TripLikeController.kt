@@ -19,14 +19,14 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
     fun likeTrip(
         req: HttpServletRequest,
         @RequestBody tripIdDto: TripIdDto,
-    ): ResponseEntity<String> {
-        val memberId = req.getAttribute("memberId") as Long?
-            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
+    ): ResponseEntity<Any> {
         return try {
+            val memberId = req.getAttribute("memberId") as Long?
+                ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
             tripLikeService.likeTrip(memberId, tripIdDto.id)
-            ResponseEntity.status(HttpStatus.OK).body("해당 게시물을 '좋아요'하였습니다.")
+            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "해당 게시물을 '좋아요'하였습니다."))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.notFound().build()
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 
@@ -35,13 +35,13 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         req: HttpServletRequest,
         @RequestBody tripIdDto: TripIdDto,
     ): ResponseEntity<Any> {
-        val memberId = req.getAttribute("memberId") as Long?
-            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
+            val memberId = req.getAttribute("memberId") as Long?
+                ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
             tripLikeService.unlikeTrip(memberId, tripIdDto.id)
-            ResponseEntity.status(HttpStatus.OK).body("좋아요를 취소하였습니다.")
+            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "좋아요를 취소하였습니다."))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.notFound().build()
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 
