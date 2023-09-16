@@ -94,7 +94,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     /**
      * 사용자가 작성한 전체 게시물을 조회합니다.
      * */
@@ -237,6 +236,10 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(countryFrequencyMap)
     }
 
+
+    /**
+     * 사용자 권한, 트립id를 기준으로 게시물을 조회합니다.
+     * */
     @GetMapping("/{id}")
     fun getTripByIdWithMemberId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
         return try {
