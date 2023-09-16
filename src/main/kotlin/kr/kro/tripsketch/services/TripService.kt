@@ -96,7 +96,7 @@ class TripService(
 //        } else if (currentPage > totalPage) {
 //            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
 //        }
-        if (currentPage > totalPage) {
+        if (currentPage > totalPage && findTrips.content.isNotEmpty()) {
             throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
         }
         return mapOf(
