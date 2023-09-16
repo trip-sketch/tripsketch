@@ -431,6 +431,14 @@ private fun getSort(sortType: Int): Sort {
             Sort.Order(Sort.Direction.ASC, "views"),
             Sort.Order(Sort.Direction.DESC, "createdAt")
         )
+        3 -> Sort.by(
+            Sort.Order(Sort.Direction.DESC, "likes"),
+            Sort.Order(Sort.Direction.DESC, "createdAt")
+        )
+        -3 -> Sort.by(
+            Sort.Order(Sort.Direction.ASC, "likes"),
+            Sort.Order(Sort.Direction.DESC, "createdAt")
+        )
         else -> throw IllegalArgumentException("Invalid sort type")
     }
 }
