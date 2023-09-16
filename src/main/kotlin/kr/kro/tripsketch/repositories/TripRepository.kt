@@ -64,7 +64,7 @@ interface TripRepository : MongoRepository<Trip, String> {
             "'isPublic': true, 'isHidden': false" +
             "}",
     )
-    fun findTripsByKeyword(keyword: String, sorting: Sort): List<Trip>
+    fun findTripsByKeyword(keyword: String, pageable: Pageable): Page<Trip>
 
     @Query(
         "{" +
