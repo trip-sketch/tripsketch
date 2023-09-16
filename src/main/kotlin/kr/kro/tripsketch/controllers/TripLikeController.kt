@@ -59,8 +59,6 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
             ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to message))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
-        } catch (e: IllegalStateException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 }
