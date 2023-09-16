@@ -34,7 +34,7 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
     fun unlikeTrip(
         req: HttpServletRequest,
         @RequestBody tripIdDto: TripIdDto,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<Any> {
         val memberId = req.getAttribute("memberId") as Long?
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
@@ -42,7 +42,25 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
             ResponseEntity.status(HttpStatus.OK).body("좋아요를 취소하였습니다.")
         } catch (e: IllegalArgumentException) {
             ResponseEntity.notFound().build()
-//            throw (${e.message}")
+        }
+    }
+
+    @PostMapping("/toggle-like")
+    fun toggleTripLike(
+        req: HttpServletRequest,
+        @RequestBody tripIdDto: TripIdDto,
+    ): ResponseEntity<Any> {
+        val memberId = req.getAttribute("memberId") as Long?
+            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
+        return try {
+            tripLikeService.toggleTripLike(memberId, tripIdDto.id)
+            val isLiked = tripLikeService.isTripLiked(memberId, tripIdDto.id)
+            val message = if (isLiked) "게시물을 '좋아요'하였습니다." else "'좋아요'를 취소하였습니다."
+            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to message))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
+        } catch (e: IllegalStateException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 }
