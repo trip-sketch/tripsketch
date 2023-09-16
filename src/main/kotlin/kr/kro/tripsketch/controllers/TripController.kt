@@ -238,7 +238,7 @@ class TripController(private val tripService: TripService) {
 
 
     /**
-     * 사용자 권한, 트립id를 기준으로 게시물을 조회합니다.
+     * 사용자 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
      * */
     @GetMapping("/{id}")
     fun getTripByIdWithMemberId(req: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> {
@@ -271,7 +271,7 @@ class TripController(private val tripService: TripService) {
 
 
     /**
-     * 게스트 권한, 트립id 를 기준으로 게시물을 조회합니다.
+     * 게스트 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
      * */
     @GetMapping("/guest/{id}")
     fun getTripById(@PathVariable id: String): ResponseEntity<Any> {
@@ -289,7 +289,7 @@ class TripController(private val tripService: TripService) {
 
     /**
      * 내가 구독한 게시물을 조회합니다.
-     * 정렬방식은 구독하는 사람 각각의 게시글 중 가장 높은 조회수를 기준으로 1개씩 정렬됩니다.
+     * 정렬방식은 구독하는 사람 각각의 게시글 중 가장 높은 조회수의 게시물을 1개씩 조회하여 정렬합니다
      * */
     @GetMapping("/list/following")
     fun getListFollowingTrips(

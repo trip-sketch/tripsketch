@@ -26,6 +26,13 @@ class TripService(
     private val imageService: ImageService,
     private val commentService: CommentService,
 ) {
+    /**
+     * 게시물을 작성하는 메소드입니다.
+     * @param memberId 현재 사용자의 멤버 ID
+     * @param tripCreateDto 신규로 작성될 게시물 정보
+     * @param images 업로드 파일
+     * @return 신규로 작성된 게시물 (TripDto)
+     * */
     fun createTrip(memberId: Long, tripCreateDto: TripCreateDto, images: List<MultipartFile>?): TripDto {
         val user = userService.findUserByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
         val startedAt = tripCreateDto.startedAt
@@ -58,10 +65,8 @@ class TripService(
             longitude = tripCreateDto.longitude,
             hashtagInfo = hashtagInfo,
             isPublic = tripCreateDto.isPublic,
-            images = uploadedImageUrls,
-
+            images = uploadedImageUrls
         )
-
         val createdTrip = tripRepository.save(newTrip)
         val userId = userRepository.findByMemberId(memberId)?.id ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
         val follower = followRepository.findByFollowing(userId)
@@ -82,6 +87,13 @@ class TripService(
         return fromTrip(createdTrip, userId)
     }
 
+    /**
+     * 관리자 권한으로 전체 게시물을 조회합니다.
+     *  - 비공개로 작성된 게시물 및 삭제한 게시물을 모두 조회할 수 있습니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param pageable 페이지네이션 정보
+     * @return 조회한 게시물 정보 목록 (TripDto)
+     * */
     fun getAllTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -101,6 +113,13 @@ class TripService(
         )
     }
 
+    /**
+     * 사용자 권한으로 전체 게시물을 조회합니다.
+     *  - 비공개로 작성된 게시물 및 삭제한 게시물을 모두 조회할 수 있습니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param pageable 페이지네이션 정보
+     * @return 조회한 게시물 정보 목록 (TripCardDto)
+     * */
     fun getAllTripsByUser(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -120,6 +139,13 @@ class TripService(
         )
     }
 
+    /**
+     * 사용자 권한으로 사용자가 작성한 전체 게시물을 조회합니다.
+     *  - 사용자가 직접 작성한 비공개 게시물을 조회할 수 있습니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param pageable 페이지네이션 정보
+     * @return 조회한 게시물 정보 목록 (TripCardDto)
+     * */
     fun getAllMyTripsByUser(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -139,6 +165,12 @@ class TripService(
         )
     }
 
+    /**
+     * 게스트 권한으로 전체 게시물을 조회합니다.
+     *  - 사용자가 직접 작성한 비공개 게시물을 조회할 수 있습니다.
+     * @param pageable 페이지네이션 정보
+     * @return 조회한 게시물 정보 목록 (TripCardDto)
+     * */
     fun getAllTripsByGuest(pageable: Pageable): Map<String, Any> {
         val findTrips = tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalse(pageable)
         val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, "") }
@@ -156,6 +188,12 @@ class TripService(
         )
     }
 
+    /**
+     * 닉네임을 기준으로 게시물을 조회합니다.
+     * @param nickname 닉네임
+     * @param pageable 페이지네이션 정보
+     * @return 조회한 게시물 정보 목록 (TripCardDto)
+     * */
     fun getTripsByNickname(nickname: String, pageable: Pageable): Map<String, Any> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findByIsPublicIsTrueAndIsHiddenIsFalseAndUserId(it, pageable) }
@@ -314,6 +352,13 @@ class TripService(
         return countryInfoList
     }
 
+    /**
+     * 사용자 권한으로 게시물 ID 를 기준으로 게시물을 조회합니다.
+     *  - 단, 사용자 정보는 로그인 상태만 확인하고, 게시물 조회에 영향을 주지 않습니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param id 게시물 ID
+     * @return 조회한 게시물 정보 (TripDto) 또는 null
+     * */
     fun getTripByIdWithMemberId(memberId: Long, id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -335,12 +380,25 @@ class TripService(
         return fromTripToUpdate(findTrip, userId)
     }
 
+
+    /**
+     * 게스트 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
+     *  - 단, 좋아요 상태는 게스트이기 때문에 false 로 표시됩니다.
+     * @param id 게시물 ID
+     * @return 조회한 게시물 정보 (TripDto)
+     * */
     fun getTripById(id: String): TripDto? {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         return fromTrip(findTrip, "")
     }
 
+    /**
+     * 내가 구독한 게시물을 조회합니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param pageable 페이지네이션
+     * @return 내가 구독하는 게시물 목록
+     * */
     fun getListFollowingTrips(memberId: Long, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -375,6 +433,14 @@ class TripService(
         )
     }
 
+    /**
+     * 사용자 권한, keyword 를 기반으로 게시물 목록을 조회합니다.
+     *  - 게시물 마다 좋아요 상태가 표시됩니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param keyword 검색어(제목 또는 내용으로 검색)
+     * @param pageable 페이지네이션 정보
+     * @return 검색된 게시물 목록
+     * */
     fun getSearchTripsByKeyword(memberId: Long, keyword: String, pageable: Pageable): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -395,6 +461,13 @@ class TripService(
         )
     }
 
+    /**
+     * 게스트 권한, keyword 를 기반으로 게시물 목록을 조회합니다.
+     *  - 단, 좋아요 상태는 게스트이기 때문에 false 로 표시됩니다.
+     * @param keyword 검색어(제목 또는 내용으로 검색)
+     * @param pageable 페이지네이션 정보
+     * @return 검색된 게시물 목록
+     * */
     fun getSearchTripsByKeywordAsGuest(keyword: String, pageable: Pageable): Map<String, Any> {
         val findTrips = tripRepository.findTripsByKeyword(keyword, pageable)
         val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, "") }
@@ -412,6 +485,12 @@ class TripService(
         )
     }
 
+    /**
+     * 게시물을 수정합니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param tripUpdateDto 수정할 게시물 정보
+     * @return 수정된 게시물 - TripDto 형태의 데이터
+     * */
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
@@ -478,6 +557,12 @@ class TripService(
         }
     }
 
+    /**
+     * softdelete 방식으로 게시물을 삭제합니다.
+     *  - 단, 작성한 사용자 본인 또는 관리자만 삭제 가능합니다.
+     * @param memeberId 현재 사용자의 멤버 ID
+     * @param id 삭제할 게시물 ID
+     * */
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
@@ -510,6 +595,12 @@ class TripService(
         }
     }
 
+    /**
+     * Trip 데이터를 TripDto 형식으로 변환합니다.
+     * @param trip 변환할 Trip 도메인
+     * @param currentUserId 현재 사용자 ID
+     * @return 변환된 TripDto 데이터
+     * */
     fun fromTrip(trip: Trip, currentUserId: String): TripDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val isLiked: Boolean = if (currentUserId != "") {
@@ -596,6 +687,12 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 을 TripCardDto 형식으로 변환합니다.
+     * @param trip 변환할 Trip 도메인
+     * @param currentUserId 현재 사용자 ID
+     * @return 변환된 TripCardDto 데이터
+     * */
     fun fromTripToTripCardDto(trip: Trip, currentUserId: String): TripCardDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
