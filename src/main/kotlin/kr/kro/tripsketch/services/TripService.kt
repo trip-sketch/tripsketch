@@ -334,8 +334,6 @@ class TripService(
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-
-        // 조회수
         if (!findTrip.tripViews.contains(userId) && findTrip.userId != userId) {
             findTrip.tripViews.add(userId)
             findTrip.views += 1
@@ -437,35 +435,25 @@ class TripService(
 //        return tripDtoList
 //    }
 
-//    fun getSearchTripsByKeyword(memberId: Long, keyword: String, sortType: Int, pageable: Pageable): List<TripCardDto> {
-//        val userId = userRepository.findByMemberId(memberId)?.id
-//            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-//
-//        val findTrips: List<Trip>
-//        val sort = when (sortType) {
-//            1 -> {
-//                val sort = Sort.by(Sort.Order.desc("createdAt"))
-//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-//            }
-//            -1 -> {
-//                val sort = Sort.by(Sort.Order.asc("createdAt"))
-//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-//            }
-//            2 -> {
-//                val sort = Sort.by(Sort.Order.desc("likes"), Sort.Order.desc("createdAt"))
-//                findTrips = tripRepository.findTripsByKeywordWithLikes(keyword, sort)
-//            }
-//            else -> {
-//                val sort = Sort.by(Sort.Order.desc("createdAt"))
-//                findTrips = tripRepository.findTripsByKeyword(keyword, sort)
-//            }
-//        }
-//        val tripDtoList = mutableListOf<TripCardDto>()
-//        findTrips.forEach { trip ->
-//            tripDtoList.add(fromTripToTripCardDto(trip, userId))
-//        }
-//        return tripDtoList
-//    }
+    fun getSearchTripsByKeyword(memberId: Long, keyword: String, pageable: Pageable): Map<String, Any> {
+        val userId = userRepository.findByMemberId(memberId)?.id
+            ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
+
+        val findTrips = tripRepository.findTripsByKeyword(keyword, pageable)
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, userId) }
+        val currentPage = findTrips.number + 1
+        val totalPage = findTrips.totalPages
+        val postsPerPage = findTrips.size
+        if (currentPage > totalPage && findTrips.content.isNotEmpty()) {
+            throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
+        }
+        return mapOf(
+            "currentPage" to currentPage,
+            "trips" to tripsDtoList,
+            "postsPerPage" to postsPerPage,
+            "totalPages" to totalPage,
+        )
+    }
 
     fun updateTrip(memberId: Long, tripUpdateDto: TripUpdateDto): TripDto {
         val findTrip = tripRepository.findById(tripUpdateDto.id).orElse(null)
