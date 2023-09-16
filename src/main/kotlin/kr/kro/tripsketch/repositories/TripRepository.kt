@@ -27,7 +27,7 @@ interface TripRepository : MongoRepository<Trip, String> {
     // trip id가 일치하는 게시글 조회
     fun findByIdAndIsHiddenIsFalse(id: String): Trip?
 
-    // public true, hidden false 인 trip id가 일치하는 게시글 조회
+    // trip id가 일치하는 전체공개 게시글 조회
     fun findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id: String): Trip?
 
     // 로그인 사용자 외 작성자가 작성한 게시글 조회
