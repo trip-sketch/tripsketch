@@ -66,10 +66,8 @@ class TripLikeController(private val tripLikeService: TripLikeService) {
         val memberId = req.getAttribute("memberId") as Long?
             ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
         return try {
-            tripLikeService.toggleTripLike(memberId, tripIdDto.id)
-            val isLiked = tripLikeService.isTripLiked(memberId, tripIdDto.id)
-            val message = if (isLiked) "게시물을 '좋아요'하였습니다." else "'좋아요'를 취소하였습니다."
-            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to message))
+            val result = tripLikeService.toggleTripLike(memberId, tripIdDto.id)
+            ResponseEntity.status(HttpStatus.OK).body(result)
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }

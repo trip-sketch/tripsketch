@@ -67,14 +67,16 @@ class TripLikeService(
     }
 
     /**
-     * memberId 와 tripId 로 '좋아요' '좋아요 취소' 상태를 저장합니다.
+     * memberId 와 tripId 로 '좋아요' '좋아요 취소' 상태를 저장하고,
+     * 그 결과 값(좋아요 유무)을 확인합니다.
      * */
-    fun toggleTripLike(memberId: Long, tripId: String) {
+    fun toggleTripLike(memberId: Long, tripId: String): Map<String, Any> {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
         val findTrip = tripRepository.findById(tripId).orElse(null)
             ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-        if (findTrip.tripLikes.contains(userId)) {
+        val isLiked = findTrip.tripLikes.contains(userId)
+        if (isLiked) {
             findTrip.tripLikes.remove(userId)
             findTrip.likes--
         } else {
@@ -103,16 +105,9 @@ class TripLikeService(
             }
         }
         tripRepository.save(findTrip)
-    }
-
-    /**
-     * memberId 와 tripId 로 좋아요 유무를 확인합니다.
-     * */
-    fun isTripLiked(memberId: Long, tripId: String): Boolean {
-        val userId = userRepository.findByMemberId(memberId)?.id
-            ?: throw IllegalArgumentException("조회되는 사용자 ID가 없습니다.")
-        val findTrip = tripRepository.findById(tripId).orElse(null)
-            ?: throw IllegalArgumentException("조회되는 게시물이 없습니다.")
-        return findTrip.tripLikes.contains(userId)
+        return mapOf(
+            "message" to if (isLiked) "'좋아요'를 취소하였습니다." else "게시물을 '좋아요'하였습니다.",
+            "isLiked" to !isLiked
+        )
     }
 }
