@@ -54,7 +54,6 @@ class WebMvcConfig(
                 "/api/trip/guest/**",
                 "/api/geocode",
                 "/favicon.ico",
-                "/api/comment/admin/commentsWithPagination/**",
             )
     }
 }
