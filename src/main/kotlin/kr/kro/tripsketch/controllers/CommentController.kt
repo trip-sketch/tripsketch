@@ -22,7 +22,7 @@ class CommentController(private val commentService: CommentService) {
     }
 
     @GetMapping("/admin/commentsWithPagination")
-    fun getAllComments(
+    fun getAllCommentsWIthPagination(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
