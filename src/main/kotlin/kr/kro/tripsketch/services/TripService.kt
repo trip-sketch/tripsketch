@@ -572,6 +572,7 @@ class TripService(
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
         if (memberId in adminIds || findTrip.userId == userId) {
+            commentService.deleteAllCommentsAdminByTripId(id)
             val images = findTrip.images
             if (images != null) {
                 val currentImages = images.toMutableList()
