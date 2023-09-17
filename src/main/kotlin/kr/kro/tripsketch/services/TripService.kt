@@ -477,9 +477,11 @@ class TripService(
         if (currentPage > totalPage && findTrips.content.isNotEmpty()) {
             throw IllegalArgumentException("현재 페이지가 총 페이지 수보다 큽니다.")
         }
+        val trips = if (tripsDtoList.isNotEmpty()) tripsDtoList else emptyList<Map<String, Any>>()
         return mapOf(
             "currentPage" to currentPage,
-            "trips" to tripsDtoList,
+//            "trips" to tripsDtoList,
+            "trips" to trips,
             "postsPerPage" to postsPerPage,
             "totalPages" to totalPage,
         )
