@@ -52,7 +52,6 @@ class WebMvcConfig(
                 "/api/comment/guest/**",
                 "/api/trip/nickname/**",
                 "/api/trip/guest/**",
-                "/api/geocode",
                 "/favicon.ico",
             )
     }
