@@ -737,7 +737,7 @@ fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String
     val totalPage = if (tripList.isEmpty()) 0 else (totalTrips + pageSize - 1) / pageSize
 
     return mapOf(
-        "posts" to paginatedTrips,
+        "trips" to paginatedTrips,
         "currentPage" to page,
         "totalPage" to totalPage,
         "postsPerPage" to pageSize,
