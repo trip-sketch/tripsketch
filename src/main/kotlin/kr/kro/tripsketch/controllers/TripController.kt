@@ -193,7 +193,7 @@ class TripController(private val tripService: TripService) {
 
     // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
     @GetMapping("/nickname/trips/categories")
-    fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+    fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripCardDto>>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
@@ -213,7 +213,7 @@ class TripController(private val tripService: TripService) {
     fun getTripsInCountry(
         @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,
-    ): ResponseEntity<Set<TripDto>> {
+    ): ResponseEntity<Set<TripCardDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
