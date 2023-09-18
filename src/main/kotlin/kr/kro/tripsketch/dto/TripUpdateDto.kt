@@ -27,7 +27,10 @@ data class TripUpdateDto(
     var images: List<MultipartFile>? = null,
     var deletedImageUrls: List<String>? = null,
     var countryCode: String? = null,
-    var country: String? = null,
+
+    @field:NotBlank(message = "국가를 입력하세요.")
+    var country: String,
+
     var city: String? = null,
     var municipality: String? = null,
     var name: String? = null,
