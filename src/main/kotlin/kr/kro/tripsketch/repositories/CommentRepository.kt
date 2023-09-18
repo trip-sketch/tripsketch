@@ -13,6 +13,5 @@ interface CommentRepository : MongoRepository<Comment, String> {
     // 특정 부모 댓글에 속한 모든 자식 댓글 검색
     fun findAllByParentId(parentId: String): List<Comment>
 
-    @Query("{'tripId': ?0}")
-    fun countCommentsByTripId(tripId: String): Int? = 0
+    fun countCommentsByTripId(tripId: String): Int
 }

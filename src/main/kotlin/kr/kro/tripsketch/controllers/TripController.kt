@@ -154,14 +154,14 @@ class TripController(private val tripService: TripService) {
     }
 
     // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터
-    @GetMapping("/guest/tripAndComments/{tripId}")
+    @GetMapping("/guest/trip-comments/{tripId}")
     fun getTripAndCommentsByTripId(@PathVariable tripId: String): ResponseEntity<TripAndCommentResponseDto> {
         val findTripAndComment = tripService.getTripAndCommentsIsPublicByTripIdGuest(tripId)
         return ResponseEntity.ok(findTripAndComment)
     }
 
     // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 회원 라우터
-    @GetMapping("/user/tripAndComments/{tripId}")
+    @GetMapping("/user/trip-comments/{tripId}")
     fun getTripIsLikedAndCommentsByTripId(
         req: HttpServletRequest,
         @PathVariable tripId: String,
@@ -173,12 +173,12 @@ class TripController(private val tripService: TripService) {
 
     // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
     @GetMapping("/nickname/trips/categories")
-    fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripDto>>> {
+    fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripCardDto>>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    @GetMapping("/nickname/tripsWithPagination/categories")
+    @GetMapping("/nickname/trips-pagination/categories")
     fun getTripsCategorizedByCountryWithPagination(
         @RequestParam("nickname") nickname: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
@@ -193,12 +193,12 @@ class TripController(private val tripService: TripService) {
     fun getTripsInCountry(
         @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,
-    ): ResponseEntity<Set<TripDto>> {
+    ): ResponseEntity<Set<TripCardDto>> {
         val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    @GetMapping("/nickname/tripsWithPagination/country/{country}")
+    @GetMapping("/nickname/trips-pagination/country/{country}")
     fun getTripsInCountryWithPagination(
         @RequestParam("nickname") nickname: String,
         @PathVariable("country") country: String,

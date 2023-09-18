@@ -56,22 +56,9 @@ class CommentService(
         val commentsToDelete = getCommentsAdminByTripId(tripId)
 
         commentsToDelete.forEach { commentDto ->
-            // commentDto에서 댓글의 ID를 가져온다.
             val commentId = commentDto.id
-
-            val childCommentsToDelete = commentId?.let { getChildCommentsByParentId(it) }
-
-            // 자식 댓글을 삭제합니다.
-            childCommentsToDelete?.forEach { childCommentDto ->
-                childCommentDto.id?.let { commentRepository.deleteById(it) }
-            }
-            // 댓글을 삭제합니다.
             commentId?.let { commentRepository.deleteById(it) }
         }
-    }
-
-    fun getChildCommentsByParentId(parentId: String): List<CommentDto> {
-        return commentRepository.findAllByParentId(parentId).map { fromComment(it, userService) }
     }
 
     /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
@@ -124,6 +111,7 @@ class CommentService(
                 profileUrl = commenter.profileImageUrl,
                 tripId = comment.tripId,
                 commentId = comment.id,
+                content= commentCreateDto.content,
             )
         }
         return fromComment(createdComment, userService)
@@ -185,6 +173,7 @@ class CommentService(
                 tripId = childComment.tripId,
                 parentId = childComment.parentId,
                 commentId = childComment.id,
+                content= commentChildrenCreateDto.content,
             )
         }
         return fromComment(createdComment, userService)

@@ -58,7 +58,7 @@ class TripService(
             userId = user.id!!,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-            location = tripCreateDto.location,
+            location = tripCreateDto.country,
             startedAt = startedAt,
             endAt = endAt,
             latitude = tripCreateDto.latitude,
@@ -234,7 +234,7 @@ class TripService(
         return fromTripAndComments(findTrip, commentDtoList, userId)
     }
 
-    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripDto>> {
+    fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripCardDto>> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -251,7 +251,7 @@ class TripService(
         return paginateTrips(categorizedTrips.second, page, pageSize)
     }
 
-    fun getTripsInCountry(nickname: String, country: String): Set<TripDto> {
+    fun getTripsInCountry(nickname: String, country: String): Set<TripCardDto> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -279,7 +279,7 @@ class TripService(
      * 여행 목록을 나라 기준으로 카테고리화하고 결과를 반환합니다.
      *
      */
-    fun Set<Trip>.categorizeTripsByCountry(): Pair<Map<String, Int>, Set<TripDto>> {
+    fun Set<Trip>.categorizeTripsByCountry(): Pair<Map<String, Int>, Set<TripCardDto>> {
         // 나라별 여행 횟수를 계산하기 위한 맵
         val countryFrequencyMap = mutableMapOf<String, Int>()
 
@@ -300,7 +300,7 @@ class TripService(
             .sortedWith(compareByDescending { sortedCountryFrequencyMap[it.hashtagInfo?.country] })
 
         // TripDto로 변환한 여행 목록을 Set으로 반환
-        val categorizedTrips = sortedTrips.map { fromTrip(it, "") }.toSet()
+        val categorizedTrips = sortedTrips.map { fromTripToTripCardDto(it, "") }.toSet()
 
         return sortedCountryFrequencyMap to categorizedTrips
     }
@@ -311,7 +311,7 @@ class TripService(
      * @param targetCountry 검색할 나라의 이름
      * @return 해당 나라의 여행 목록
      */
-    fun Set<Trip>.getTripsInCountry(targetCountry: String): Set<TripDto> {
+    fun Set<Trip>.getTripsInCountry(targetCountry: String): Set<TripCardDto> {
         // 지정된 나라와 일치하는 여행만 필터링하고 TripDto로 변환하여 반환
         val filteredTrips = this.filter { trip ->
             trip.hashtagInfo?.country == targetCountry
@@ -320,7 +320,7 @@ class TripService(
         // 최신순으로 정렬
         val sortedTrips = filteredTrips.sortedByDescending { it.createdAt }
 
-        return sortedTrips.map { fromTrip(it, "") }.toSet()
+        return sortedTrips.map { fromTripToTripCardDto(it, "") }.toSet()
     }
 
     /**
@@ -506,7 +506,7 @@ class TripService(
         if (findTrip.userId == userId) {
             findTrip.title = tripUpdateDto.title
             findTrip.content = tripUpdateDto.content
-            findTrip.location = tripUpdateDto.location ?: findTrip.location
+            findTrip.location = tripUpdateDto.country
             if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
@@ -578,6 +578,7 @@ class TripService(
         val adminIds = adminIdsStrings.mapNotNull { it.toLongOrNull() }
 
         if (memberId in adminIds || findTrip.userId == userId) {
+            commentService.deleteAllCommentsAdminByTripId(id)
             val images = findTrip.images
             if (images != null) {
                 val currentImages = images.toMutableList()
@@ -702,7 +703,7 @@ class TripService(
     fun fromTripToTripCardDto(trip: Trip, currentUserId: String): TripCardDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
-        val comments = commentRepository.countCommentsByTripId(trip.id!!) ?: 0
+        val comments = commentRepository.countCommentsByTripId(trip.id!!)
         val hashtags = trip.hashtagInfo
         val countryCode = hashtags?.countryCode ?: ""
         val country = hashtags?.country ?: ""
@@ -729,7 +730,7 @@ class TripService(
     }
 }
 
-fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, Any> {
+fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
     val totalTrips = tripList.size
     val startIndex = (page - 1) * pageSize
@@ -743,7 +744,7 @@ fun paginateTrips(trips: Set<TripDto>, page: Int, pageSize: Int): Map<String, An
     val totalPage = if (tripList.isEmpty()) 0 else (totalTrips + pageSize - 1) / pageSize
 
     return mapOf(
-        "posts" to paginatedTrips,
+        "trips" to paginatedTrips,
         "currentPage" to page,
         "totalPage" to totalPage,
         "postsPerPage" to pageSize,
