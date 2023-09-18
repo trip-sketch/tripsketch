@@ -58,7 +58,7 @@ class TripService(
             userId = user.id!!,
             title = tripCreateDto.title,
             content = tripCreateDto.content,
-            location = tripCreateDto.location,
+            location = tripCreateDto.country,
             startedAt = startedAt,
             endAt = endAt,
             latitude = tripCreateDto.latitude,
@@ -500,7 +500,7 @@ class TripService(
         if (findTrip.userId == userId) {
             findTrip.title = tripUpdateDto.title
             findTrip.content = tripUpdateDto.content
-            findTrip.location = tripUpdateDto.location ?: findTrip.location
+            findTrip.location = tripUpdateDto.country
             if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
@@ -697,7 +697,7 @@ class TripService(
     fun fromTripToTripCardDto(trip: Trip, currentUserId: String): TripCardDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
-        val comments = commentRepository.countCommentsByTripId(trip.id!!) ?: 0
+        val comments = commentRepository.countCommentsByTripId(trip.id!!)
         val hashtags = trip.hashtagInfo
         val countryCode = hashtags?.countryCode ?: ""
         val country = hashtags?.country ?: ""
