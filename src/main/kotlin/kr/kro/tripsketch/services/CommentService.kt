@@ -111,6 +111,7 @@ class CommentService(
                 profileUrl = commenter.profileImageUrl,
                 tripId = comment.tripId,
                 commentId = comment.id,
+                content= commentCreateDto.content,
             )
         }
         return fromComment(createdComment, userService)
@@ -172,6 +173,7 @@ class CommentService(
                 tripId = childComment.tripId,
                 parentId = childComment.parentId,
                 commentId = childComment.id,
+                content= commentChildrenCreateDto.content,
             )
         }
         return fromComment(createdComment, userService)
