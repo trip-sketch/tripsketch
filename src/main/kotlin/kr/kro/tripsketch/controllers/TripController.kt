@@ -162,12 +162,13 @@ class TripController(private val tripService: TripService) {
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, Sort.by("createdAt").descending())
             val findTrips = tripService.getTripsByNickname(nickname, pageable)
-            val tripsList = findTrips["trips"] as List<*>
-            if (tripsList.isNotEmpty()) {
-                ResponseEntity.status(HttpStatus.OK).body(findTrips)
-            } else {
-                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
-            }
+//            val tripsList = findTrips["trips"] as List<*>
+//            if (tripsList.isNotEmpty()) {
+//                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+//            } else {
+//                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "조회되는 게시물이 없습니다."))
+//            }
+            ResponseEntity.status(HttpStatus.OK).body(findTrips)
         } catch (e: IllegalArgumentException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
         }
