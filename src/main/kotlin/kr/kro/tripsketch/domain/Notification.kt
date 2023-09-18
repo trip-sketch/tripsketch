@@ -33,6 +33,8 @@ data class Notification(
 
     var profileUrl: String? = null,
 
+    var content: String? = null,
+
     @Indexed(expireAfterSeconds = 30 * 24 * 60 * 60) // 30 days in seconds
     var createdAt: LocalDateTime = LocalDateTime.now(),
 )

@@ -74,6 +74,7 @@ class NotificationService(
         tripId: String? = null,
         nickname: String? = null,
         profileUrl: String? = null,
+        content: String? = null,
     ): String {
         val tokens = ids.mapNotNull { getUserToken(it) }.toSet()
 
@@ -89,6 +90,7 @@ class NotificationService(
                 tripId = tripId,
                 nickname = nickname,
                 profileUrl = profileUrl,
+                content=content,
             )
             notificationRepository.save(notification)
         }
