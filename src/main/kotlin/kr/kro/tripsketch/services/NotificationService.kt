@@ -31,7 +31,7 @@ class NotificationService(
 
     fun getNotificationsByReceiverId(memberId: Long, page: Int, size: Int): Page<Notification> {
         val userId = userService.getUserIdByMemberId(memberId)
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"))
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
         val notificationsPage = notificationRepository.findByReceiverId(userId, pageable)
 
         val updatedNotifications = notificationsPage.content.map { notification ->
@@ -74,6 +74,7 @@ class NotificationService(
         tripId: String? = null,
         nickname: String? = null,
         profileUrl: String? = null,
+        content: String? = null,
     ): String {
         val tokens = ids.mapNotNull { getUserToken(it) }.toSet()
 
@@ -89,6 +90,7 @@ class NotificationService(
                 tripId = tripId,
                 nickname = nickname,
                 profileUrl = profileUrl,
+                content=content,
             )
             notificationRepository.save(notification)
         }
