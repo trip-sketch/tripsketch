@@ -53,11 +53,21 @@ class AuthService(
 
     fun refreshUserToken(request: KakaoRefreshRequest): TokenResponse? {
         val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null
-        if (kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) == null) return null
+
+        val (newAccessToken, newKakaoRefreshToken) = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) ?: return null
+        if (newAccessToken == null) return null
+
+        if (newKakaoRefreshToken != null) {
+            userService.updateKakaoRefreshToken(user.memberId, newKakaoRefreshToken)
+        }
 
         user.updateLastLogin()
+
+        val tokenResponse = jwtService.createTokens(user)
+
+        user.ourRefreshToken = tokenResponse.refreshToken
         userService.saveOrUpdate(user)
 
-        return jwtService.createTokens(user)
+        return tokenResponse
     }
 }

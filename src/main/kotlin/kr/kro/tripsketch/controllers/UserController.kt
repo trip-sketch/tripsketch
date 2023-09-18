@@ -133,10 +133,10 @@ class UserController(
         val user = userService.findUserByMemberId(memberId)
             ?: throw DataNotFoundException("회원 정보를 찾을 수 없습니다.")
 
-        val accessToken = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!)
+        val (newAccessToken, _) = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!)
             ?: throw BadRequestException("카카오 Refresh Token이 없습니다.")
 
-        if (!kakaoOAuthService.unlinkUser(accessToken)) {
+        if (newAccessToken == null || !kakaoOAuthService.unlinkUser(newAccessToken)) {
             throw InternalServerException("카카오 연동 해제에 실패했습니다")
         }
 

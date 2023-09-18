@@ -65,7 +65,7 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
     }
 
     /** 카카오 리프레시 토큰을 사용하여 카카오로부터 새로운 액세스 토큰을 가져옵니다. */
-    fun refreshAccessToken(refreshToken: String): String? {
+    fun refreshAccessToken(refreshToken: String): Pair<String?, String?>? {
         val params = LinkedMultiValueMap<String, String>().apply {
             add("grant_type", "refresh_token")
             add("client_id", kakaoConfig.clientId)
@@ -73,8 +73,13 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         }
 
         val response = requestKakaoToken(params)
-        return response?.get("access_token") as? String
+        val newAccessToken = response?.get("access_token") as? String
+        val newRefreshToken = response?.get("refresh_token") as? String
+
+        if (newAccessToken == null) return null
+        return Pair(newAccessToken, newRefreshToken)
     }
+
 
     /** 액세스 토큰을 사용하여 카카오 사용자의 멤버 ID를 가져옵니다. */
     fun getUserInfo(accessToken: String?): Map<String, Any>? {
