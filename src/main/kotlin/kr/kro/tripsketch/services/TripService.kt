@@ -208,7 +208,8 @@ class TripService(
         val trips = if (tripsDtoList.isNotEmpty()) tripsDtoList else emptyList<Map<String, Any>>()
         return mapOf(
             "currentPage" to currentPage,
-            "trips" to tripsDtoList,
+//            "trips" to tripsDtoList,
+            "trips" to trips,
             "postsPerPage" to postsPerPage,
             "totalPages" to totalPage,
         )
