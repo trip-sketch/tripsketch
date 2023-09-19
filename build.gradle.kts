@@ -94,9 +94,6 @@ dependencies {
 
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
-
-    implementation("com.drewnoakes:metadata-extractor:2.18.0")
-    implementation("net.coobird:thumbnailator:0.4.20")
 }
 
 tasks.withType<KotlinCompile> {
