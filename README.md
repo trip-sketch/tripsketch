@@ -30,25 +30,25 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 
 Follow the steps below to set up and run the project:
 
-# Step 1: Install JVM 17
+##### Step 1: Install JVM 17
 sudo apt-get update
 sudo apt-get install openjdk-17-jdk
 
-# Step 2: Install Kotlin 1.9.10
+##### Step 2: Install Kotlin 1.9.10
 curl -s https://get.sdkman.io | bash  # Install SDKMAN if not already installed
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 sdk install kotlin 1.9.10
 
-# Step 3: Clone the repository (Assuming it's on GitHub, adjust for other VCS if needed)
+##### Step 3: Clone the repository (Assuming it's on GitHub, adjust for other VCS if needed)
 git clone github.com/nea04184/tripsketch
 
-# Step 4: Navigate to the project directory
+##### Step 4: Navigate to the project directory
 cd tripsketch
 
-# Step 5: Build and run the project (Adjust this step as per your project's build tool e.g. Gradle, Maven, etc.)
+##### Step 5: Build and run the project (Adjust this step as per your project's build tool e.g. Gradle, Maven, etc.)
 ./gradlew build  
 
-# Step 6: Run the project (This might differ based on your project's structure)
+##### Step 6: Run the project (This might differ based on your project's structure)
 ./gradlew run
 
 
