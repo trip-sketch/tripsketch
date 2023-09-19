@@ -58,10 +58,11 @@ cd tripsketch
 
 # Step 6: Run the project
 ./gradlew run
-
+```
 
 
 ## 📂 Project File Structure
+```
 ├── HELP.md
 ├── build.gradle.kts
 ├── gradlew
@@ -151,6 +152,7 @@ cd tripsketch
     │           └── index.html
     └── test
         └── kotlin
+```
 
 
 ## 🎨 Project Description
