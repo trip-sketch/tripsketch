@@ -81,8 +81,9 @@ class TripService(
             null,
             null,
             createdTrip.id,
-            followingNickname,
-            followingProfileUrl,
+            content = tripCreateDto.title,
+            nickname = followingNickname,
+            profileUrl = followingProfileUrl,
         )
         return fromTrip(createdTrip, userId)
     }
