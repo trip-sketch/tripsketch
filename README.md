@@ -21,7 +21,6 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 - Spring Boot 
 - MongoDB
 
-
 ## 시작 가이드
 
 #### 필요한 개발 환경
