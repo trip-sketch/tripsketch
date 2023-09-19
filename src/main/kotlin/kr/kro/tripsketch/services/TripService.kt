@@ -753,14 +753,14 @@ class TripService(
             false
         }
         val content = keyword?.let {
-            trip.content.substringAfter(it).substringBefore("\n") }
-            ?: trip.content.split("\n")[0] // 첫 줄 가져오기
+            extractContextAroundKeyword(trip.content, it)
+        } ?: trip.content.split("\n")[0] // 첫 번째 줄 가져오기
         return TripCardWithKeywordDto(
             id = trip.id,
             nickname = tripUser.nickname,
             profileImageUrl = profileImageUrl,
             title = trip.title,
-            content = trip.content,
+            content = content,
             likes = trip.likes,
             views = trip.views,
             comments = comments,
@@ -770,6 +770,18 @@ class TripService(
             image = trip.images?.firstOrNull(),
             isLiked = isLiked,
         )
+    }
+
+    fun extractContextAroundKeyword(content: String, keyword: String): String {
+        val keywordIndex = content.indexOf(keyword)
+
+        if (keywordIndex == -1) {
+            return content.split("\n")[0] // 키워드가 없으면 첫 번째 줄 반환
+        }
+
+        val start = maxOf(keywordIndex - 10, 0)
+        val end = minOf(keywordIndex + keyword.length + 10, content.length)
+        return content.substring(start, end)
     }
 
     /**
