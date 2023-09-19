@@ -1,4 +1,4 @@
-echo "# 🚀 Tripsketch Backend Project
+# 🚀 Tripsketch Backend Project
 
 Welcome to the **Tripsketch Backend Server** built with **Spring Boot**!
 
