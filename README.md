@@ -35,21 +35,21 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 
 ```
 
-## 프로젝트 설명
+## Project Description
 
-### 주요 기능
+### Key Features
 
-OAuth를 활용한 사용자인증
+- User authentication using Kakao OAuth
+- Travel diary CRUD (Create, Read, Update, Delete) functionality
+- Exploration and search feature for travel diaries
+- 'Like' feature for travel diaries
+- Comment CRUD functionality
+- 'Like' feature for comments
+- User subscription feature
+- Push notification and notification management feature
+- Profile editing feature
 
-- 여행 일기 CRUD 기능
-- 여행 일기 탐색 및 검색 기능
-- 여행 일기 좋아요 기능
-- 댓글 CRUD 기능
-- 댓글 좋아요 기능
-- 사용자 구독 기능
-- 푸시 알림 및 알림 관리 기능
-- 프로필 수정 기능
-
+- 
 ### 화면 구성
 
 ...작성중
