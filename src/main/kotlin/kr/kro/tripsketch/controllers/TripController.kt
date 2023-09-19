@@ -5,6 +5,7 @@ import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
+import kr.kro.tripsketch.exceptions.UnauthorizedException
 import kr.kro.tripsketch.services.TripService
 import kr.kro.tripsketch.utils.PagenationUtil
 import org.springframework.data.domain.PageRequest
@@ -385,6 +386,25 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         } catch (e: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to (e.message ?: "")))
+        }
+    }
+
+
+    /**
+     * 게시물을 '좋아요', '좋아요 취소' 모두 할 수 있습니다.
+     * */
+    @PostMapping("/toggle-like")
+    fun toggleTripLike(
+        req: HttpServletRequest,
+        @RequestBody tripIdDto: TripIdDto,
+    ): ResponseEntity<Any> {
+        val memberId = req.getAttribute("memberId") as Long?
+            ?: throw UnauthorizedException("해당 사용자가 존재하지 않습니다.")
+        return try {
+            val result = tripService.toggleTripLike(memberId, tripIdDto.id)
+            ResponseEntity.status(HttpStatus.OK).body(result)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
 }
