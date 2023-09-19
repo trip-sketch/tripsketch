@@ -62,8 +62,6 @@ cd tripsketch
 
 
 ## 📂 Project File Structure
-
-```
 ├── HELP.md
 ├── build.gradle.kts
 ├── gradlew
@@ -153,7 +151,7 @@ cd tripsketch
     │           └── index.html
     └── test
         └── kotlin
-```
+
 
 ## 🎨 Project Description
 ### Key Features
