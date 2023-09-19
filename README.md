@@ -9,16 +9,13 @@
 # Project Introduction
 The web server application of the mobile application "TripSketch"
 
-<br />
-
 ## Development period
 07.2023 ~ 09.2023
 
-### 멤버 구성
+### Member
+Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 
-송호준, 박세진, 고병욱, 윤혜진
-
-### 사용 기술 스택
+### Technologies Used
 
 - Kotlin
 - Spring Boot 
