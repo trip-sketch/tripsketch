@@ -1,58 +1,67 @@
-# Tripsketch Backend Project
+echo "# 🚀 Tripsketch Backend Project
 
-#### Tripsketch Backend Server with Spring Boot
-
-<br/>
+Welcome to the **Tripsketch Backend Server** built with **Spring Boot**!
 
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
 
-# Project Introduction
-The web server application of the mobile application "TripSketch"
+## 📜 Introduction
+Tripsketch is the powerful web server application backing the mobile application \"TripSketch\".
 
-## Development period
-07.2023 ~ 09.2023
+📅 **Development period:** July 2023 - September 2023
 
-### Member
-Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
+## 🤝 Team Members & Responsibilities
 
-### Technologies Used
+- **Hojun Song**
+  - User management
+  - Image handling
+  - Authentication
+  - Notification management
 
+- **Park Sejin**
+  - Posts/Articles handling and management
+
+- **Ko Byungwook**
+  - Categories management
+  - Comments handling and management
+
+- **Yoon Hyejin**
+  - Image handling (partial)
+
+## 🛠 Technologies Used
 - Kotlin
 - Spring Boot 
 - MongoDB
 
-
-#### Installation Guide
-
+## 📦 Installation Guide
 ### Prerequisites
 - JVM 17
 - Kotlin 1.9.10
 
-Follow the steps below to set up and run the project:
-
-##### Step 1: Install JVM 17
+```bash
+# Step 1: Install JVM 17
 sudo apt-get update
 sudo apt-get install openjdk-17-jdk
 
-##### Step 2: Install Kotlin 1.9.10
-curl -s https://get.sdkman.io | bash  # Install SDKMAN if not already installed
-source "$HOME/.sdkman/bin/sdkman-init.sh"
+# Step 2: Install Kotlin 1.9.10
+curl -s https://get.sdkman.io | bash
+source \"$HOME/.sdkman/bin/sdkman-init.sh\"
 sdk install kotlin 1.9.10
 
-##### Step 3: Clone the repository (Assuming it's on GitHub, adjust for other VCS if needed)
+# Step 3: Clone the repository
 git clone github.com/nea04184/tripsketch
 
-##### Step 4: Navigate to the project directory
+# Step 4: Navigate to the project directory
 cd tripsketch
 
-##### Step 5: Build and run the project (Adjust this step as per your project's build tool e.g. Gradle, Maven, etc.)
+# Step 5: Build and run the project
 ./gradlew build  
 
-##### Step 6: Run the project (This might differ based on your project's structure)
+# Step 6: Run the project
 ./gradlew run
 
 
-#### Project File Structure
+
+## 📂 Project File Structure
 
 ```
 ├── HELP.md
