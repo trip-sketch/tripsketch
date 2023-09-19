@@ -218,7 +218,9 @@ class TripService(
     }
 
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
-        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException(
+            "게시글이 존재하지 않습니다."
+        )
         val commentDtoList = commentService.getCommentsGuestByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
@@ -226,7 +228,8 @@ class TripService(
     fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId: Long): TripAndCommentResponseDto {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
-        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
+        val findTrip =
+            tripRepository.findByIdAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException("게시글이 존재하지 않습니다.")
         if (findTrip.isPublic == false && findTrip.userId != userId) {
             throw ForbiddenException("해당 게시물에 접근 권한이 없습니다.")
         }
@@ -507,7 +510,10 @@ class TripService(
             findTrip.title = tripUpdateDto.title
             findTrip.content = tripUpdateDto.content
             findTrip.location = tripUpdateDto.country
-            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(tripUpdateDto.endAt)) {
+            if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(
+                    tripUpdateDto.endAt
+                )
+            ) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
             }
             findTrip.startedAt = tripUpdateDto.startedAt
@@ -708,7 +714,8 @@ class TripService(
         val countryCode = hashtags?.countryCode ?: ""
         val country = hashtags?.country ?: ""
         val isLiked: Boolean = if (currentUserId != "") {
-            val currentUser = userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
+            val currentUser =
+                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
             trip.tripLikes.contains(currentUser.id)
         } else {
             false
