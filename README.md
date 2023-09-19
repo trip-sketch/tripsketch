@@ -6,15 +6,13 @@
 
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
 
-## 프로젝트 소개
-
-모바일 어플리케이션 "트립스케치"의 웹 서버 어플리케이션입니다.
+# Project Introduction
+The web server application of the mobile application "TripSketch"
 
 <br />
 
-## 개발 기간
-
-- 2023.07 ~ 09
+## Development period
+07.2023 ~ 09.2023
 
 ### 멤버 구성
 
