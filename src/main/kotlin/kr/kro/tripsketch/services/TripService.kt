@@ -767,9 +767,11 @@ class TripService(
                         "$userNickname 님이 회원님의 글을 좋아합니다.",
                         null,
                         null,
+                        null,
                         findTrip.id,
                         userNickname,
                         userProfileUrl,
+                        findTrip.title
                     )
                 } else {
                     throw IllegalArgumentException("조회되는 사용자가 없습니다.")
