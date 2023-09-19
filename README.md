@@ -21,17 +21,8 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 - Spring Boot 
 - MongoDB
 
-## 시작 가이드
 
-#### 필요한 개발 환경
-
-
-
-#### 파일 구성
-```
-# README.md
-
-## Installation Guide
+#### Installation Guide
 
 ### Prerequisites
 - JVM 17
@@ -39,7 +30,6 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 
 Follow the steps below to set up and run the project:
 
-```bash
 # Step 1: Install JVM 17
 sudo apt-get update
 sudo apt-get install openjdk-17-jdk
@@ -60,8 +50,9 @@ cd tripsketch
 
 # Step 6: Run the project (This might differ based on your project's structure)
 ./gradlew run
-```
 
+
+#### Project File Structure
 
 ```
 ├── HELP.md
