@@ -48,6 +48,9 @@ class OauthController(
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
         val tokenResponse = authService.refreshUserToken(request)
+
+        println("RefreshToken: ${tokenResponse?.refreshToken}")
+        
         return if (tokenResponse != null) {
             val headers = HttpHeaders().apply {
                 set("AccessToken", tokenResponse.accessToken)
