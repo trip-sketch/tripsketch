@@ -155,6 +155,7 @@ cd tripsketch
 ```
 
 
+
 ## 🎨 Project Description
 ### Key Features
 - User authentication using Kakao OAuth
