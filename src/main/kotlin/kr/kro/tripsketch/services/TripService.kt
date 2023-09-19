@@ -455,7 +455,7 @@ class TripService(
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
 
         val findTrips = tripRepository.findTripsByKeyword(keyword, pageable)
-        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, userId) }
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardWithKeywordDto(it, userId, keyword) }
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
@@ -480,7 +480,7 @@ class TripService(
      * */
     fun getSearchTripsByKeywordAsGuest(keyword: String, pageable: Pageable): Map<String, Any> {
         val findTrips = tripRepository.findTripsByKeyword(keyword, pageable)
-        val tripsDtoList = findTrips.content.map { fromTripToTripCardDto(it, "") }
+        val tripsDtoList = findTrips.content.map { fromTripToTripCardWithKeywordDto(it, "", keyword) }
         val currentPage = findTrips.number + 1
         val totalPage = findTrips.totalPages
         val postsPerPage = findTrips.size
@@ -727,6 +727,40 @@ class TripService(
             nickname = tripUser.nickname,
             profileImageUrl = profileImageUrl,
             title = trip.title,
+            likes = trip.likes,
+            views = trip.views,
+            comments = comments,
+            countryCode = countryCode,
+            country = country,
+            createdAt = trip.createdAt,
+            image = trip.images?.firstOrNull(),
+            isLiked = isLiked,
+        )
+    }
+
+    fun fromTripToTripCardWithKeywordDto(trip: Trip, currentUserId: String, keyword: String? = null): TripCardWithKeywordDto {
+        val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
+        val profileImageUrl = tripUser.profileImageUrl
+        val comments = commentRepository.countCommentsByTripId(trip.id!!)
+        val hashtags = trip.hashtagInfo
+        val countryCode = hashtags?.countryCode ?: ""
+        val country = hashtags?.country ?: ""
+        val isLiked: Boolean = if (currentUserId != "") {
+            val currentUser =
+                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
+            trip.tripLikes.contains(currentUser.id)
+        } else {
+            false
+        }
+        val content = keyword?.let {
+            trip.content.substringAfter(it).substringBefore("\n") }
+            ?: trip.content.split("\n")[0] // 첫 줄 가져오기
+        return TripCardWithKeywordDto(
+            id = trip.id,
+            nickname = tripUser.nickname,
+            profileImageUrl = profileImageUrl,
+            title = trip.title,
+            content = trip.content,
             likes = trip.likes,
             views = trip.views,
             comments = comments,
