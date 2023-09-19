@@ -1,4 +1,4 @@
-# Tripsketch Backend
+# Tripsketch Backend Project
 
 #### Tripsektch Backend Server with Spring Boot
 
