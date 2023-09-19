@@ -746,7 +746,7 @@ fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String
     return mapOf(
         "trips" to paginatedTrips,
         "currentPage" to page,
-        "totalPage" to totalPage,
+        "totalPages" to totalPage,
         "postsPerPage" to pageSize,
     )
 }
