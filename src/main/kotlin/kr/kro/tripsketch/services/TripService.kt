@@ -738,6 +738,13 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 을 TripCardWithKeywordDto 형식으로 변환합니다.
+     * @param trip 변환할 Trip 도메인
+     * @param currentUserId 현재 사용자 ID
+     * @param keyword 검색어
+     * @return 변환된 TripCardWithKeywordDto 데이터
+     * */
     fun fromTripToTripCardWithKeywordDto(trip: Trip, currentUserId: String, keyword: String? = null): TripCardWithKeywordDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
@@ -772,16 +779,27 @@ class TripService(
         )
     }
 
+    /**
+     * 검색어 주위로 텍스트를 추출하는 함수입니다.
+     * */
     fun extractContextAroundKeyword(content: String, keyword: String): String {
         val keywordIndex = content.indexOf(keyword)
 
         if (keywordIndex == -1) {
-            return content.split("\n")[0] // 키워드가 없으면 첫 번째 줄 반환
+            return content.split("\n")[0]
         }
 
-        val start = maxOf(keywordIndex - 10, 0)
-        val end = minOf(keywordIndex + keyword.length + 10, content.length)
-        return content.substring(start, end)
+        val start = maxOf(keywordIndex - 15, 0)
+        val end = minOf(keywordIndex + keyword.length + 15, content.length)
+//        return content.substring(start, end)
+        var context = content.substring(start, end)
+        if (start > 0) {
+            context = "..$context"
+        }
+        if (end < content.length) {
+            context += ".."
+        }
+        return context
     }
 
     /**
