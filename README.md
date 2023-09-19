@@ -155,15 +155,17 @@ cd tripsketch
         └── kotlin
 ```
 
-## Project Description
-
+## 🎨 Project Description
 ### Key Features
-
 - User authentication using Kakao OAuth
 - Travel diary CRUD (Create, Read, Update, Delete) functionality
 - Exploration and search feature for travel diaries
 - 'Like' feature for travel diaries
 - Comment CRUD functionality
+- 'Like' feature for comments
+- User subscription feature
+- Push notification and notification management feature
+- Profile editing feature
 - 'Like' feature for comments
 - User subscription feature
 - Push notification and notification management feature
