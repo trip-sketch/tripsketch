@@ -36,6 +36,7 @@ Tripsketch is the powerful web server application backing the mobile application
 ### Prerequisites
 - JVM 17
 - Kotlin 1.9.10
+- MongoDB (NoSQL)
 
 ```bash
 # Step 1: Install JVM 17
