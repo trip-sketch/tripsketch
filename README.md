@@ -1,6 +1,6 @@
 # 🚀 Tripsketch Backend Project
 
-Welcome to the **Tripsketch Backend Server** built with **Spring Boot**!
+Welcome to **Tripsketch Backend Server** built with **Spring Boot**!
 
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
 
