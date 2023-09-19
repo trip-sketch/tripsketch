@@ -381,6 +381,7 @@ class CommentService(
                     profileUrl = commenter.profileImageUrl,
                     tripId = comment.tripId,
                     commentId = comment.id,
+                    content = comment.content,
                 )
             }
         }
@@ -429,6 +430,7 @@ class CommentService(
                     tripId = childComment.tripId,
                     parentId = childComment.parentId,
                     commentId = childComment.id,
+                    content = childComment.content,
                 )
             }
         }
