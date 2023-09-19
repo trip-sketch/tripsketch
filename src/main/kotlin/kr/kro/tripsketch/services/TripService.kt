@@ -80,10 +80,11 @@ class TripService(
             "$followingNickname 님이 새로운 글을 작성하였습니다.",
             null,
             null,
-            createdTrip.id,
-            content = tripCreateDto.title,
+            parentId= null,
+            tripId= createdTrip.id,
             nickname = followingNickname,
             profileUrl = followingProfileUrl,
+            content = tripCreateDto.title,
         )
         return fromTrip(createdTrip, userId)
     }
