@@ -18,6 +18,7 @@ Tripsketch is the powerful web server application backing the mobile application
   - Notification management
 
 - **Park Sejin**
+  - Search Functionality
   - Posts/Articles handling and management
 
 - **Ko Byungwook**
