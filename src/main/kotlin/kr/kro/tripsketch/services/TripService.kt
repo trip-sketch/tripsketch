@@ -77,7 +77,7 @@ class TripService(
         notificationService.sendPushNotification(
             followerUserIds,
             "새로운 여행의 시작, 트립스케치",
-            "$followingNickname 님이 새로운 글을 작성하였습니다.",
+            "$followingNickname 님이 새글을 작성하였습니다.",
             null,
             null,
             parentId= null,
