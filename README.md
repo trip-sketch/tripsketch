@@ -135,8 +135,3 @@ Hojun Song, Park Sejin, Ko Byungwook, Yoon Hyejin
 - User subscription feature
 - Push notification and notification management feature
 - Profile editing feature
-
-
-### 화면 구성
-
-...작성중
