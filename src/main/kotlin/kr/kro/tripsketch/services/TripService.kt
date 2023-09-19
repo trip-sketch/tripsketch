@@ -796,6 +796,7 @@ class TripService(
         if (end < content.length) {
             context += ".."
         }
+        context = context.replace("\n", " ")
         return context
     }
 
