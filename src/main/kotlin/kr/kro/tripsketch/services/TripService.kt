@@ -613,7 +613,7 @@ class TripService(
                 for (url in deletedUrls) {
                     try {
                         imageService.deleteImage(url)
-                        currentImages.remove(url) // 이미지 URL을 리스트에서 제거합니다.
+                        currentImages.remove(url) 
                     } catch (e: Exception) {
                         println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
                     }
