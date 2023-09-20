@@ -80,8 +80,8 @@ class TripService(
             "$followingNickname 님이 새글을 작성하였습니다.",
             null,
             null,
-            parentId= null,
-            tripId= createdTrip.id,
+            parentId = null,
+            tripId = createdTrip.id,
             nickname = followingNickname,
             profileUrl = followingProfileUrl,
             content = tripCreateDto.title,
@@ -717,6 +717,14 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 객체를 TripUpdateResponseDto로 변환합니다.
+     *
+     * @param trip Trip 객체
+     * @param currentUserId 현재 사용자의 ID
+     * @return TripUpdateResponseDto 객체
+     * @throws IllegalArgumentException 해당 유저가 존재하지 않을 경우 발생
+     */
     fun fromTripToUpdate(trip: Trip, currentUserId: String): TripUpdateResponseDto {
         val user = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
 
@@ -752,6 +760,14 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 객체와 댓글 목록을 TripAndCommentResponseDto로 변환합니다.
+     *
+     * @param trip Trip 객체
+     * @param comments 댓글 목록
+     * @param currentUserId 현재 사용자의 ID
+     * @return TripAndCommentResponseDto 객체
+     */
     fun fromTripAndComments(trip: Trip, comments: List<CommentDto>, currentUserId: String): TripAndCommentResponseDto {
         return TripAndCommentResponseDto(
             tripAndCommentPairDataByTripId = Pair(
@@ -804,7 +820,11 @@ class TripService(
      * @param keyword 검색어
      * @return 변환된 TripCardWithKeywordDto 데이터
      * */
-    fun fromTripToTripCardWithKeywordDto(trip: Trip, currentUserId: String, keyword: String? = null): TripCardWithKeywordDto {
+    fun fromTripToTripCardWithKeywordDto(
+        trip: Trip,
+        currentUserId: String,
+        keyword: String? = null
+    ): TripCardWithKeywordDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
         val comments = commentRepository.countCommentsByTripId(trip.id!!)
@@ -907,6 +927,14 @@ class TripService(
     }
 }
 
+/**
+ * TripCardDto 목록을 페이지네이션하여 반환합니다.
+ *
+ * @param TripCardDto trips 여행 카드 목록
+ * @param page 현재 페이지 번호
+ * @param pageSize 페이지당 표시할 게시물 수
+ * @return 페이지네이션된 여행 카드 목록
+ */
 fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
     val totalTrips = tripList.size
@@ -924,6 +952,6 @@ fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String
         "trips" to paginatedTrips,
         "currentPage" to page,
         "totalPages" to totalPage,
-        "postsPerPage" to pageSize,
+        "postsPerPage" to pageSize
     )
 }
