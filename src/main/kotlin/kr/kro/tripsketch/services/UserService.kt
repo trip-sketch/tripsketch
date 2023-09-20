@@ -166,7 +166,7 @@ class UserService(
     /** 활동하지 않는 사용자들을 삭제하는 스케쥴 함수. */
     @Scheduled(cron = "0 30 15 * * ?")
     fun softDeleteInactiveUsers() {
-        val cutoffDateForDeletion = LocalDateTime.now().minusMonths(12)
+        val cutoffDateForDeletion = LocalDateTime.now().minusMonths(24)
         val usersToDelete = userRepository.findUsersByUpdatedAtBefore(cutoffDateForDeletion)
 
         usersToDelete.forEach { user ->
