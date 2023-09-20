@@ -96,9 +96,9 @@ class OauthController(
         val baseUrl = "https://kauth.kakao.com/oauth/authorize"
         val clientId = kakaoOAuthConfig.clientId
         val redirectUri = kakaoOAuthConfig.redirectUri
-        val responseType = "code" 
+        val responseType = "code"
 
-        val redirectUrl = "$baseUrl?client_id=$clientId&redirect_uri=$redirectUri&response_type=$responseType"  // 수정
+        val redirectUrl = "$baseUrl?client_id=$clientId&redirect_uri=$redirectUri&response_type=$responseType"  
         return RedirectView(redirectUrl)
     }
 }
