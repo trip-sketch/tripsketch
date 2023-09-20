@@ -590,7 +590,6 @@ class TripService(
             findTrip.latitude = tripUpdateDto.latitude ?: findTrip.latitude
             findTrip.longitude = tripUpdateDto.longitude ?: findTrip.longitude
 
-            // HashtagInfo 업데이트 로직
             tripUpdateDto.countryCode?.let {
                 findTrip.hashtagInfo = HashtagInfo(
                     countryCode = tripUpdateDto.countryCode,
@@ -613,7 +612,7 @@ class TripService(
                 for (url in deletedUrls) {
                     try {
                         imageService.deleteImage(url)
-                        currentImages.remove(url) 
+                        currentImages.remove(url)
                     } catch (e: Exception) {
                         println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
                     }
