@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.controllers
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import kr.kro.tripsketch.config.KakaoOAuthConfig
 import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.services.AuthService
 import kr.kro.tripsketch.services.UserService
@@ -8,6 +9,7 @@ import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.view.RedirectView
 
 /**
  * Kakao OAuth와 관련된 요청을 처리하는 컨트롤러입니다.
@@ -18,6 +20,7 @@ class OauthController(
     private val authService: AuthService,
     private val resourceLoader: ResourceLoader,
     private val userService: UserService,
+    private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
 
     /**
@@ -83,5 +86,19 @@ class OauthController(
         } catch (ex: Exception) {
             ResponseEntity.badRequest().body(ex.message)
         }
+    }
+
+    /**
+     * 클라이언트 요청을 Kakao OAuth URL로 리다이렉트하는 메서드입니다.
+     */
+    @GetMapping("/redirect")
+    fun redirectToKakaoOauth(): RedirectView {
+        val baseURL = "https://kauth.kakao.com/oauth/authorize"
+        val client_id = kakaoOAuthConfig.clientId
+        val redirect_uri = kakaoOAuthConfig.redirectUri 
+        val response_type = "code"
+
+        val redirectUrl = "$baseURL?client_id=$client_id&redirect_uri=$redirect_uri&response_type=$response_type"
+        return RedirectView(redirectUrl)
     }
 }
