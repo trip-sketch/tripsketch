@@ -185,7 +185,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
-        val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname, page, pageSize)
+        val sortedCountryFrequencyMap = tripService.getTripCategoryByNicknameWithPagination(nickname, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
@@ -206,7 +206,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("pageSize", required = false, defaultValue = "10") pageSize: Int,
     ): ResponseEntity<Map<String, Any>> {
-        val sortedCountryFrequencyMap = tripService.getTripsInCountry(nickname, country, page, pageSize)
+        val sortedCountryFrequencyMap = tripService.getTripsInCountryWithPagination(nickname, country, page, pageSize)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
