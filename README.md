@@ -21,9 +21,10 @@ Tripsketch is the powerful web server application backing the mobile application
   - Search Functionality
   - Posts/Articles handling and management
 
-- **Ko Byungwook**
+- **Ko ByeonUk**
   - Categories management
   - Comments handling and management
+  - Reply handling and management
 
 - **Yoon Hyejin**
   - Image handling (partial)
@@ -166,10 +167,11 @@ cd tripsketch
 - 'Like' feature for travel diaries
 - Comment CRUD functionality
 - 'Like' feature for comments
+- Reply CRUD functionality
+- 'Like' feature for replies
 - User subscription feature
 - Push notification and notification management feature
 - Profile editing feature
-- 'Like' feature for comments
 - User subscription feature
 - Push notification and notification management feature
 - Profile editing feature
