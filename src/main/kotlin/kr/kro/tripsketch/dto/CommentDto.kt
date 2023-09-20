@@ -4,6 +4,24 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
+/**
+ * 댓글 정보를 담은 DTO 클래스입니다.
+ *
+ * @property id 댓글 식별자 (Optional)
+ * @property userNickName 유저 닉네임 (Required)
+ * @property userProfileUrl 유저 프로필 이미지 URL (Required)
+ * @property tripId 게시물 아이디 (Required)
+ * @property parentId 부모 댓글의 식별자 (Optional)
+ * @property content 댓글 내용 (Required, 최대 200자)
+ * @property createdAt 댓글 생성 일시 (기본값: 현재 일시)
+ * @property updatedAt 댓글 수정 일시 (기본값: 현재 일시)
+ * @property replyToNickname 답글 대상 닉네임 (Optional)
+ * @property isDeleted 댓글 삭제 여부 (기본값: false)
+ * @property isLiked 댓글 좋아요 여부 (기본값: false)
+ * @property numberOfLikes 댓글 좋아요 수 (기본값: 0)
+ * @property children 자식 댓글 목록 (기본값: 빈 리스트)
+ * @author BYEONGUK KO
+ */
 data class CommentDto(
     val id: String? = null,
 
