@@ -440,6 +440,14 @@ class TripService(
         return fromTrip(findTrip, userId)
     }
 
+    /**
+     * 회원의 ID와 여행 ID를 기반으로 업데이트용 여행 정보를 가져옵니다.
+     *
+     * @param memberId 회원 ID
+     * @param id 여행 ID
+     * @return TripUpdateResponseDto 여행 정보 및 댓글 정보
+     * @throws IllegalArgumentException 조회된 사용자가 없거나 해당 게시글이 존재하지 않을 경우 발생합니다.
+     */
     fun getTripByMemberIdAndIdToUpdate(memberId: Long, id: String): TripUpdateResponseDto? {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
