@@ -24,6 +24,7 @@ import kotlin.math.min
  * @property userService 사용자 정보 관련 비즈니스 로직을 담당하는 서비스
  * @property notificationService 알림 서비스
  * @property tripRepository 여행 관련 데이터의 CRUD를 처리하는 레포지토리
+ * @author BYEONGUK KO
  */
 @Service
 class CommentService(
