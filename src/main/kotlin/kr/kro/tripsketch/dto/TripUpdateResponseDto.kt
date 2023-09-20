@@ -5,6 +5,11 @@ import kr.kro.tripsketch.domain.HashtagInfo
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+/**
+ * 여행 정보 수정 응답 DTO 클래스입니다.
+ *
+ * @author BYEONGUK KO
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class TripUpdateResponseDto(
     var id: String? = null,
