@@ -89,7 +89,6 @@ cd tripsketch
     │   │               │   ├── NotificationController.kt
     │   │               │   ├── OauthController.kt
     │   │               │   ├── TripController.kt
-    │   │               │   ├── TripLikeController.kt
     │   │               │   └── UserController.kt
     │   │               ├── domain
     │   │               │   ├── Comment.kt
@@ -137,7 +136,6 @@ cd tripsketch
     │   │               │   ├── NickNameService.kt
     │   │               │   ├── NotificationService.kt
     │   │               │   ├── S3Service.kt
-    │   │               │   ├── TripLikeService.kt
     │   │               │   ├── TripService.kt
     │   │               │   └── UserService.kt
     │   │               └── utils
