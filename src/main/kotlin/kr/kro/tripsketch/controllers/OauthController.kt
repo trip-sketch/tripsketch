@@ -98,7 +98,7 @@ class OauthController(
         val redirectUri = kakaoOAuthConfig.redirectUri
         val responseType = "code"
 
-        val redirectUrl = "$baseUrl?client_id=$clientId&redirect_uri=$redirectUri&response_type=$responseType"  
+        val redirectUrl = "$baseUrl?client_id=$clientId&redirect_uri=$redirectUri&response_type=$responseType"
         return RedirectView(redirectUrl)
     }
 }
