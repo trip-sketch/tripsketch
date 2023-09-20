@@ -16,11 +16,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/comment")
 class CommentController(private val commentService: CommentService) {
 
-    @GetMapping("/admin/comments")
-    fun getAllComments(req: HttpServletRequest, pageable: Pageable): Page<CommentDto> {
-        return commentService.getAllComments(pageable)
-    }
-
     @GetMapping("/admin/comments-pagination")
     fun getAllCommentsWIthPagination(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
