@@ -23,8 +23,7 @@ Tripsketch is the powerful web server application backing the mobile application
 
 - **Ko ByeonUk**
   - Categories management
-  - Comments handling and management
-  - Reply handling and management
+  - Handling and management of threaded comments
 
 - **Yoon Hyejin**
   - Image handling (partial)
