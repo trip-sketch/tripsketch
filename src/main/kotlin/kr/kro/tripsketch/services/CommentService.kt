@@ -8,12 +8,23 @@ import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import kr.kro.tripsketch.utils.EnvLoader
 import org.bson.types.ObjectId
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import kotlin.math.min
 
+
+/**
+ * CommentService 클래스
+ *
+ * 주요 기능:
+ * - 댓글 관련 비즈니스 로직을 담당합니다.
+ *
+ * @property commentRepository 댓글 관련 데이터의 CRUD를 처리하는 레포지토리
+ * @property userRepository 사용자 관련 데이터의 CRUD를 처리하는 레포지토리
+ * @property userService 사용자 정보 관련 비즈니스 로직을 담당하는 서비스
+ * @property notificationService 알림 서비스
+ * @property tripRepository 여행 관련 데이터의 CRUD를 처리하는 레포지토리
+ */
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
@@ -23,10 +34,13 @@ class CommentService(
     private val tripRepository: TripRepository,
 ) {
 
-    fun getAllComments(pageable: Pageable): Page<CommentDto> {
-        return commentRepository.findAll(pageable).map { fromComment(it, userService) }
-    }
-
+    /**
+     * 페이지네이션을 적용하여 모든 댓글을 가져옵니다.
+     *
+     * @param page 현재 페이지 번호
+     * @param pageSize 페이지당 댓글 수
+     * @return 페이지네이션된 댓글 목록과 페이지 관련 정보
+     */
     fun getAllCommentsWithPagination(page: Int, pageSize: Int): Map<String, Any> {
         val commentsPage = commentRepository.findAll()
         val commentsList = commentsPage.map { fromComment(it, userService) }
@@ -34,6 +48,13 @@ class CommentService(
         return paginateComments(commentsList, page, pageSize)
     }
 
+    /**
+     * 게스트가 특정 여행의 댓글 목록을 가져옵니다.
+     *
+     * @param tripId 조회할 여행의 ID
+     * @return 댓글 목록
+     * @throws IllegalArgumentException 해당 게시글이 존재하지 않거나 접근 권한이 없을 경우 발생
+     */
     fun getCommentsGuestByTripId(tripId: String): List<CommentDto> {
         val trip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -44,6 +65,13 @@ class CommentService(
         return comments.map { fromComment(it, userService) }
     }
 
+    /**
+     * 관리자 권한으로 특정 여행의 댓글 목록을 가져옵니다.
+     *
+     * @param tripId 조회할 여행의 ID
+     * @return 댓글 목록
+     * @throws IllegalArgumentException 해당 게시글이 존재하지 않을 경우 발생
+     */
     fun getCommentsAdminByTripId(tripId: String): List<CommentDto> {
         tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -51,7 +79,11 @@ class CommentService(
         return comments.map { fromComment(it, userService) }
     }
 
-    // 트립 id 로 모든 댓글 hardDelete
+    /**
+     * 특정 여행에 속한 모든 댓글을 영구 삭제합니다.
+     *
+     * @param tripId 삭제할 댓글들이 속한 여행의 ID
+     */
     fun deleteAllCommentsAdminByTripId(tripId: String) {
         val commentsToDelete = getCommentsAdminByTripId(tripId)
 
@@ -61,13 +93,27 @@ class CommentService(
         }
     }
 
-    /** 로그인 한 유저가 좋아요가 있는 댓글 조회 */
+    /**
+     * 로그인한 유저가 특정 여행에서 좋아요를 누른 댓글 목록을 조회합니다.
+     *
+     * @param memberId 조회할 유저의 ID
+     * @param tripId 조회할 여행의 ID
+     * @return 좋아요를 누른 댓글 목록
+     * @throws IllegalArgumentException 해당 게시글이 존재하지 않을 경우 발생
+     */
     fun getIsLikedByMemberIdForTrip(memberId: Long, tripId: String): List<CommentDto> {
         val updatedComments = isLikedByTokenForComments(memberId, tripId)
 
         return updatedComments.map { fromComment(it, userService) }
     }
 
+    /**
+     * 특정 유저가 특정 여행의 댓글들에 대한 좋아요 정보를 반환합니다.
+     *
+     * @param memberId 좋아요 정보를 업데이트할 유저의 ID
+     * @param tripId 좋아요 정보를 업데이트할 여행의 ID
+     * @return 좋아요 정보가 업데이트된 댓글 목록
+     */
     private fun isLikedByTokenForComments(memberId: Long, tripId: String): List<Comment> {
         tripRepository.findByIdAndIsHiddenIsFalse(tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -87,7 +133,14 @@ class CommentService(
         }
     }
 
-    // 트립아이디 조회 하여 널이 아닐경우에만 글을 쓰도록
+    /**
+     * 새로운 댓글을 생성합니다.
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param commentCreateDto 생성할 댓글의 정보를 담은 DTO
+     * @return CommentDto 생성된 댓글의 정보를 담은 DTO
+     * @throws IllegalArgumentException 해당 게시글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     */
     fun createComment(memberId: Long, commentCreateDto: CommentCreateDto): CommentDto {
         val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(commentCreateDto.tripId)
             ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
@@ -116,6 +169,16 @@ class CommentService(
         }
         return fromComment(createdComment, userService)
     }
+
+    /**
+     * 댓글의 자식 댓글을 생성합니다. (대댓글 생성)
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param parentId 부모 댓글의 ID
+     * @param commentChildrenCreateDto 생성할 자식 댓글의 정보를 담은 DTO
+     * @return CommentDto 생성된 자식 댓글의 정보를 담은 부모 댓글의 DTO
+     * @throws IllegalArgumentException 해당 게시글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     */
 
     fun createChildrenComment(
         memberId: Long,
@@ -179,6 +242,16 @@ class CommentService(
         return fromComment(createdComment, userService)
     }
 
+    /**
+     * 댓글을 업데이트합니다.
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param id 업데이트할 댓글의 ID
+     * @param commentUpdateDto 업데이트할 댓글의 정보를 담은 DTO
+     * @return CommentDto 업데이트된 댓글의 정보를 담은 DTO
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 댓글 작성자 또는 관리자가 아닌 사용자가 업데이트를 시도할 경우 발생
+     */
     fun updateComment(memberId: Long, id: String, commentUpdateDto: CommentUpdateDto): CommentDto {
         val comment =
             commentRepository.findById(id).orElse(null) ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
@@ -204,6 +277,17 @@ class CommentService(
         return fromComment(savedComment, userService)
     }
 
+    /**
+     * 자식 댓글을 업데이트합니다. (대댓글)
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param parentId 부모 댓글의 ID
+     * @param id 업데이트할 자식 댓글의 ID
+     * @param commentUpdateDto 업데이트할 자식 댓글의 정보를 담은 DTO
+     * @return CommentDto 업데이트된 자식 댓글의 정보를 담은 부모 댓글의 DTO
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 댓글 작성자 또는 관리자가 아닌 사용자가 업데이트를 시도할 경우 발생
+     */
     fun updateChildrenComment(
         memberId: Long,
         parentId: String,
@@ -243,6 +327,14 @@ class CommentService(
         return fromComment(savedParentComment, userService)
     }
 
+    /**
+     * 댓글을 삭제합니다.
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param id 삭제할 댓글의 ID
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 댓글 작성자 또는 관리자가 아닌 사용자가 삭제를 시도할 경우 발생
+     */
     fun deleteComment(memberId: Long, id: String) {
         val comment = commentRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("해당 id 댓글은 존재하지 않습니다.")
@@ -286,6 +378,15 @@ class CommentService(
         commentRepository.save(deletedComment)
     }
 
+    /**
+     * 자식 댓글을 삭제합니다. (대댓글 삭제)
+     *
+     * @param memberId 댓글을 작성한 회원의 ID
+     * @param parentId 부모 댓글의 ID
+     * @param id 삭제할 자식 댓글의 ID
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 댓글 작성자 또는 관리자가 아닌 사용자가 삭제를 시도할 경우 발생
+     */
     fun deleteChildrenComment(memberId: Long, parentId: String, id: String) {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
@@ -344,6 +445,15 @@ class CommentService(
         commentRepository.save(parentComment)
     }
 
+    /**
+     * 댓글에 좋아요, 좋아요 취소를 토글 형식으로 요청합니다.
+     *
+     * @param memberId 좋아요를 누른 회원의 ID
+     * @param id 좋아요를 토글할 댓글의 ID
+     * @return CommentDto 좋아요가 토글된 댓글의 정보를 담은 DTO
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 비공개 게시글이면 댓글 작성자가 아닌 사용자가 좋아요를 시도할 경우, 삭제 된 댓글의 경우 발생
+     */
     fun toggleLikeComment(memberId: Long, id: String): CommentDto {
         val commenter =
             userRepository.findByMemberId(memberId) ?: throw IllegalArgumentException("해당 이메일의 사용자 존재하지 않습니다.")
@@ -390,6 +500,16 @@ class CommentService(
         return fromComment(savedComment, userService)
     }
 
+    /**
+     * 자식 댓글에 좋아요, 좋아요 취소를 토글 형식으로 요청합니다. (대댓글)
+     *
+     * @param memberId 좋아요를 누른 회원의 ID
+     * @param parentId 부모 댓글의 ID
+     * @param id 좋아요를 토글할 자식 댓글의 ID
+     * @return 좋아요가 토글된 자식 댓글의 정보를 담은 DTO
+     * @throws IllegalArgumentException 해당 ID의 댓글이 존재하지 않거나 사용자가 존재하지 않을 경우 발생
+     * @throws ForbiddenException 비공개 게시글이면 댓글 작성자가 아닌 사용자가 좋아요를 시도할 경우, 삭제 된 댓글의 경우 발생
+     */
     fun toggleLikeChildrenComment(memberId: Long, parentId: String, id: String): CommentDto {
         val parentComment = commentRepository.findById(parentId).orElse(null)
             ?: throw IllegalArgumentException("해당 parentId 댓글은 존재하지 않습니다.")
@@ -440,6 +560,14 @@ class CommentService(
     }
 
     companion object {
+
+        /**
+         * Comment 객체로부터 CommentDto를 생성합니다.
+         *
+         * @param comment : Comment 객체
+         * @param userService : UserService 객체
+         * @return 생성된 CommentDto
+         */
         fun fromComment(comment: Comment, userService: UserService): CommentDto {
             val commenter = comment.userId?.let { userService.findUserById(it) }
 
@@ -475,6 +603,14 @@ class CommentService(
     }
 }
 
+/**
+ * 댓글 목록을 페이지네이션하여 반환합니다.
+ *
+ * @param comments 댓글 목록
+ * @param page 페이지 번호
+ * @param pageSize 페이지당 댓글 수
+ * @return 페이지네이션된 댓글 목록과 페이지 관련 정보를 담은 Map
+ */
 fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<String, Any> {
     val paginatedComments = mutableListOf<CommentDto>()
     val formattedComments = formattingCommentsWithChildren(comments)
@@ -500,6 +636,15 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
 }
 
 
+/**
+ * 댓글 목록을 형식에 맞게 정리합니다.
+ *
+ * 각 댓글은 그 자신을 포함한 모든 대댓글을 포함하는 새로운 리스트로 구성됩니다.
+ * 댓글의 자식(대댓글)이 있는 경우, 그 자식들이 해당 댓글 뒤에 연이어 추가됩니다.
+ *
+ * @param comments 댓글 목록
+ * @return 포맷팅된 댓글 목록
+ */
 fun formattingCommentsWithChildren(comments: List<CommentDto>): List<CommentDto> {
     val commentsList = mutableListOf<CommentDto>()
 
