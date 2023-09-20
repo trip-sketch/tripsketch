@@ -154,14 +154,25 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-    // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 비회원 라우터
+    /**
+     * 특정 트립 ID를 이용하여 트립 정보 및 댓글 목록을 가져오는 라우터입니다.
+     *
+     * @param tripId 가져올 트립의 ID
+     * @return ResponseEntity<TripAndCommentResponseDto> 트립 정보 및 댓글 목록과 상태 코드
+     */
     @GetMapping("/guest/trip-comments/{tripId}")
     fun getTripAndCommentsByTripId(@PathVariable tripId: String): ResponseEntity<TripAndCommentResponseDto> {
         val findTripAndComment = tripService.getTripAndCommentsIsPublicByTripIdGuest(tripId)
         return ResponseEntity.ok(findTripAndComment)
     }
 
-    // 트립 아이디로 트립을 가져와서 트립 + 댓글s 가져오는 회원 라우터
+    /**
+     * 특정 트립 ID를 이용하여 트립 정보 및 댓글 목록을 가져오는 회원 전용 라우터입니다.
+     *
+     * @param req HttpServletRequest 객체
+     * @param tripId 가져올 트립의 ID
+     * @return ResponseEntity<TripAndCommentResponseDto> 트립 정보 및 댓글 목록과 상태 코드
+     */
     @GetMapping("/user/trip-comments/{tripId}")
     fun getTripIsLikedAndCommentsByTripId(
         req: HttpServletRequest,
@@ -172,13 +183,26 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(findTripAndComment)
     }
 
-    // 해당 nickname 트립을 가져와서 여행 목록을 나라 기준으로 카테고리화하여 반환하는 엔드포인트
+    /**
+     * 특정 닉네임의 유저가 작성한 트립을 가져와서 나라 기준으로 카테고리화하여 반환하는 엔드포인트입니다.
+     *
+     * @param nickname 트립을 작성한 유저의 닉네임
+     * @return ResponseEntity<Pair<Map<String, Int>, Set<TripCardDto>>> 나라별 카테고리화된 트립 정보와 상태 코드
+     */
     @GetMapping("/nickname/trips/categories")
     fun getTripsCategorizedByCountry(@RequestParam("nickname") nickname: String): ResponseEntity<Pair<Map<String, Int>, Set<TripCardDto>>> {
         val sortedCountryFrequencyMap = tripService.getTripCategoryByNickname(nickname)
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
+    /**
+     * 특정 닉네임의 유저가 작성한 트립을 나라 기준으로 카테고리화하여 반환하고, 페이지네이션된 결과를 제공하는 엔드포인트입니다.
+     *
+     * @param nickname 트립을 작성한 유저의 닉네임
+     * @param page 페이지 번호 (기본값: 1)
+     * @param pageSize 페이지당 트립 수 (기본값: 10)
+     * @return ResponseEntity<Map<String, Any>> 나라별 카테고리화된 트립 정보와 페이징 정보
+     */
     @GetMapping("/nickname/trips-pagination/categories")
     fun getTripsCategorizedByCountryWithPagination(
         @RequestParam("nickname") nickname: String,
@@ -189,7 +213,13 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    // 해당 nickname 트립을 가져와서 특정 나라의 여행 목록을 반환하는 엔드포인트
+    /**
+     * 특정 닉네임의 유저가 작성한 특정 나라의 여행 목록을 반환하는 엔드포인트입니다.
+     *
+     * @param nickname 트립을 작성한 유저의 닉네임
+     * @param country 조회할 나라 이름
+     * @return ResponseEntity<Set<TripCardDto>> 특정 나라의 여행 목록과 상태 코드
+     */
     @GetMapping("/nickname/trips/country/{country}")
     fun getTripsInCountry(
         @RequestParam("nickname") nickname: String,
@@ -199,6 +229,15 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
+    /**
+     * 특정 닉네임의 유저가 작성한 특정 나라의 여행 목록을 페이지네이션하여 반환하는 엔드포인트입니다.
+     *
+     * @param nickname 트립을 작성한 유저의 닉네임
+     * @param country 조회할 나라 이름
+     * @param page 페이지 번호 (기본값: 1)
+     * @param pageSize 페이지당 트립 수 (기본값: 10)
+     * @return ResponseEntity<Map<String, Any>> 페이지네이션된 특정 나라의 여행 목록과 페이징 정보
+     */
     @GetMapping("/nickname/trips-pagination/country/{country}")
     fun getTripsInCountryWithPagination(
         @RequestParam("nickname") nickname: String,
@@ -210,7 +249,12 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(sortedCountryFrequencyMap)
     }
 
-    // 해당 nickname 트립을 가져와서 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트
+    /**
+     * 특정 닉네임의 유저가 작성한 트립을 나라별 여행 횟수를 많은 순으로 정렬하여 반환하는 엔드포인트입니다.
+     *
+     * @param nickname 트립을 작성한 유저의 닉네임
+     * @return ResponseEntity<List<TripCountryFrequencyDto>> 나라별 여행 횟수 정보와 상태 코드
+     */
     @GetMapping("/nickname/trips/country-frequencies")
     fun getCountryFrequencies(@RequestParam("nickname") nickname: String): ResponseEntity<List<TripCountryFrequencyDto>> {
         val countryFrequencyMap = tripService.getCountryFrequencies(nickname)
@@ -236,6 +280,13 @@ class TripController(private val tripService: TripService) {
         }
     }
 
+    /**
+     * 특정 회원의 ID와 여행 ID를 기반으로 업데이트용 여행 정보를 가져와 응답합니다.
+     *
+     * @param req HttpServletRequest 객체
+     * @param id 여행 ID
+     * @return ResponseEntity<TripUpdateResponseDto> 업데이트용 여행 정보 및 상태 코드
+     */
     @GetMapping("modify/{id}")
     fun getTripByMemberIdAndIdToUpdate(
         req: HttpServletRequest,
