@@ -588,7 +588,7 @@ class CommentService(
                 id = comment.id,
                 userNickName = commenterProfile?.nickname ?: "알 수 없는 사용자", // 사용자가 없을 경우 대비
                 userProfileUrl = commenterProfile?.profileImageUrl
-                    ?: "https://ax6izwmsuv9c.objectstorage.ap-osaka-1.oci.customer-oci.com/n/ax6izwmsuv9c/b/tripsketch/o/profile.png", // 사용자가 없을 경우 대비
+                    ?: "https://ax6izwmsuv9c.objectstorage.ap-osaka-1.oci.customer-oci.com/n/ax6izwmsuv9c/b/tripsketch/o/profileLogo.png",
                 tripId = comment.tripId,
                 parentId = comment.parentId,
                 content = comment.content,
