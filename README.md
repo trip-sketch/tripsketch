@@ -18,7 +18,7 @@ We power the "TripSketch" mobile app with our robust web server application.
   - User Authentication
   - Managing Notifications
 
-- **Sejin Park**
+- **Saejin Park**
   - Implementing Search Features
   - Posts/Articles Management
 
