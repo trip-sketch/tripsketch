@@ -30,8 +30,8 @@ data class Trip(
     var location: String? = null,
     var startedAt: LocalDate? = LocalDate.now(),
     var endAt: LocalDate? = LocalDate.now(),
-    var isPublic: Boolean? = true, // 게시글 전체공개 또는 비공개 여부
-    var isHidden: Boolean = false, // 게시글 삭제 여부
+    var isPublic: Boolean? = true,
+    var isHidden: Boolean = false,
     var latitude: Double? = null,
     var longitude: Double? = null,
     var hashtagInfo: HashtagInfo? = null,

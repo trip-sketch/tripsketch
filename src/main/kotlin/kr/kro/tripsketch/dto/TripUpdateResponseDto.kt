@@ -5,6 +5,11 @@ import kr.kro.tripsketch.domain.HashtagInfo
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+/**
+ * 여행 정보 수정 응답 DTO 클래스입니다.
+ *
+ * @author BYEONGUK KO
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class TripUpdateResponseDto(
     var id: String? = null,
@@ -17,8 +22,8 @@ data class TripUpdateResponseDto(
     var startedAt: LocalDate? = LocalDate.now(),
     var endAt: LocalDate? = LocalDate.now(),
     var hashtagInfo: HashtagInfo? = null,
-    val latitude: Double? = null, // 위도
-    val longitude: Double? = null, // 경도
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     var isPublic: Boolean,
     var isHidden: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),

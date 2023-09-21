@@ -7,6 +7,24 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
+/**
+ * 댓글 정보를 담은 도메인 클래스입니다.
+ *
+ * @property id 댓글 식별자 (Optional)
+ * @property userId 사용자 이메일 (Required)
+ * @property tripId 게시물 아이디 (Required)
+ * @property parentId 부모 댓글의 식별자 (Optional)
+ * @property content 댓글 내용 (Required, 최대 200자)
+ * @property createdAt 댓글 생성 일시 (기본값: 현재 일시)
+ * @property updatedAt 댓글 수정 일시 (기본값: 현재 일시)
+ * @property likedBy 댓글을 좋아하는 사용자 목록 (기본값: 빈 Set)
+ * @property replyToUserId 답글 대상 사용자 이메일 (Optional)
+ * @property children 자식 댓글 목록 (기본값: 빈 리스트)
+ * @property isDeleted 댓글 삭제 여부 (기본값: false)
+ * @property isLiked 댓글 좋아요 여부 (기본값: false)
+ * @property numberOfLikes 댓글 좋아요 수 (기본값: 0)
+ * @author BYEONGUK KO
+ */
 @Document(collection = "comments")
 data class Comment(
     @Id val id: String? = null,
