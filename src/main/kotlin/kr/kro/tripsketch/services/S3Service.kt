@@ -40,11 +40,11 @@ class S3Service(private val s3Client: S3Client) {
 
     fun uploadFile(dir: String, multipartFile: MultipartFile): Pair<String, PutObjectResponse> {
         val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-        val originalFilenameWithoutExtension = multipartFile.originalFilename?.substringBeforeLast(".") ?: "file"
-        val fileExtension = multipartFile.originalFilename?.substringAfterLast(".", "")
+        val fileExtension = multipartFile.originalFilename?.substringAfterLast(".", "") ?: ""
 
-        val encodedFileNameWithoutExtension = Base64.getEncoder().encodeToString(originalFilenameWithoutExtension.toByteArray(Charsets.UTF_8)).replace("=", "")
-        val newFilename = "$datetime$encodedFileNameWithoutExtension.$fileExtension"
+        val uniqueId = UUID.randomUUID().toString()
+
+        val newFilename = "$datetime-$uniqueId.$fileExtension"
         val key = "$dir/$newFilename"
 
         val putObjectRequest = PutObjectRequest.builder()
