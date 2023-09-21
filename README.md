@@ -5,28 +5,29 @@ Welcome to **Tripsketch Backend Server** built with **Spring Boot**!
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
 
 ## 📜 Introduction
-Tripsketch is the powerful web server application backing the mobile application \"TripSketch\".
+We power the "TripSketch" mobile app with our robust web server application.
 
 📅 **Development period:** July 2023 - September 2023
 
 ## 🤝 Team Members & Responsibilities
 
 - **Hojun Song**
+  - Team Leadership
   - User management
-  - Image handling
-  - Authentication
-  - Notification management
+  - Image Processing
+  - User Authentication
+  - Managing Notifications
 
-- **Park Sejin**
-  - Search Functionality
-  - Posts/Articles handling and management
+- **Sejin Park**
+  - Implementing Search Features
+  - Posts/Articles Management
 
-- **Ko ByeonUk**
-  - Categories management
-  - Handling and management of threaded comments
+- **ByeonUk Ko**
+  - Category Management
+  - Threaded Comments Oversight and Management
 
-- **Youn Hyejin**
-  - Image handling (partial)
+- **Hyejin Youn**
+  - Image Processing
 
 ## 🛠 Technologies Used
 - Kotlin
