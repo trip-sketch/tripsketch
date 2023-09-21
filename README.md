@@ -12,21 +12,22 @@ Tripsketch is the powerful web server application backing the mobile application
 ## 🤝 Team Members & Responsibilities
 
 - **Hojun Song**
+  - Team Leadership
   - User management
-  - Image handling
-  - Authentication
-  - Notification management
+  - Image Processing
+  - User Authentication
+  - Managing Notifications
 
-- **Park Sejin**
-  - Search Functionality
-  - Posts/Articles handling and management
+- **Sejin Park**
+  - Implementing Search Features
+  - Posts/Articles Management
 
-- **Ko ByeonUk**
-  - Categories management
-  - Handling and management of threaded comments
+- **ByeonUk Ko**
+  - Category Management
+  - Threaded Comments Oversight and Management
 
-- **Youn Hyejin**
-  - Image handling (partial)
+- **Hyejin Youn**
+  - Image Processing
 
 ## 🛠 Technologies Used
 - Kotlin
