@@ -80,8 +80,8 @@ class TripService(
             "$followingNickname 님이 새글을 작성하였습니다.",
             null,
             null,
-            parentId= null,
-            tripId= createdTrip.id,
+            parentId = null,
+            tripId = createdTrip.id,
             nickname = followingNickname,
             profileUrl = followingProfileUrl,
             content = tripCreateDto.title,
@@ -219,6 +219,13 @@ class TripService(
         )
     }
 
+    /**
+     * 게스트로부터 특정 여행 및 댓글 정보를 가져옵니다. 해당 게시물은 공개되어야 하고 숨김되어 있지 않은 게시물 입니다.
+     *
+     * @param id 조회할 여행의 ID
+     * @return TripAndCommentResponseDto 여행 및 댓글 정보를 담은 DTO
+     * @throws IllegalArgumentException 게시글이 존재하지 않을 경우 발생
+     */
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
         val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException(
             "게시글이 존재하지 않습니다."
@@ -227,6 +234,15 @@ class TripService(
         return fromTripAndComments(findTrip, commentDtoList, "")
     }
 
+    /**
+     * 특정 사용자가 여행과 해당 여행의 댓글 정보를 좋아요 유무를 포함하여 가져옵니다.
+     *
+     * @param id 조회할 여행의 ID
+     * @param memberId 조회하는 사용자의 ID
+     * @return TripAndCommentResponseDto 여행 및 댓글 정보를 담은 DTO
+     * @throws IllegalArgumentException 조회되는 사용자가 없거나 게시글이 존재하지 않을 경우 발생
+     * @throws ForbiddenException 해당 게시물에 접근 권한이 없을 경우 발생
+     */
     fun getTripAndCommentsIsLikedByTripIdMember(id: String, memberId: Long): TripAndCommentResponseDto {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -239,6 +255,13 @@ class TripService(
         return fromTripAndComments(findTrip, commentDtoList, userId)
     }
 
+    /**
+     * 특정 사용자의 닉네임으로 여행을 조회하고 국가별로 카테고리화합니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @return Pair<Map<String, Int>, Set<TripCardDto>> 국가별 여행 빈도와 여행 목록을 담은 Pair
+     * @throws IllegalArgumentException 해당 유저를 조회할 수 없거나 게시물이 존재하지 않을 경우 발생
+     */
     fun getTripCategoryByNickname(nickname: String): Pair<Map<String, Int>, Set<TripCardDto>> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
@@ -246,7 +269,16 @@ class TripService(
         return findTrips.categorizeTripsByCountry()
     }
 
-    fun getTripCategoryByNickname(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
+    /**
+     * 특정 사용자의 닉네임으로 여행을 조회하고 국가별로 카테고리화한 후 페이지네이션을 적용합니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @param page 페이지 번호
+     * @param pageSize 페이지 당 항목 수
+     * @return Map<String, Any> 페이지네이션이 적용된 국가별 여행 목록과 관련 정보를 담은 Map
+     * @throws IllegalArgumentException 해당 유저를 조회할 수 없거나 게시물이 존재하지 않을 경우 발생
+     */
+    fun getTripCategoryByNicknameWithPagination(nickname: String, page: Int, pageSize: Int): Map<String, Any> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -256,6 +288,14 @@ class TripService(
         return paginateTrips(categorizedTrips.second, page, pageSize)
     }
 
+    /**
+     * 특정 사용자의 닉네임으로 조회한 여행 중 특정 국가에 속하는 여행을 가져옵니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @param country 국가 이름
+     * @return Set<TripCardDto> 특정 국가에 속하는 여행 목록을 담은 Set
+     * @throws IllegalArgumentException 해당 유저를 조회할 수 없거나 게시물이 존재하지 않을 경우 발생
+     */
     fun getTripsInCountry(nickname: String, country: String): Set<TripCardDto> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
@@ -263,7 +303,17 @@ class TripService(
         return findTrips.getTripsInCountry(country)
     }
 
-    fun getTripsInCountry(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
+    /**
+     * 특정 사용자의 닉네임으로 조회한 여행 중 특정 국가에 속하는 여행을 가져오고 페이지네이션을 적용합니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @param country 국가 이름
+     * @param page 페이지 번호
+     * @param pageSize 페이지 당 항목 수
+     * @return Map<String, Any> 페이지네이션이 적용된 특정 국가에 속하는 여행 목록과 관련 정보를 담은 Map
+     * @throws IllegalArgumentException 해당 유저를 조회할 수 없거나 게시물이 존재하지 않을 경우 발생
+     */
+    fun getTripsInCountryWithPagination(nickname: String, country: String, page: Int, pageSize: Int): Map<String, Any> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
             ?: throw IllegalArgumentException("해당 게시물 존재하지 않습니다.")
@@ -273,6 +323,13 @@ class TripService(
         return paginateTrips(tripsInCountry, page, pageSize)
     }
 
+    /**
+     * 특정 사용자의 닉네임으로 조회한 여행 중 각 국가별 여행 빈도를 가져옵니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @return List<TripCountryFrequencyDto> 각 국가별 여행 빈도 정보를 담은 리스트
+     * @throws IllegalArgumentException 해당 유저를 조회할 수 없거나 게시물이 존재하지 않을 경우 발생
+     */
     fun getCountryFrequencies(nickname: String): List<TripCountryFrequencyDto> {
         val user = userService.findUserByNickname(nickname) ?: throw IllegalArgumentException("해당 유저를 조회 할 수 없습니다.")
         val findTrips = user.id?.let { tripRepository.findTripByUserIdAndIsPublicIsTrueAndIsHiddenIsFalse(it) }
@@ -283,6 +340,8 @@ class TripService(
     /**
      * 여행 목록을 나라 기준으로 카테고리화하고 결과를 반환합니다.
      *
+     * @receiver Set<Trip> 여행 목록
+     * @return Pair 객체로, 첫 번째 요소는 나라별 횟수 맵, 두 번째 요소는 카테고리화된 여행 목록(Set<TripCardDto>)입니다.
      */
     fun Set<Trip>.categorizeTripsByCountry(): Pair<Map<String, Int>, Set<TripCardDto>> {
         // 나라별 여행 횟수를 계산하기 위한 맵
@@ -381,6 +440,14 @@ class TripService(
         return fromTrip(findTrip, userId)
     }
 
+    /**
+     * 회원의 ID와 여행 ID를 기반으로 업데이트용 여행 정보를 가져옵니다.
+     *
+     * @param memberId 회원 ID
+     * @param id 여행 ID
+     * @return TripUpdateResponseDto 여행 정보 및 댓글 정보
+     * @throws IllegalArgumentException 조회된 사용자가 없거나 해당 게시글이 존재하지 않을 경우 발생합니다.
+     */
     fun getTripByMemberIdAndIdToUpdate(memberId: Long, id: String): TripUpdateResponseDto? {
         val userId = userRepository.findByMemberId(memberId)?.id
             ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -523,7 +590,6 @@ class TripService(
             findTrip.latitude = tripUpdateDto.latitude ?: findTrip.latitude
             findTrip.longitude = tripUpdateDto.longitude ?: findTrip.longitude
 
-            // HashtagInfo 업데이트 로직
             tripUpdateDto.countryCode?.let {
                 findTrip.hashtagInfo = HashtagInfo(
                     countryCode = tripUpdateDto.countryCode,
@@ -546,7 +612,7 @@ class TripService(
                 for (url in deletedUrls) {
                     try {
                         imageService.deleteImage(url)
-                        currentImages.remove(url) // 이미지 URL을 리스트에서 제거합니다.
+                        currentImages.remove(url)
                     } catch (e: Exception) {
                         println("이미지 삭제에 실패했습니다. URL: $url, 오류: ${e.message}")
                     }
@@ -658,6 +724,14 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 객체를 TripUpdateResponseDto로 변환합니다.
+     *
+     * @param trip Trip 객체
+     * @param currentUserId 현재 사용자의 ID
+     * @return TripUpdateResponseDto 객체
+     * @throws IllegalArgumentException 해당 유저가 존재하지 않을 경우 발생
+     */
     fun fromTripToUpdate(trip: Trip, currentUserId: String): TripUpdateResponseDto {
         val user = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 유저가 존재하지 않습니다.")
 
@@ -693,6 +767,14 @@ class TripService(
         )
     }
 
+    /**
+     * Trip 객체와 댓글 목록을 TripAndCommentResponseDto로 변환합니다.
+     *
+     * @param trip Trip 객체
+     * @param comments 댓글 목록
+     * @param currentUserId 현재 사용자의 ID
+     * @return TripAndCommentResponseDto 객체
+     */
     fun fromTripAndComments(trip: Trip, comments: List<CommentDto>, currentUserId: String): TripAndCommentResponseDto {
         return TripAndCommentResponseDto(
             tripAndCommentPairDataByTripId = Pair(
@@ -745,7 +827,11 @@ class TripService(
      * @param keyword 검색어
      * @return 변환된 TripCardWithKeywordDto 데이터
      * */
-    fun fromTripToTripCardWithKeywordDto(trip: Trip, currentUserId: String, keyword: String? = null): TripCardWithKeywordDto {
+    fun fromTripToTripCardWithKeywordDto(
+        trip: Trip,
+        currentUserId: String,
+        keyword: String? = null
+    ): TripCardWithKeywordDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
         val comments = commentRepository.countCommentsByTripId(trip.id!!)
@@ -848,6 +934,14 @@ class TripService(
     }
 }
 
+/**
+ * TripCardDto 목록을 페이지네이션하여 반환합니다.
+ *
+ * @param TripCardDto trips 여행 카드 목록
+ * @param page 현재 페이지 번호
+ * @param pageSize 페이지당 표시할 게시물 수
+ * @return 페이지네이션된 여행 카드 목록
+ */
 fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String, Any> {
     val tripList = trips.toList()
     val totalTrips = tripList.size
@@ -865,6 +959,6 @@ fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String
         "trips" to paginatedTrips,
         "currentPage" to page,
         "totalPages" to totalPage,
-        "postsPerPage" to pageSize,
+        "postsPerPage" to pageSize
     )
 }

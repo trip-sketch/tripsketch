@@ -11,8 +11,8 @@ data class TripCardWithKeywordDto(
     var likes: Int?,
     var views: Int?,
     var comments: Int?,
-    var countryCode: String? = "", // HashtagInfo
-    var country: String? = "", // HashtagInfo
+    var countryCode: String? = "",
+    var country: String? = "",
     val createdAt: LocalDateTime? = null,
     var image: String? = "",
     var isLiked: Boolean,

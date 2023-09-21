@@ -35,6 +35,6 @@ data class Notification(
 
     var content: String? = null,
 
-    @Indexed(expireAfterSeconds = 30 * 24 * 60 * 60) // 30 days in seconds
+    @Indexed(expireAfterSeconds = 30 * 24 * 60 * 60)
     var createdAt: LocalDateTime = LocalDateTime.now(),
 )
