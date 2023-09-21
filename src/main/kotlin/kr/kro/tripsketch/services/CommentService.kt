@@ -164,6 +164,7 @@ class CommentService(
                 nickname = commenter.nickname,
                 profileUrl = commenter.profileImageUrl,
                 tripId = comment.tripId,
+                senderId = commenter.id,
                 commentId = comment.id,
                 content = commentCreateDto.content,
             )
@@ -236,6 +237,7 @@ class CommentService(
                 profileUrl = commenter.profileImageUrl,
                 tripId = childComment.tripId,
                 parentId = childComment.parentId,
+                senderId = commenter.id,
                 commentId = childComment.id,
                 content = commentChildrenCreateDto.content,
             )
@@ -491,6 +493,7 @@ class CommentService(
                     nickname = commenter.nickname,
                     profileUrl = commenter.profileImageUrl,
                     tripId = comment.tripId,
+                    senderId = commenter.id,
                     commentId = comment.id,
                     content = comment.content,
                 )
@@ -550,6 +553,7 @@ class CommentService(
                     profileUrl = commenter.profileImageUrl,
                     tripId = childComment.tripId,
                     parentId = childComment.parentId,
+                    senderId = commenter.id,
                     commentId = childComment.id,
                     content = childComment.content,
                 )
