@@ -5,7 +5,7 @@ Welcome to **Tripsketch Backend Server** built with **Spring Boot**!
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
 
 ## 📜 Introduction
-"We power the "TripSketch" mobile app with our robust web server application."
+We power the "TripSketch" mobile app with our robust web server application.
 
 📅 **Development period:** July 2023 - September 2023
 
