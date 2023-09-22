@@ -336,11 +336,12 @@ class TripController(private val tripService: TripService) {
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
             val findTrips = tripService.getListFollowingTrips(memberId, pageable)
             val tripsList = findTrips["trips"] as List<*>
-            if (tripsList.isNotEmpty()) {
-                ResponseEntity.status(HttpStatus.OK).body(findTrips)
-            } else {
-                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "구독하는 게시물이 없습니다."))
-            }
+            ResponseEntity.status(HttpStatus.OK).body(findTrips)
+//            if (tripsList.isNotEmpty()) {
+//                ResponseEntity.status(HttpStatus.OK).body(findTrips)
+//            } else {
+//                ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "구독하는 게시물이 없습니다."))
+//            }
         } catch (e: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
