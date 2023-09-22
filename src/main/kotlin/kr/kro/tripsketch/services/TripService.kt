@@ -76,10 +76,10 @@ class TripService(
         val followingProfileUrl = userService.findUserByMemberId(memberId)?.profileImageUrl ?: ""
         notificationService.sendPushNotification(
             followerUserIds,
-            "새로운 여행의 시작, 트립스케치",
-            "$followingNickname 님이 새글을 작성하였습니다.",
-            null,
-            null,
+            title = "새로운 여행의 시작, 트립스케치",
+            body = "$followingNickname 님이 새글을 작성하였습니다.",
+            senderId = userId,
+            commentId = null,
             parentId = null,
             tripId = createdTrip.id,
             nickname = followingNickname,
@@ -916,15 +916,15 @@ class TripService(
                     val userProfileUrl = user.profileImageUrl ?: ""
                     notificationService.sendPushNotification(
                         listOf(findTrip.userId),
-                        "새로운 여행의 시작, 트립스케치",
-                        "$userNickname 님이 회원님의 글을 좋아합니다.",
-                        null,
-                        null,
-                        null,
-                        findTrip.id,
-                        userNickname,
-                        userProfileUrl,
-                        findTrip.title
+                        title = "새로운 여행의 시작, 트립스케치",
+                        body = "$userNickname 님이 회원님의 글을 좋아합니다.",
+                        senderId = userId,
+                        commentId = null,
+                        parentId = null,
+                        tripId = findTrip.id,
+                        nickname = userNickname,
+                        profileUrl = userProfileUrl,
+                        content = findTrip.title
                     )
                 } else {
                     throw IllegalArgumentException("조회되는 사용자가 없습니다.")
