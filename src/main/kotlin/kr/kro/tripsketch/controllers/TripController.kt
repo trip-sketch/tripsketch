@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
-
 /**
  * 게시물과 관련된 요청을 처리하는 컨트롤러입니다.
  */
@@ -49,7 +48,7 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -72,7 +71,7 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -120,7 +119,7 @@ class TripController(private val tripService: TripService) {
     fun getAllTripsByGuest(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort_type", required = false, defaultValue = "2") sort_type: Int
+        @RequestParam("sort_type", required = false, defaultValue = "2") sort_type: Int,
     ): ResponseEntity<Any> {
         return try {
             val sort = getSort(sort_type)
@@ -261,7 +260,6 @@ class TripController(private val tripService: TripService) {
         return ResponseEntity.ok(countryFrequencyMap)
     }
 
-
     /**
      * 사용자 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
      * */
@@ -300,7 +298,6 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.notFound().build()
         }
     }
-
 
     /**
      * 게스트 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
@@ -352,7 +349,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam keyword: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int,
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
@@ -376,7 +373,7 @@ class TripController(private val tripService: TripService) {
         @RequestParam keyword: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int,
     ): ResponseEntity<Any> {
         return try {
             val sort = getSort(sort_type)
@@ -436,7 +433,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     /**
      * 게시물을 '좋아요', '좋아요 취소' 모두 할 수 있습니다.
      * */
@@ -455,7 +451,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 }
-
 
 /**
  * 에러메세지와 반환형태를 전달해주는 함수입니다.
@@ -477,22 +472,22 @@ private fun getSort(sort_type: Int): Sort {
         -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
         2 -> Sort.by(
             Sort.Order(Sort.Direction.DESC, "views"),
-            Sort.Order(Sort.Direction.DESC, "createdAt")
+            Sort.Order(Sort.Direction.DESC, "createdAt"),
         )
 
         -2 -> Sort.by(
             Sort.Order(Sort.Direction.ASC, "views"),
-            Sort.Order(Sort.Direction.DESC, "createdAt")
+            Sort.Order(Sort.Direction.DESC, "createdAt"),
         )
 
         3 -> Sort.by(
             Sort.Order(Sort.Direction.DESC, "likes"),
-            Sort.Order(Sort.Direction.DESC, "createdAt")
+            Sort.Order(Sort.Direction.DESC, "createdAt"),
         )
 
         -3 -> Sort.by(
             Sort.Order(Sort.Direction.ASC, "likes"),
-            Sort.Order(Sort.Direction.DESC, "createdAt")
+            Sort.Order(Sort.Direction.DESC, "createdAt"),
         )
 
         else -> throw IllegalArgumentException("Invalid sort type")

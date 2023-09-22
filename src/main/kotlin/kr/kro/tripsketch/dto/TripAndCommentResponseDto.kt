@@ -7,5 +7,5 @@ package kr.kro.tripsketch.dto
  * @author BYEONGUK KO
  */
 data class TripAndCommentResponseDto(
-    val tripAndCommentPairDataByTripId: Pair<TripDto, List<CommentDto>>?
+    val tripAndCommentPairDataByTripId: Pair<TripDto, List<CommentDto>>?,
 )

@@ -56,4 +56,3 @@ interface FollowRepository : MongoRepository<Follow, String> {
      */
     fun countByFollowing(following: String): Long
 }
-

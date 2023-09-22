@@ -48,7 +48,6 @@ class NotificationService(
         return PageImpl(updatedNotifications, pageable, notificationsPage.totalElements)
     }
 
-
     /**
      * 회원이 받은 특정 알림을 삭제합니다. 해당 회원이 알림의 수신자가 아닌 경우 예외가 발생합니다.
      */
@@ -93,7 +92,7 @@ class NotificationService(
                 tripId = tripId,
                 nickname = nickname,
                 profileUrl = profileUrl,
-                content=content,
+                content = content,
             )
             notificationRepository.save(notification)
         }

@@ -25,4 +25,3 @@ interface NotificationRepository : MongoRepository<Notification, String> {
      */
     fun findByReceiverId(receiverId: String, pageable: Pageable): Page<Notification>
 }
-

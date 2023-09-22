@@ -80,7 +80,6 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         return Pair(newAccessToken, newRefreshToken)
     }
 
-
     /** 액세스 토큰을 사용하여 카카오 사용자의 멤버 ID를 가져옵니다. */
     fun getUserInfo(accessToken: String?): Map<String, Any>? {
         if (accessToken == null) return null

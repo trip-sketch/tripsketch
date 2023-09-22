@@ -49,5 +49,4 @@ class NotificationController(
         notificationService.deleteNotificationById(notificationId, memberId)
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
-
 }

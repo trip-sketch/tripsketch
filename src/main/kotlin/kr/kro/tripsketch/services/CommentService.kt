@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import kotlin.math.min
 
-
 /**
  * CommentService 클래스
  *
@@ -640,7 +639,6 @@ fun paginateComments(comments: List<CommentDto>, page: Int, pageSize: Int): Map<
     )
 }
 
-
 /**
  * 댓글 목록을 형식에 맞게 정리합니다.
  *
@@ -667,13 +665,3 @@ fun formattingCommentsWithChildren(comments: List<CommentDto>): List<CommentDto>
 
     return commentsList
 }
-
-
-
-
-
-
-
-
-
-
