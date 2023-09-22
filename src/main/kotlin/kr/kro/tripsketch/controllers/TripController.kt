@@ -49,11 +49,11 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val sort = getSort(sortType)
+            val sort = getSort(sort_type)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
@@ -72,11 +72,11 @@ class TripController(private val tripService: TripService) {
         req: HttpServletRequest,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val sort = getSort(sortType)
+            val sort = getSort(sort_type)
             val pageable: Pageable = PageRequest.of(page - 1, size, sort)
             val findTrips = tripService.getAllTripsByUser(memberId, pageable)
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
@@ -120,10 +120,10 @@ class TripController(private val tripService: TripService) {
     fun getAllTripsByGuest(
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sortType", required = false, defaultValue = "2") sortType: Int
+        @RequestParam("sort_type", required = false, defaultValue = "2") sort_type: Int
     ): ResponseEntity<Any> {
         return try {
-            val sort = getSort(sortType)
+            val sort = getSort(sort_type)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
@@ -348,7 +348,7 @@ class TripController(private val tripService: TripService) {
 
     /**
      * 검색어를 입력하여 게시물을 조회합니다.
-     * 검색 조건은 게시글의 제목과 내용이며, sortType 에 따라 정렬합니다.
+     * 검색 조건은 게시글의 제목과 내용이며, sort_type 에 따라 정렬합니다.
      * */
     @GetMapping("/search")
     fun getSearchTripsByKeyword(
@@ -356,11 +356,11 @@ class TripController(private val tripService: TripService) {
         @RequestParam keyword: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
     ): ResponseEntity<Any> {
         return try {
             val memberId = req.getAttribute("memberId") as Long
-            val sort = getSort(sortType)
+            val sort = getSort(sort_type)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
@@ -373,17 +373,17 @@ class TripController(private val tripService: TripService) {
 
     /**
      * 게스트 권한으로 검색어를 입력하여 게시물을 조회합니다.
-     * 검색 조건은 게시글의 제목과 내용이며, sortType 에 따라 정렬합니다.
+     * 검색 조건은 게시글의 제목과 내용이며, sort_type 에 따라 정렬합니다.
      * */
     @GetMapping("/guest/search")
     fun getSearchTripsByKeywordAsGuest(
         @RequestParam keyword: String,
         @RequestParam("page", required = false, defaultValue = "1") page: Int,
         @RequestParam("size", required = false, defaultValue = "10") size: Int,
-        @RequestParam("sortType", required = false, defaultValue = "1") sortType: Int
+        @RequestParam("sort_type", required = false, defaultValue = "1") sort_type: Int
     ): ResponseEntity<Any> {
         return try {
-            val sort = getSort(sortType)
+            val sort = getSort(sort_type)
             val pagenationUtil = PagenationUtil()
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize, sort)
@@ -473,10 +473,10 @@ private fun ResponseEntity.BodyBuilder.body(returnedTripDto: TripDto, message: S
 }
 
 /**
- * sortType 에 따른 정렬방식을 정해주는 함수입니다.
+ * sort_type 에 따른 정렬방식을 정해주는 함수입니다.
  * */
-private fun getSort(sortType: Int): Sort {
-    return when (sortType) {
+private fun getSort(sort_type: Int): Sort {
+    return when (sort_type) {
         1 -> Sort.by(Sort.Direction.DESC, "createdAt")
         -1 -> Sort.by(Sort.Direction.ASC, "createdAt")
         2 -> Sort.by(
