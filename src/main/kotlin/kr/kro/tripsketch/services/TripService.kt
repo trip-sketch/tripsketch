@@ -251,6 +251,11 @@ class TripService(
         if (findTrip.isPublic == false && findTrip.userId != userId) {
             throw ForbiddenException("해당 게시물에 접근 권한이 없습니다.")
         }
+        if (!findTrip.tripViews.contains(userId) && findTrip.userId != userId) {
+            findTrip.tripViews.add(userId)
+            findTrip.views += 1
+            tripRepository.save(findTrip)
+        }
         val commentDtoList = commentService.getIsLikedByMemberIdForTrip(memberId, id)
         return fromTripAndComments(findTrip, commentDtoList, userId)
     }
