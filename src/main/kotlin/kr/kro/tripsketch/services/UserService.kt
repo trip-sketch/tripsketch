@@ -24,7 +24,6 @@ class UserService(
         const val DEFAULT_IMAGE_URL = "https://ax6izwmsuv9c.objectstorage.ap-osaka-1.oci.customer-oci.com/n/ax6izwmsuv9c/b/tripsketch/o/profile.png"
     }
 
-
     /**
      * 사용자를 등록하거나 업데이트하는 메소드.
      * 사용자가 존재하지 않으면 새로운 사용자를 생성하고 저장.
@@ -261,5 +260,4 @@ class UserService(
             )
         }
     }
-
 }

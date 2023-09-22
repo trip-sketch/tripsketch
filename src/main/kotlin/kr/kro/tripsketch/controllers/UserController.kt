@@ -8,7 +8,6 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.InternalServerException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.FollowService
 import kr.kro.tripsketch.services.KakaoOAuthService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-
 
 /**
  * 사용자와 관련된 요청을 처리하는 컨트롤러입니다.
@@ -143,5 +141,4 @@ class UserController(
         userService.softDeleteUserByMemberId(memberId)
         return ResponseEntity.ok(mapOf("message" to "회원 탈퇴가 성공적으로 처리되었습니다."))
     }
-
 }

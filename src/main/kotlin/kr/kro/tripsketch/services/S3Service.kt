@@ -20,7 +20,6 @@ class S3Service(private val s3Client: S3Client) {
     @Value("\${aws.bucketName}")
     lateinit var bucketName: String
 
-
     /**
      * 파일을 S3 저장소에 업로드하고 해당 파일의 URL과 응답을 반환합니다.
      *
@@ -74,5 +73,4 @@ class S3Service(private val s3Client: S3Client) {
 
         s3Client.deleteObject(deleteObjectRequest)
     }
-
 }

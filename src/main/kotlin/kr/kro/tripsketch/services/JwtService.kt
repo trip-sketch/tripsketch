@@ -19,6 +19,7 @@ class JwtService {
         EnvLoader.getPropertyOrDefault("ACCESS_TOKEN_VALIDITY", "3600000").toLong()
     private val refreshTokenValidityInMilliseconds: Long =
         EnvLoader.getPropertyOrDefault("REFRESH_TOKEN_VALIDITY", "2592000000").toLong()
+
     /**
      * 사용자 정보를 바탕으로 Access Token과 Refresh Token을 생성합니다.
      *
@@ -92,5 +93,4 @@ class JwtService {
             return it.toLong()
         } ?: throw UnauthorizedException("토큰에 memberId가 없습니다.")
     }
-
 }

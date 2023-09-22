@@ -4,7 +4,6 @@ import kr.kro.tripsketch.dto.KakaoRefreshRequest
 import kr.kro.tripsketch.dto.TokenResponse
 import org.springframework.stereotype.Service
 
-@Service
 /**
  * AuthService: 사용자 인증 관련 서비스입니다.
  *
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service
  * - Kakao OAuth를 통해 얻은 정보로 사용자 정보를 등록 및 업데이트 하는 로직 포함
  * @author Hojun Song
  */
+@Service
 class AuthService(
     private val kakaoOAuthService: KakaoOAuthService,
     private val userService: UserService,

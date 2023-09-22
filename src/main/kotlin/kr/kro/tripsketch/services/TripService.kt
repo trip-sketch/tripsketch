@@ -65,7 +65,7 @@ class TripService(
             longitude = tripCreateDto.longitude,
             hashtagInfo = hashtagInfo,
             isPublic = tripCreateDto.isPublic,
-            images = uploadedImageUrls
+            images = uploadedImageUrls,
         )
         val createdTrip = tripRepository.save(newTrip)
         val userId = userRepository.findByMemberId(memberId)?.id ?: throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -228,7 +228,7 @@ class TripService(
      */
     fun getTripAndCommentsIsPublicByTripIdGuest(id: String): TripAndCommentResponseDto {
         val findTrip = tripRepository.findByIdAndIsPublicIsTrueAndIsHiddenIsFalse(id) ?: throw IllegalArgumentException(
-            "게시글이 존재하지 않습니다."
+            "게시글이 존재하지 않습니다.",
         )
         val commentDtoList = commentService.getCommentsGuestByTripId(id)
         return fromTripAndComments(findTrip, commentDtoList, "")
@@ -461,7 +461,6 @@ class TripService(
         return fromTripToUpdate(findTrip, userId)
     }
 
-
     /**
      * 게스트 권한, 게시물 ID 를 기준으로 게시물을 조회합니다.
      *  - 단, 좋아요 상태는 게스트이기 때문에 false 로 표시됩니다.
@@ -585,7 +584,7 @@ class TripService(
             findTrip.content = tripUpdateDto.content
             findTrip.location = tripUpdateDto.country
             if (tripUpdateDto.startedAt != null && tripUpdateDto.endAt != null && tripUpdateDto.startedAt!!.isAfter(
-                    tripUpdateDto.endAt
+                    tripUpdateDto.endAt,
                 )
             ) {
                 throw IllegalArgumentException("시작일은 종료일보다 같거나 이전이어야 합니다.")
@@ -835,7 +834,7 @@ class TripService(
     fun fromTripToTripCardWithKeywordDto(
         trip: Trip,
         currentUserId: String,
-        keyword: String? = null
+        keyword: String? = null,
     ): TripCardWithKeywordDto {
         val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
         val profileImageUrl = tripUser.profileImageUrl
@@ -924,7 +923,7 @@ class TripService(
                         tripId = findTrip.id,
                         nickname = userNickname,
                         profileUrl = userProfileUrl,
-                        content = findTrip.title
+                        content = findTrip.title,
                     )
                 } else {
                     throw IllegalArgumentException("조회되는 사용자가 없습니다.")
@@ -934,7 +933,7 @@ class TripService(
         tripRepository.save(findTrip)
         return mapOf(
             "message" to if (isLiked) "'좋아요'를 취소하였습니다." else "게시물을 '좋아요'하였습니다.",
-            "isLiked" to !isLiked
+            "isLiked" to !isLiked,
         )
     }
 }
@@ -964,6 +963,6 @@ fun paginateTrips(trips: Set<TripCardDto>, page: Int, pageSize: Int): Map<String
         "trips" to paginatedTrips,
         "currentPage" to page,
         "totalPages" to totalPage,
-        "postsPerPage" to pageSize
+        "postsPerPage" to pageSize,
     )
 }

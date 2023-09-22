@@ -10,7 +10,6 @@ package kr.kro.tripsketch.utils
  * */
 class PagenationUtil {
     fun validatePageAndSize(page: Int?, size: Int?): Pair<Int, Int> {
-
         /** 불러올 페이지 검증 */
         val validatedPage = try {
             if (page != null && page > 0) page else 1

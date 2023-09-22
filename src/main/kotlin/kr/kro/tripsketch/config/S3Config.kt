@@ -35,5 +35,4 @@ class S3Config {
             .endpointOverride(URI.create("https://compat.objectstorage.ap-osaka-1.oraclecloud.com"))
             .build()
     }
-
 }

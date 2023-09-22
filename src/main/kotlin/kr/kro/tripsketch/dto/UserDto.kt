@@ -17,5 +17,5 @@ data class UserDto(
     val followersCount: Long? = null,
     val followingCount: Long? = null,
     val isFollowing: Boolean? = null,
-    val isAdmin: Boolean? = null
+    val isAdmin: Boolean? = null,
 )

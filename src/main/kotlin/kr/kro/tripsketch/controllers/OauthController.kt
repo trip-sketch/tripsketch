@@ -50,7 +50,6 @@ class OauthController(
     @ApiResponse(responseCode = "200", description = "카카오 토큰 갱신이 성공적으로 완료되었습니다.")
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
-
         // 프론트로부터 받는 토큰 출력
         println("Received RefreshToken from frontend: ${request.ourRefreshToken}")
 
