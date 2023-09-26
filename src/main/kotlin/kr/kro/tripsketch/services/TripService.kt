@@ -939,7 +939,6 @@ class TripService(
         )
     }
 
-
     /**
      * 게시물 ID(tripId) 로 '좋아요' 사용자를 조회합니다.
      * @param tripId 게시물 ID
