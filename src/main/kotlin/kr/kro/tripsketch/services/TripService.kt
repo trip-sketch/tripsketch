@@ -960,7 +960,7 @@ class TripService(
                 )
                 tripLikesDto.tripLikesInfo.add(tripLikesUserInfo)
             } else {
-                println("User not found")
+                println("조회되는 사용자가 없습니다.")
             }
         }
         return tripLikesDto
