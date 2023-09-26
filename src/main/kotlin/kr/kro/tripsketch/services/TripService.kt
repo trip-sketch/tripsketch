@@ -647,8 +647,6 @@ class TripService(
      * @param memeberId 현재 사용자의 멤버 ID
      * @param id 삭제할 게시물 ID
      * */
-
-
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
