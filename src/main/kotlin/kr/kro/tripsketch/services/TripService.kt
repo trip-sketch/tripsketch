@@ -647,6 +647,8 @@ class TripService(
      * @param memeberId 현재 사용자의 멤버 ID
      * @param id 삭제할 게시물 ID
      * */
+
+
     fun deleteTripById(memberId: Long, id: String) {
         val findTrip = tripRepository.findById(id).orElse(null)
             ?: throw IllegalArgumentException("삭제할 게시물이 존재하지 않습니다.")
@@ -936,6 +938,70 @@ class TripService(
             "isLiked" to !isLiked,
         )
     }
+
+
+    /**
+     * 게시물 ID(tripId) 로 '좋아요' 사용자를 조회합니다.
+     * @param tripId 게시물 ID
+     * @return 변환된 TripLikeUserDto 데이터
+     * 그 결과 값(좋아요 유무)을 확인합니다.
+     * */
+    fun getTripLikeUser(tripId: String): TripLikesDto {
+        val findTrip = tripRepository.findByIdAndIsHiddenIsFalse(tripId)
+            ?: throw IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+        val tripLikesDto = TripLikesDto(id = findTrip.id)
+        for (userId in findTrip.tripLikes) {
+            val userOptional = userRepository.findById(userId)
+            if (userOptional.isPresent) {
+                val user = userOptional.get()
+                val tripLikesUserInfo = TripLikesUserInfo(
+                    nickname = user.nickname,
+                    profileImageUrl = user.profileImageUrl
+                )
+                tripLikesDto.tripLikesInfo.add(tripLikesUserInfo)
+            } else {
+                println("User not found")
+            }
+        }
+        return tripLikesDto
+    }
+
+    /**
+     * Trip 을 TripCardDto 형식으로 변환합니다.
+     * @param trip 변환할 Trip 도메인
+     * @param currentUserId 현재 사용자 ID
+     * @return 변환된 TripCardDto 데이터
+     * */
+    fun fromTripToTripLikesDto(trip: Trip, currentUserId: String): TripCardDto {
+        val tripUser = userService.findUserById(trip.userId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
+        val profileImageUrl = tripUser.profileImageUrl
+        val comments = commentRepository.countCommentsByTripId(trip.id!!)
+        val hashtags = trip.hashtagInfo
+        val countryCode = hashtags?.countryCode ?: ""
+        val country = hashtags?.country ?: ""
+        val isLiked: Boolean = if (currentUserId != "") {
+            val currentUser =
+                userService.findUserById(currentUserId) ?: throw IllegalArgumentException("해당 사용자가 존재하지 않습니다.")
+            trip.tripLikes.contains(currentUser.id)
+        } else {
+            false
+        }
+        return TripCardDto(
+            id = trip.id,
+            nickname = tripUser.nickname,
+            profileImageUrl = profileImageUrl,
+            title = trip.title,
+            likes = trip.likes,
+            views = trip.views,
+            comments = comments,
+            countryCode = countryCode,
+            country = country,
+            createdAt = trip.createdAt,
+            image = trip.images?.firstOrNull(),
+            isLiked = isLiked,
+        )
+    }
+
 }
 
 /**
