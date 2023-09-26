@@ -450,6 +450,22 @@ class TripController(private val tripService: TripService) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))
         }
     }
+
+
+    /**
+     * 게시물을 '좋아요' 한 사용자 를 모두 조회합니다.
+     * */
+    @GetMapping("/like/user/{id}")
+    fun getTripLikeUser(
+        @PathVariable id: String
+    ): ResponseEntity<Any> {
+        return try {
+            val result = tripService.getTripLikeUser(id)
+            ResponseEntity.status(HttpStatus.OK).body(result)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("message" to (e.message ?: "")))
+        }
+    }
 }
 
 /**
