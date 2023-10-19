@@ -30,10 +30,8 @@ We power the "TripSketch" mobile app with our robust web server application.
 - **Hyejin Youn**
   - Image Processing
 
-## 🛠 Technologies Used
-- Kotlin
-- Spring Boot 
-- MongoDB
+## 🛠 Architecture Diagram
+![트립스케치 구조](https://github.com/limeorange/TripSketch/assets/78308684/8507d6f8-1580-4edd-acc2-0deaf4e6386f)
 
 ## 📦 Installation Guide
 ### Prerequisites
