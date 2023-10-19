@@ -3,6 +3,7 @@
 Welcome to **Tripsketch Backend Server** built with **Spring Boot**!
 
 ![트립스케치](https://github.com/seoyeon-00/tripsketch/assets/110542210/bb42bf65-9123-47aa-8f33-d1bd115f343d)
+<img width="1120" alt="화면들" src="https://github.com/sossost/portfolio./assets/110542210/f5bb03f5-4ca1-46a8-8097-054bcc2b1454">
 
 ## 📜 Introduction
 We power the "TripSketch" mobile app with our robust web server application.
