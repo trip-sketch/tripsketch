@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [feature/*]
+
+jobs:
+
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests with Coverage
+        run: npm run test:cov
+
+  run-format-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Format
+        run: npm run format
+      - name: Run Lint
+        run: npm run lint
