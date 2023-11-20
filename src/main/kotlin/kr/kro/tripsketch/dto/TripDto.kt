@@ -34,4 +34,5 @@ data class TripDto(
     var deletedAt: LocalDateTime? = null,
     var images: List<String>? = emptyList(),
     var isLiked: Boolean,
+//    2023.11.21
 )
