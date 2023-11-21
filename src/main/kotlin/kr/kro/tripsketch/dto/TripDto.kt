@@ -35,4 +35,5 @@ data class TripDto(
     var images: List<String>? = emptyList(),
     var isLiked: Boolean,
     // 2023.11.21 - 다시
+    // 2023.11.21 - IntelliJ 에 Github Token 사용시 실패 확인 -> 웹으로 commit and push 
 )
