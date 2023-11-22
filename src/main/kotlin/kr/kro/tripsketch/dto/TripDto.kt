@@ -34,5 +34,7 @@ data class TripDto(
     var deletedAt: LocalDateTime? = null,
     var images: List<String>? = emptyList(),
     var isLiked: Boolean,
-    // 2023.11.21 - github 연동 고치기
+    // 2023.11.21 - 다시
+    // 2023.11.21 - IntelliJ 에 Github Token 사용시 실패 확인 -> 웹으로 commit and push
+    // 2023.11.22 - Github Token 로그인 다시 확인
 )
