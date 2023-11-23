@@ -32,4 +32,6 @@ data class TripCreateDto(
     var road: String? = null,
     var address: String? = null,
     var etc: Set<String>? = null,
+
+    // 2023.11.23
 )
