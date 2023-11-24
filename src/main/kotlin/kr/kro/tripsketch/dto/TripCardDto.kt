@@ -15,4 +15,5 @@ data class TripCardDto(
     val createdAt: LocalDateTime? = null,
     var image: String? = "",
     var isLiked: Boolean,
+    // 2023.11.24
 )
