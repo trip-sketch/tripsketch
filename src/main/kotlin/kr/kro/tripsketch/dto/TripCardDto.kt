@@ -16,5 +16,5 @@ data class TripCardDto(
     var image: String? = "",
     var isLiked: Boolean,
     // 2023.11.24
-    // 2023.11.25
+    // 2023.11.25 작성
 )
