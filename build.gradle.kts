@@ -109,7 +109,7 @@ tasks.withType<Test> {
 }
 
 ktlint {
-    version = "0.42.1" // 사용하는 ktlint 버전에 맞게 수정
+    version = "10.2.0"// 사용하는 ktlint 버전에 맞게 수정
     reporters = ["checkstyle", "json", "html", "plain", "xml"]
     // 다른 설정들...
     ruleSets = emptyList()
