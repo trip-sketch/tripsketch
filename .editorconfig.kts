@@ -1,0 +1,1 @@
+disabledRules = "no-wildcard-imports"
