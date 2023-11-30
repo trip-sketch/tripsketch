@@ -1,1 +1,3 @@
-disabledRules = "no-wildcard-imports"
+ktlint {
+    disabledRules = "no-wildcard-imports"
+}
