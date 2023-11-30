@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.9.10"
     kotlin("plugin.spring") version "1.9.10"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    id("com.diffplug.gradle.spotless") version "5.14.0"
+    id("com.diffplug.spotless") version "5.0.0"
 }
 
 group = "kr.kro"
