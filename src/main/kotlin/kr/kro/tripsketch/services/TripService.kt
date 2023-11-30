@@ -998,7 +998,6 @@ class TripService(
             isLiked = isLiked,
         )
     }
-
 }
 
 /**

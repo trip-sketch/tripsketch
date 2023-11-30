@@ -451,7 +451,6 @@ class TripController(private val tripService: TripService) {
         }
     }
 
-
     /**
      * 게시물을 '좋아요' 한 사용자 를 모두 조회합니다.
      * */
