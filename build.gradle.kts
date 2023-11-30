@@ -109,11 +109,5 @@ tasks.withType<Test> {
 }
 
 ktlint {
-    version = "10.2.0"// 사용하는 ktlint 버전에 맞게 수정
-    reporters = ["checkstyle", "json", "html", "plain", "xml"]
-    // 다른 설정들...
-    ruleSets = emptyList()
-    ruleSetsMain = emptyList()
-    // 와일드카드 임포트 허용
-    disabledRules = "no-wildcard-imports"
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
