@@ -113,6 +113,7 @@ ktlint {
     reporters = ["checkstyle", "json", "html", "plain", "xml"]
     // 다른 설정들...
     ruleSets = emptyList()
+    ruleSetsMain = ruleSets
     // 와일드카드 임포트 허용
     disabledRules = "no-wildcard-imports"
 }
