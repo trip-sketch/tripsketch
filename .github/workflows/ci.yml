@@ -30,7 +30,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up Kotlin
-        uses: actions/setup-kotlin@v2
+        uses: fwilhe2/setup-kotlin@0.9.0
         with:
           kotlin-version: '1.9.10'
 
@@ -56,7 +56,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up Kotlin
-        uses: actions/setup-kotlin@v2
+        uses: fwilhe2/setup-kotlin@0.9.0
         with:
           kotlin-version: '1.9.10'
 
