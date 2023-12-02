@@ -5,6 +5,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.9.10"
     kotlin("plugin.spring") version "1.9.10"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    id("com.diffplug.spotless") version "5.0.0"
 }
 
 group = "kr.kro"
@@ -105,4 +107,8 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+ktlint {
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
