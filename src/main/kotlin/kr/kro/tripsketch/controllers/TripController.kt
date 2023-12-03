@@ -332,7 +332,6 @@ class TripController(private val tripService: TripService) {
             val (validatedPage, validatedSize) = pagenationUtil.validatePageAndSize(page, size)
             val pageable: Pageable = PageRequest.of(validatedPage - 1, validatedSize)
             val findTrips = tripService.getListFollowingTrips(memberId, pageable)
-            val tripsList = findTrips["trips"] as List<*>
             ResponseEntity.status(HttpStatus.OK).body(findTrips)
         } catch (e: IllegalAccessException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to (e.message ?: "")))

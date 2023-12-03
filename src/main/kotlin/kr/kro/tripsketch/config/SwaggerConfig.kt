@@ -17,7 +17,8 @@ class SwaggerConfig {
             .components(
                 io.swagger.v3.oas.models.Components()
                     .addSecuritySchemes(
-                        "bearerAuth", SecurityScheme()
+                        "bearerAuth",
+                        SecurityScheme()
                             .name("bearerAuth")
                             .type(SecurityScheme.Type.HTTP)
                             .scheme("bearer")
