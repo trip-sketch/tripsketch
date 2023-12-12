@@ -1,17 +1,17 @@
 package kr.kro.tripsketch.trip
 
-import kr.kro.tripsketch.dto.*
-import kr.kro.tripsketch.exceptions.ForbiddenException
+import kr.kro.tripsketch.user.dtos.*
+import kr.kro.tripsketch.commons.exceptions.ForbiddenException
 import kr.kro.tripsketch.comment.CommentRepository
 import kr.kro.tripsketch.comment.CommentService
 import kr.kro.tripsketch.comment.dtos.CommentDto
 import kr.kro.tripsketch.follow.FollowRepository
-import kr.kro.tripsketch.repositories.UserRepository
-import kr.kro.tripsketch.services.ImageService
+import kr.kro.tripsketch.user.UserRepository
+import kr.kro.tripsketch.commons.services.ImageService
 import kr.kro.tripsketch.notification.NotificationService
-import kr.kro.tripsketch.services.UserService
+import kr.kro.tripsketch.user.services.UserService
 import kr.kro.tripsketch.trip.dtos.*
-import kr.kro.tripsketch.utils.EnvLoader
+import kr.kro.tripsketch.commons.utils.EnvLoader
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
