@@ -2,9 +2,9 @@
 
 package kr.kro.tripsketch.follow
 
-import kr.kro.tripsketch.user.dtos.ProfileDto
 import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.user.UserRepository
+import kr.kro.tripsketch.user.dtos.ProfileDto
 import kr.kro.tripsketch.user.services.UserService
 import org.springframework.stereotype.Service
 @Service
