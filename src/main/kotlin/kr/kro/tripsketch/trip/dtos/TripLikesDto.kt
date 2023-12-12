@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.trip.dtos
 
 data class TripLikesDto(
     var id: String? = null,

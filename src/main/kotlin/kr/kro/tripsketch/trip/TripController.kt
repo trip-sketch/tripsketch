@@ -1,12 +1,11 @@
-package kr.kro.tripsketch.controllers
+package kr.kro.tripsketch.trip
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.TripService
+import kr.kro.tripsketch.trip.dtos.*
 import kr.kro.tripsketch.utils.PagenationUtil
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -15,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+
 
 /**
  * 게시물과 관련된 요청을 처리하는 컨트롤러입니다.
