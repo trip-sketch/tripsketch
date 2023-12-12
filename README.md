@@ -8,13 +8,15 @@ Welcome to **Tripsketch Backend Server** built with **Spring Boot**!
 <img width="1120" alt="화면들" src="https://github.com/sossost/portfolio./assets/110542210/f5bb03f5-4ca1-46a8-8097-054bcc2b1454">
 
 ## 📜 Introduction
-We power the "TripSketch" mobile app with our robust web server application.
+
+We power the "TRIPSKETCH" mobile app with our robust web server application.
 
 📅 **Development period:** July 2023 - September 2023
 
 ## 🤝 Team Members & Responsibilities
 
 - **Hojun Song**
+
   - Team Leadership
   - User management
   - Image Processing
@@ -22,10 +24,12 @@ We power the "TripSketch" mobile app with our robust web server application.
   - Managing Notifications
 
 - **Saejin Park**
+
   - Implementing Search Features
   - Posts/Articles Management
 
 - **ByeonUk Ko**
+
   - Category Management
   - Threaded Comments Oversight and Management
 
@@ -33,10 +37,13 @@ We power the "TripSketch" mobile app with our robust web server application.
   - Image Processing
 
 ## 🛠 Architecture Diagram
+
 ![트립스케치 구조](https://github.com/limeorange/TripSketch/assets/78308684/8507d6f8-1580-4edd-acc2-0deaf4e6386f)
 
 ## 📦 Installation Guide
+
 ### Prerequisites
+
 - JVM 17
 - Kotlin 1.9.10
 - MongoDB (NoSQL)
@@ -58,14 +65,14 @@ git clone github.com/nea04184/tripsketch
 cd tripsketch
 
 # Step 5: Build and run the project
-./gradlew build  
+./gradlew build
 
 # Step 6: Run the project
 ./gradlew run
 ```
 
-
 ## 📂 Project File Structure
+
 ```
 ├── HELP.md
 ├── build.gradle.kts
@@ -156,10 +163,10 @@ cd tripsketch
         └── kotlin
 ```
 
-
-
 ## 🎨 Project Description
+
 ### Key Features
+
 - User authentication using Kakao OAuth
 - Travel diary CRUD (Create, Read, Update, Delete) functionality
 - Exploration and search feature for travel diaries
