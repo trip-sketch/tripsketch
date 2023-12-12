@@ -1,6 +1,6 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.notification
 
-import kr.kro.tripsketch.domain.Notification
+import kr.kro.tripsketch.notification.Notification
 
 /**
  * @author Hojun Song

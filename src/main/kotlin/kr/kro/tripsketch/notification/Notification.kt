@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.domain
+package kr.kro.tripsketch.notification
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed

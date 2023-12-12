@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.domain
+package kr.kro.tripsketch.follow
 
 import jakarta.validation.constraints.NotBlank
 import org.springframework.data.annotation.Id

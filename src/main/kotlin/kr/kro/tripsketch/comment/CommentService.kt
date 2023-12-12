@@ -8,7 +8,7 @@ import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.trip.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
-import kr.kro.tripsketch.services.NotificationService
+import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
 import org.bson.types.ObjectId
