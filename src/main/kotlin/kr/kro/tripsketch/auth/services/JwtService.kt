@@ -4,9 +4,9 @@ import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import kr.kro.tripsketch.auth.dtos.TokenResponse
-import kr.kro.tripsketch.user.User
 import kr.kro.tripsketch.commons.exceptions.UnauthorizedException
 import kr.kro.tripsketch.commons.utils.EnvLoader
+import kr.kro.tripsketch.user.User
 import org.springframework.stereotype.Service
 import java.util.*
 import javax.crypto.spec.SecretKeySpec

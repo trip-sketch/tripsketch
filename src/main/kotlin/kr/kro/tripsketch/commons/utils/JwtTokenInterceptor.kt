@@ -2,9 +2,9 @@ package kr.kro.tripsketch.commons.utils
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kr.kro.tripsketch.auth.services.JwtService
 import kr.kro.tripsketch.commons.exceptions.ForbiddenException
 import kr.kro.tripsketch.commons.exceptions.UnauthorizedException
-import kr.kro.tripsketch.auth.services.JwtService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor

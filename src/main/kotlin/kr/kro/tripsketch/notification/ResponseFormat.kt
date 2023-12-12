@@ -1,7 +1,5 @@
 package kr.kro.tripsketch.notification
 
-import kr.kro.tripsketch.notification.Notification
-
 /**
  * @author Hojun Song
  */

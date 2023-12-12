@@ -1,12 +1,12 @@
 package kr.kro.tripsketch.user.services
 
+import kr.kro.tripsketch.commons.exceptions.BadRequestException
 import kr.kro.tripsketch.commons.services.ImageService
+import kr.kro.tripsketch.follow.FollowRepository
 import kr.kro.tripsketch.user.User
+import kr.kro.tripsketch.user.UserRepository
 import kr.kro.tripsketch.user.dtos.UserDto
 import kr.kro.tripsketch.user.dtos.UserUpdateDto
-import kr.kro.tripsketch.commons.exceptions.BadRequestException
-import kr.kro.tripsketch.follow.FollowRepository
-import kr.kro.tripsketch.user.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
