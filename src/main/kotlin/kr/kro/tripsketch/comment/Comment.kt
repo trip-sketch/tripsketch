@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.domain
+package kr.kro.tripsketch.comment
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size

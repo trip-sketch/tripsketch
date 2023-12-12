@@ -1,7 +1,7 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.trip.dtos
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import kr.kro.tripsketch.domain.HashtagInfo
+import kr.kro.tripsketch.trip.HashtagInfo
 import java.time.LocalDate
 import java.time.LocalDateTime
 

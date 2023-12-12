@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.domain
+package kr.kro.tripsketch.trip
 
 import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.Length

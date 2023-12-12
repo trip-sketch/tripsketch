@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.trip.dtos
 
 /**
  * 여행 국가별 게시물 빈도수 정보를 담은 DTO 클래스입니다.

@@ -1,11 +1,10 @@
-package kr.kro.tripsketch.controllers
+package kr.kro.tripsketch.comment
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.dto.CommentChildrenCreateDto
-import kr.kro.tripsketch.dto.CommentCreateDto
-import kr.kro.tripsketch.dto.CommentDto
-import kr.kro.tripsketch.dto.CommentUpdateDto
-import kr.kro.tripsketch.services.CommentService
+import kr.kro.tripsketch.comment.dtos.CommentChildrenCreateDto
+import kr.kro.tripsketch.comment.dtos.CommentCreateDto
+import kr.kro.tripsketch.comment.dtos.CommentDto
+import kr.kro.tripsketch.comment.dtos.CommentUpdateDto
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
