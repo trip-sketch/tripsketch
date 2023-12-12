@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.commons.config
+package kr.kro.tripsketch.commons.configs
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

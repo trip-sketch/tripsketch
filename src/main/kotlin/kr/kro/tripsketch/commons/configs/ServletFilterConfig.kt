@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.commons.config
+package kr.kro.tripsketch.commons.configs
 
 import jakarta.servlet.Filter
 import kr.kro.tripsketch.commons.utils.SimpleLoggingFilter
