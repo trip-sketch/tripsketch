@@ -8,7 +8,7 @@ import kr.kro.tripsketch.exceptions.BadRequestException
 import kr.kro.tripsketch.exceptions.DataNotFoundException
 import kr.kro.tripsketch.exceptions.InternalServerException
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.services.KakaoOAuthService
+import kr.kro.tripsketch.auth.services.KakaoOAuthService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
 import org.springframework.data.domain.Page

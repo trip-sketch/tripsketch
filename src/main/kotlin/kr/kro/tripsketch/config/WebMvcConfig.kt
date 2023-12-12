@@ -1,6 +1,6 @@
 package kr.kro.tripsketch.config
 
-import kr.kro.tripsketch.services.JwtService
+import kr.kro.tripsketch.auth.services.JwtService
 import kr.kro.tripsketch.utils.JwtTokenInterceptor
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry

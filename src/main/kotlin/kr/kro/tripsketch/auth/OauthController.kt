@@ -1,9 +1,9 @@
-package kr.kro.tripsketch.controllers
+package kr.kro.tripsketch.auth
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
+import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.config.KakaoOAuthConfig
-import kr.kro.tripsketch.dto.KakaoRefreshRequest
-import kr.kro.tripsketch.services.AuthService
 import kr.kro.tripsketch.services.UserService
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
