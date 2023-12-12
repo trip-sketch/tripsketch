@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.trip.dtos
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
