@@ -1,11 +1,15 @@
-package kr.kro.tripsketch.services
+package kr.kro.tripsketch.comment
 
-import kr.kro.tripsketch.domain.Comment
+import kr.kro.tripsketch.comment.dtos.CommentUpdateDto
+import kr.kro.tripsketch.comment.dtos.CommentChildrenCreateDto
+import kr.kro.tripsketch.comment.dtos.CommentDto
+import kr.kro.tripsketch.comment.dtos.CommentCreateDto
 import kr.kro.tripsketch.dto.*
 import kr.kro.tripsketch.exceptions.ForbiddenException
-import kr.kro.tripsketch.repositories.CommentRepository
 import kr.kro.tripsketch.repositories.TripRepository
 import kr.kro.tripsketch.repositories.UserRepository
+import kr.kro.tripsketch.services.NotificationService
+import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.utils.EnvLoader
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
