@@ -1,6 +1,6 @@
 package kr.kro
 
-import kr.kro.tripsketch.utils.EnvLoader
+import kr.kro.tripsketch.commons.utils.EnvLoader
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling

@@ -1,7 +1,7 @@
 package kr.kro.tripsketch.notification
 
 import jakarta.servlet.http.HttpServletRequest
-import kr.kro.tripsketch.exceptions.UnauthorizedException
+import kr.kro.tripsketch.commons.exceptions.UnauthorizedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
