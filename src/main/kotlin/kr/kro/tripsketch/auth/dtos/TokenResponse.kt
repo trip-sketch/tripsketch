@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.dto
+package kr.kro.tripsketch.auth.dtos
 
 /**
  * @author Hojun Song

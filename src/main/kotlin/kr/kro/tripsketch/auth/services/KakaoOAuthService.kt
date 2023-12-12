@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.services
+package kr.kro.tripsketch.auth.services
 
 import kr.kro.tripsketch.config.KakaoOAuthConfig
 import org.springframework.core.ParameterizedTypeReference

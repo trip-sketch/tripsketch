@@ -1,7 +1,8 @@
-package kr.kro.tripsketch.services
+package kr.kro.tripsketch.auth.services
 
-import kr.kro.tripsketch.dto.KakaoRefreshRequest
-import kr.kro.tripsketch.dto.TokenResponse
+import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
+import kr.kro.tripsketch.auth.dtos.TokenResponse
+import kr.kro.tripsketch.services.UserService
 import org.springframework.stereotype.Service
 
 /**
