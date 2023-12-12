@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.commons.config
+package kr.kro.tripsketch.commons.configs
 
 import kr.kro.tripsketch.auth.services.JwtService
 import kr.kro.tripsketch.commons.utils.JwtTokenInterceptor

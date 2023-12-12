@@ -3,7 +3,7 @@ package kr.kro.tripsketch.auth
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
-import kr.kro.tripsketch.commons.config.KakaoOAuthConfig
+import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import kr.kro.tripsketch.user.services.UserService
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders

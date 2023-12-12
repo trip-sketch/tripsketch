@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.commons.config
+package kr.kro.tripsketch.commons.configs
 
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
