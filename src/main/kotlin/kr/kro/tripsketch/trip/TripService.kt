@@ -5,10 +5,10 @@ import kr.kro.tripsketch.exceptions.ForbiddenException
 import kr.kro.tripsketch.comment.CommentRepository
 import kr.kro.tripsketch.comment.CommentService
 import kr.kro.tripsketch.comment.dtos.CommentDto
-import kr.kro.tripsketch.repositories.FollowRepository
+import kr.kro.tripsketch.follow.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import kr.kro.tripsketch.services.ImageService
-import kr.kro.tripsketch.services.NotificationService
+import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.services.UserService
 import kr.kro.tripsketch.trip.dtos.*
 import kr.kro.tripsketch.utils.EnvLoader

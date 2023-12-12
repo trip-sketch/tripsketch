@@ -4,7 +4,7 @@ import kr.kro.tripsketch.domain.User
 import kr.kro.tripsketch.dto.UserDto
 import kr.kro.tripsketch.dto.UserUpdateDto
 import kr.kro.tripsketch.exceptions.BadRequestException
-import kr.kro.tripsketch.repositories.FollowRepository
+import kr.kro.tripsketch.follow.FollowRepository
 import kr.kro.tripsketch.repositories.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

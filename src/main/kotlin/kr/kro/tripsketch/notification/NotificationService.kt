@@ -1,8 +1,7 @@
-package kr.kro.tripsketch.services
+package kr.kro.tripsketch.notification
 
-import kr.kro.tripsketch.domain.Notification
 import kr.kro.tripsketch.exceptions.UnauthorizedException
-import kr.kro.tripsketch.repositories.NotificationRepository
+import kr.kro.tripsketch.services.UserService
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

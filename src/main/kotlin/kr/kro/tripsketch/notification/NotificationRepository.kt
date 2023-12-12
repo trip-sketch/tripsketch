@@ -1,6 +1,6 @@
-package kr.kro.tripsketch.repositories
+package kr.kro.tripsketch.notification
 
-import kr.kro.tripsketch.domain.Notification
+import kr.kro.tripsketch.notification.Notification
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository

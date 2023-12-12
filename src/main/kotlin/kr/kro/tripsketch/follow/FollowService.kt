@@ -1,11 +1,11 @@
 @file:Suppress("KDocUnresolvedReference", "KDocUnresolvedReference")
 
-package kr.kro.tripsketch.services
+package kr.kro.tripsketch.follow
 
-import kr.kro.tripsketch.domain.Follow
 import kr.kro.tripsketch.dto.ProfileDto
-import kr.kro.tripsketch.repositories.FollowRepository
+import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.repositories.UserRepository
+import kr.kro.tripsketch.services.UserService
 import org.springframework.stereotype.Service
 @Service
 class FollowService(
