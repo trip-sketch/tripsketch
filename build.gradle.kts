@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.1.3"
+    id("org.springframework.boot") version "3.2.1"
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.9.10"
-    kotlin("plugin.spring") version "1.9.10"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.spring") version "1.9.22"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     id("com.diffplug.spotless") version "5.0.0"
 }
@@ -13,7 +13,7 @@ group = "kr.kro"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -88,20 +88,20 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
     implementation("org.junit.jupiter:junit-jupiter-engine:5.8.0")
 
-    // for EXPO Notification
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
-
     // JSON Parse
-    implementation("org.json:json:20230618")
+    implementation("org.json:json:20231013")
 
     // Nominatim 사용을 위한 HTTP 클라이언트
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // 핫리로딩 사용
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 }
 

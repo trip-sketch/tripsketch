@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  app:
+    user: "root"
+    build:
+      context: .
+      dockerfile: docker/local.dockerfile
+    ports:
+      - "8080:8080" # 애플리케이션 포트
+      - "5005:5005" # 디버깅 포트
+    volumes:
+      - .:/app # 로컬 소스 코드를 컨테이너에 마운트
+      # - ~/.gradle:/root/.gradle
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - ACCESS_TOKEN_VALIDITY=${ACCESS_TOKEN_VALIDITY}
+      - REFRESH_TOKEN_VALIDITY=${REFRESH_TOKEN_VALIDITY}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+      - SPRING_MVC_PATHMATCH_MATCHING_STRATEGY=${SPRING_MVC_PATHMATCH_MATCHING_STRATEGY}
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT}
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB}
+      - LOGGING_LEVEL_KR_KRO_TRIPSKETCH=${LOGGING_LEVEL_KR_KRO_TRIPSKETCH}
+      - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+      - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+      - ADMIN_IDS=${ADMIN_IDS}
+      - AWS_ACCESSKEYID=${AWS_ACCESSKEYID}
+      - AWS_SECRETACCESSKEY=${AWS_SECRETACCESSKEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKETNAME=${AWS_BUCKETNAME}
+    command: ["./gradlew", "bootRun"]
