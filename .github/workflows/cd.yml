@@ -7,16 +7,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: SSH and Rebuild & Restart Docker Service
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.KEY }}
-
-      - name: Deploy to VM
-        run: |
-          ssh -i ${{ secrets.KEY }} opc@168.138.40.117 "cd /path/to/your/project && git pull && docker-compose up --build -d tripsketch"
+          host: 217.142.238.10
+          username: opc
+          key: ${{ secrets.KEY }}
+          script: |
+            cd /home/opc
+            docker-compose build --no-cache tripsketch
+            docker-compose up -d --no-deps tripsketch
