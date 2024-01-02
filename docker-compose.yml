@@ -7,9 +7,8 @@ services:
       dockerfile: docker/local.dockerfile
     ports:
       - "8080:8080" # 애플리케이션 포트
-      - "5005:5005" # 디버깅 포트
     volumes:
-      - .:/app # 로컬 소스 코드를 컨테이너에 마운트
+      - .:/app
       # - ~/.gradle:/root/.gradle
     environment:
       - SECRET_KEY=${SECRET_KEY}
