@@ -14,8 +14,8 @@ jobs:
       - name: SSH and Rebuild & Restart Docker Service
         uses: appleboy/ssh-action@master
         with:
-          host: 217.142.238.10
-          username: opc
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
             cd /home/opc
