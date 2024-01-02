@@ -54,6 +54,7 @@ class WebMvcConfig(
                 "/api/trip/guest/**",
                 "/api/trip/like/user/**",
                 "/favicon.ico",
+                "/index.html"
             )
     }
 }
