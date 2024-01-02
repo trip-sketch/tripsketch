@@ -43,6 +43,7 @@ class WebMvcConfig(
         registry.addInterceptor(jwtTokenInterceptor)
             .addPathPatterns("/**")
             .excludePathPatterns(
+                "/index.html",
                 "/swagger-ui/**",
                 "/v3/**",
                 "/api/user/nickname/guest",
@@ -54,7 +55,6 @@ class WebMvcConfig(
                 "/api/trip/guest/**",
                 "/api/trip/like/user/**",
                 "/favicon.ico",
-                "/index.html"
             )
     }
 }
