@@ -3,7 +3,6 @@ package kr.kro.tripsketch.auth.services
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.dtos.TokenResponse
 import kr.kro.tripsketch.user.services.UserService
-import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
 
 /**
@@ -19,7 +18,6 @@ class AuthService(
     private val userService: UserService,
     private val jwtService: JwtService,
 ) {
-    private val logger = LogManager.getLogger(AuthService::class.java)
     /**
      * 카카오를 통해 인증 후 JWT 토큰 반환
      * @param code Kakao OAuth 인증 코드
