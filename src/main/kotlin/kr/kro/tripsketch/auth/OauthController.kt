@@ -6,6 +6,7 @@ import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import kr.kro.tripsketch.user.services.UserService
+import org.junit.platform.commons.logging.LoggerFactory
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -26,17 +27,18 @@ class OauthController(
     private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
 
-    private val logger = LoggerFactory.getLogger(YourControllerClass::class.java)
+    private val logger = LoggerFactory.getLogger(OauthController::class.java)
+
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
     @GetMapping("/callback")
     fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Void> {
-        logger.info("Received Kakao callback with code: $code")
+        logger.info { "Received Kakao callback with code: $code" }
 
         val tokenResponse = authService.authenticateViaKakao(code)
         if (tokenResponse == null) {
-            logger.error("Authentication via Kakao failed for code: $code")
+            logger.error{ "Authentication via Kakao failed for code: $code" }
             return ResponseEntity.status(400).build()
         }
 
@@ -44,7 +46,7 @@ class OauthController(
         response.setHeader("RefreshToken", tokenResponse.refreshToken)
         response.setHeader("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
 
-        logger.info("Successfully processed Kakao callback for code: $code")
+        logger.info{ "Successfully processed Kakao callback for code: $code" }
         return ResponseEntity.status(HttpStatus.FOUND).location(URI("https://tripsketch.kro.kr/index.html")).build()
     }
 
