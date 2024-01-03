@@ -27,7 +27,7 @@ class OauthController(
     private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
 
-    private val logger =  LogManager.getLogger(OauthController::class.java)
+    private val logger = LogManager.getLogger(OauthController::class.java)
 
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
