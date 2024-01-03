@@ -18,6 +18,9 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
+            cd /home/opc/tripsketch
+            git pull origin main
             cd /home/opc
-            docker-compose build --no-cache tripsketch
+            docker-compose build tripsketch
             docker-compose up -d --no-deps tripsketch
+
