@@ -956,7 +956,7 @@ class TripService(
                 val user = userOptional.get()
                 val tripLikesUserInfo = TripLikesUserInfo(
                     nickname = user.nickname,
-                    profileImageUrl = user.profileImageUrl
+                    profileImageUrl = user.profileImageUrl,
                 )
                 tripLikesDto.tripLikesInfo.add(tripLikesUserInfo)
             } else {

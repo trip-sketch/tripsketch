@@ -454,7 +454,7 @@ class TripController(private val tripService: TripService) {
      * */
     @GetMapping("/like/user/{id}")
     fun getTripLikeUser(
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<Any> {
         return try {
             val result = tripService.getTripLikeUser(id)

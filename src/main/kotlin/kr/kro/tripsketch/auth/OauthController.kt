@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.view.RedirectView
-import java.net.URI
 
 /**
  * Kakao OAuth와 관련된 요청을 처리하는 컨트롤러입니다.
@@ -23,8 +22,6 @@ class OauthController(
     private val userService: UserService,
     private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
-
-
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
