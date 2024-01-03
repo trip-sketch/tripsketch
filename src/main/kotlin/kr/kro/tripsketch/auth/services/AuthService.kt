@@ -27,52 +27,23 @@ class AuthService(
      * @author Hojun Song
      */
     fun authenticateViaKakao(code: String): TokenResponse? {
-
-        logger.info("authenticateViaKakao 시작, code: $code")
-
-        val (accessToken, refreshToken) = try {
-            kakaoOAuthService.getKakaoAccessToken(code)
-        } catch (e: Exception) {
-            logger.error("Kakao AccessToken 획득 실패", e)
-            return null
-        }
+        val (accessToken, refreshToken) = kakaoOAuthService.getKakaoAccessToken(code)
 
         if (accessToken == null || refreshToken == null) {
-            logger.info("AccessToken 또는 RefreshToken이 null입니다.")
             return null
         }
 
-        val memberId = try {
-            kakaoOAuthService.getMemberIdFromKakao(accessToken)
-        } catch (e: Exception) {
-            logger.error("Kakao로부터 memberId 획득 실패", e)
-            return null
-        } ?: run {
-            logger.info("Kakao로부터 받은 memberId가 null입니다.")
-            return null
-        }
+        val memberId = kakaoOAuthService.getMemberIdFromKakao(accessToken) ?: return null
+        val user = userService.registerOrUpdateUser(memberId)
 
-        val user = try {
-            userService.registerOrUpdateUser(memberId)
-        } catch (e: Exception) {
-            logger.error("사용자 등록 또는 업데이트 실패", e)
-            return null
-        }
+        user.updateLastLogin()
+        userService.saveOrUpdate(user)
 
-        try {
-            user.updateLastLogin()
-            userService.saveOrUpdate(user)
+        val tokenResponse = jwtService.createTokens(user)
+        userService.updateUserRefreshToken(memberId, tokenResponse.refreshToken)
+        userService.updateKakaoRefreshToken(memberId, refreshToken)
 
-            val tokenResponse = jwtService.createTokens(user)
-            userService.updateUserRefreshToken(memberId, tokenResponse.refreshToken)
-            userService.updateKakaoRefreshToken(memberId, refreshToken)
-
-            logger.info("TokenResponse 성공적으로 생성됨")
-            return tokenResponse
-        } catch (e: Exception) {
-            logger.error("Token 생성 및 저장 중 에러 발생", e)
-            return null
-        }
+        return tokenResponse
     }
 
     /**

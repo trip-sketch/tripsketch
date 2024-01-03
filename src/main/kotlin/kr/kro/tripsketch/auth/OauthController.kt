@@ -1,15 +1,12 @@
 package kr.kro.tripsketch.auth
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import kr.kro.tripsketch.user.services.UserService
-import org.apache.logging.log4j.LogManager
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.view.RedirectView
@@ -27,27 +24,25 @@ class OauthController(
     private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
 
-    private val logger = LogManager.getLogger(OauthController::class.java)
 
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
     @GetMapping("/callback")
-    fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Void> {
-        logger.info("Received Kakao callback with code: $code")
-
+    fun kakaoCallback(@RequestParam code: String): ResponseEntity<String> {
         val tokenResponse = authService.authenticateViaKakao(code)
-        if (tokenResponse == null) {
-            logger.info("Authentication via Kakao failed for code: $code")
-            return ResponseEntity.status(400).build()
+            ?: return ResponseEntity.status(400).build()
+
+        val headers = HttpHeaders().apply {
+            set("AccessToken", tokenResponse.accessToken)
+            set("RefreshToken", tokenResponse.refreshToken)
+            set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
         }
 
-        response.setHeader("AccessToken", tokenResponse.accessToken)
-        response.setHeader("RefreshToken", tokenResponse.refreshToken)
-        response.setHeader("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
+        val resource = resourceLoader.getResource("classpath:/static/index.html")
+        val responseBody = resource.inputStream.bufferedReader().readText()
 
-        logger.info("Successfully processed Kakao callback for code: $code")
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI("https://tripsketch.kro.kr/index.html")).build()
+        return ResponseEntity.ok().headers(headers).body(responseBody)
     }
 
     /**

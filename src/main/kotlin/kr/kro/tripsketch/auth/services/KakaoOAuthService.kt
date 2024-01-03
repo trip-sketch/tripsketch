@@ -1,7 +1,6 @@
 package kr.kro.tripsketch.auth.services
 
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
-import org.apache.logging.log4j.LogManager
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -15,7 +14,6 @@ import org.springframework.web.client.RestTemplate
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     private val restTemplate = RestTemplate()
-    private val logger = LogManager.getLogger(KakaoOAuthService::class.java)
 
     /**
      * Kotlin의 `inline`, `reified`, 그리고 `object : Something()`에 대한 설명:
@@ -53,9 +51,6 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     /** 제공된 코드를 사용하여 카카오로부터 액세스 토큰과 리프레시 토큰을 가져옵니다. */
     fun getKakaoAccessToken(code: String): Pair<String?, String?> {
-
-        logger.info("getKakaoAccessToken 시작, code: $code")
-
         val params = LinkedMultiValueMap<String, String>().apply {
             add("grant_type", "authorization_code")
             add("client_id", kakaoConfig.clientId)
@@ -63,17 +58,10 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
             add("code", code)
         }
 
-        try {
-            val response = requestKakaoToken(params)
-            val accessToken = response?.get("access_token") as? String
-            val refreshToken = response?.get("refresh_token") as? String
-
-            logger.info("Access Token: $accessToken, Refresh Token: $refreshToken")
-            return Pair(accessToken, refreshToken)
-        } catch (e: Exception) {
-            logger.error("getKakaoAccessToken 에서 에러 발생", e)
-            throw e
-        }
+        val response = requestKakaoToken(params)
+        val accessToken = response?.get("access_token") as? String
+        val refreshToken = response?.get("refresh_token") as? String
+        return Pair(accessToken, refreshToken)
     }
 
     /** 카카오 리프레시 토큰을 사용하여 카카오로부터 새로운 액세스 토큰을 가져옵니다. */
@@ -94,12 +82,7 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     /** 액세스 토큰을 사용하여 카카오 사용자의 멤버 ID를 가져옵니다. */
     fun getUserInfo(accessToken: String?): Map<String, Any>? {
-        logger.info("getUserInfo called with accessToken: $accessToken")
-
-        if (accessToken == null) {
-            logger.warn("Access token is null")
-            return null
-        }
+        if (accessToken == null) return null
 
         val url = "https://kapi.kakao.com/v2/user/me"
         val headers = HttpHeaders().apply {
@@ -110,11 +93,9 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val request = HttpEntity<String>("", headers)
 
         return try {
-            logger.info("Sending request to Kakao API")
             val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
             response.body
         } catch (e: RestClientException) {
-            logger.error("Error occurred while requesting user info: ${e.message}")
             null
         }
     }
