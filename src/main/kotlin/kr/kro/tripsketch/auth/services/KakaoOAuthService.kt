@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.auth.services
 
+import org.apache.logging.log4j.LogManager
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate
 class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     private val restTemplate = RestTemplate()
+    private val logger = LogManager.getLogger(KakaoOAuthService::class.java)
 
     /**
      * Kotlin의 `inline`, `reified`, 그리고 `object : Something()`에 대한 설명:
@@ -51,6 +53,9 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     /** 제공된 코드를 사용하여 카카오로부터 액세스 토큰과 리프레시 토큰을 가져옵니다. */
     fun getKakaoAccessToken(code: String): Pair<String?, String?> {
+
+        logger.info("getKakaoAccessToken 시작, code: $code")
+
         val params = LinkedMultiValueMap<String, String>().apply {
             add("grant_type", "authorization_code")
             add("client_id", kakaoConfig.clientId)
@@ -58,10 +63,17 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
             add("code", code)
         }
 
-        val response = requestKakaoToken(params)
-        val accessToken = response?.get("access_token") as? String
-        val refreshToken = response?.get("refresh_token") as? String
-        return Pair(accessToken, refreshToken)
+        try {
+            val response = requestKakaoToken(params)
+            val accessToken = response?.get("access_token") as? String
+            val refreshToken = response?.get("refresh_token") as? String
+
+            logger.info("Access Token: $accessToken, Refresh Token: $refreshToken")
+            return Pair(accessToken, refreshToken)
+        } catch (e: Exception) {
+            logger.error("getKakaoAccessToken 에서 에러 발생", e)
+            throw e
+        }
     }
 
     /** 카카오 리프레시 토큰을 사용하여 카카오로부터 새로운 액세스 토큰을 가져옵니다. */

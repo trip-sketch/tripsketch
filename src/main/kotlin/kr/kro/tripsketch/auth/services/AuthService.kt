@@ -3,6 +3,7 @@ package kr.kro.tripsketch.auth.services
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.dtos.TokenResponse
 import kr.kro.tripsketch.user.services.UserService
+import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
 
 /**
@@ -18,7 +19,7 @@ class AuthService(
     private val userService: UserService,
     private val jwtService: JwtService,
 ) {
-
+    private val logger = LogManager.getLogger(AuthService::class.java)
     /**
      * 카카오를 통해 인증 후 JWT 토큰 반환
      * @param code Kakao OAuth 인증 코드
@@ -26,23 +27,52 @@ class AuthService(
      * @author Hojun Song
      */
     fun authenticateViaKakao(code: String): TokenResponse? {
-        val (accessToken, refreshToken) = kakaoOAuthService.getKakaoAccessToken(code)
 
-        if (accessToken == null || refreshToken == null) {
+        logger.info("authenticateViaKakao 시작, code: $code")
+
+        val (accessToken, refreshToken) = try {
+            kakaoOAuthService.getKakaoAccessToken(code)
+        } catch (e: Exception) {
+            logger.error("Kakao AccessToken 획득 실패", e)
             return null
         }
 
-        val memberId = kakaoOAuthService.getMemberIdFromKakao(accessToken) ?: return null
-        val user = userService.registerOrUpdateUser(memberId)
+        if (accessToken == null || refreshToken == null) {
+            logger.info("AccessToken 또는 RefreshToken이 null입니다.")
+            return null
+        }
 
-        user.updateLastLogin()
-        userService.saveOrUpdate(user)
+        val memberId = try {
+            kakaoOAuthService.getMemberIdFromKakao(accessToken)
+        } catch (e: Exception) {
+            logger.error("Kakao로부터 memberId 획득 실패", e)
+            return null
+        } ?: run {
+            logger.info("Kakao로부터 받은 memberId가 null입니다.")
+            return null
+        }
 
-        val tokenResponse = jwtService.createTokens(user)
-        userService.updateUserRefreshToken(memberId, tokenResponse.refreshToken)
-        userService.updateKakaoRefreshToken(memberId, refreshToken)
+        val user = try {
+            userService.registerOrUpdateUser(memberId)
+        } catch (e: Exception) {
+            logger.error("사용자 등록 또는 업데이트 실패", e)
+            return null
+        }
 
-        return tokenResponse
+        try {
+            user.updateLastLogin()
+            userService.saveOrUpdate(user)
+
+            val tokenResponse = jwtService.createTokens(user)
+            userService.updateUserRefreshToken(memberId, tokenResponse.refreshToken)
+            userService.updateKakaoRefreshToken(memberId, refreshToken)
+
+            logger.info("TokenResponse 성공적으로 생성됨")
+            return tokenResponse
+        } catch (e: Exception) {
+            logger.error("Token 생성 및 저장 중 에러 발생", e)
+            return null
+        }
     }
 
     /**
