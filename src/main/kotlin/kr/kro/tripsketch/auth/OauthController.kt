@@ -1,15 +1,18 @@
 package kr.kro.tripsketch.auth
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletResponse
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import kr.kro.tripsketch.user.services.UserService
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.view.RedirectView
+import java.net.URI
 
 /**
  * Kakao OAuth와 관련된 요청을 처리하는 컨트롤러입니다.
@@ -27,20 +30,15 @@ class OauthController(
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
     @GetMapping("/callback")
-    fun kakaoCallback(@RequestParam code: String): ResponseEntity<String> {
+    fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Void> {
         val tokenResponse = authService.authenticateViaKakao(code)
             ?: return ResponseEntity.status(400).build()
 
-        val headers = HttpHeaders().apply {
-            set("AccessToken", tokenResponse.accessToken)
-            set("RefreshToken", tokenResponse.refreshToken)
-            set("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
-        }
+        response.setHeader("AccessToken", tokenResponse.accessToken)
+        response.setHeader("RefreshToken", tokenResponse.refreshToken)
+        response.setHeader("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
 
-        val resource = resourceLoader.getResource("classpath:/static/index.html")
-        val responseBody = resource.inputStream.bufferedReader().readText()
-
-        return ResponseEntity.ok().headers(headers).body(responseBody)
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI("https://tripsketch.kro.kr/index.html")).build()
     }
 
     /**
