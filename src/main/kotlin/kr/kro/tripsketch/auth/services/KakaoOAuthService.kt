@@ -94,7 +94,12 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
 
     /** 액세스 토큰을 사용하여 카카오 사용자의 멤버 ID를 가져옵니다. */
     fun getUserInfo(accessToken: String?): Map<String, Any>? {
-        if (accessToken == null) return null
+        logger.info("getUserInfo called with accessToken: $accessToken")
+
+        if (accessToken == null) {
+            logger.warn("Access token is null")
+            return null
+        }
 
         val url = "https://kapi.kakao.com/v2/user/me"
         val headers = HttpHeaders().apply {
@@ -105,9 +110,11 @@ class KakaoOAuthService(private val kakaoConfig: KakaoOAuthConfig) {
         val request = HttpEntity<String>("", headers)
 
         return try {
+            logger.info("Sending request to Kakao API")
             val response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef<Map<String, Any>>())
             response.body
         } catch (e: RestClientException) {
+            logger.error("Error occurred while requesting user info: ${e.message}")
             null
         }
     }
