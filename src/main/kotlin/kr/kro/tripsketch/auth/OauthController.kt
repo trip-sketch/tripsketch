@@ -26,18 +26,25 @@ class OauthController(
     private val kakaoOAuthConfig: KakaoOAuthConfig,
 ) {
 
+    private val logger = LoggerFactory.getLogger(YourControllerClass::class.java)
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
     @GetMapping("/callback")
     fun kakaoCallback(@RequestParam code: String, response: HttpServletResponse): ResponseEntity<Void> {
+        logger.info("Received Kakao callback with code: $code")
+
         val tokenResponse = authService.authenticateViaKakao(code)
-            ?: return ResponseEntity.status(400).build()
+        if (tokenResponse == null) {
+            logger.error("Authentication via Kakao failed for code: $code")
+            return ResponseEntity.status(400).build()
+        }
 
         response.setHeader("AccessToken", tokenResponse.accessToken)
         response.setHeader("RefreshToken", tokenResponse.refreshToken)
         response.setHeader("RefreshTokenExpiryDate", tokenResponse.refreshTokenExpiryDate.toString())
 
+        logger.info("Successfully processed Kakao callback for code: $code")
         return ResponseEntity.status(HttpStatus.FOUND).location(URI("https://tripsketch.kro.kr/index.html")).build()
     }
 
