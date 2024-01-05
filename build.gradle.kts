@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.22"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     id("com.diffplug.spotless") version "5.0.0"
+    id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
 group = "kr.kro"
@@ -111,4 +112,16 @@ tasks.withType<Test> {
 
 ktlint {
     disabledRules.set(setOf("no-wildcard-imports"))
+}
+
+jib {
+    from {
+        image = "azul/zulu-openjdk-alpine:21-jre-headless-latest"
+    }
+    to {
+        image = "hojunsong/tripsketch:latest"
+    }
+    container {
+        entrypoint = listOf("java", "-jar", "/app/application.jar")
+    }
 }
