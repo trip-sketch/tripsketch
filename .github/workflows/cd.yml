@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and push Docker image with Jib
         run: |
-          ./gradlew jib --image=hojunsong/tripsketch:latest
+          ./gradlew jib
         env:
           JIB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           JIB_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
