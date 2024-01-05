@@ -122,6 +122,6 @@ jib {
         image = "hojunsong/tripsketch:latest"
     }
     container {
-        entrypoint = ["java", "-cp", "/app/resources:/app/classes:/app/libs/*", "kr.kro.ApplicationKt"]
+        entrypoint = listOf("java", "-cp", "/app/resources:/app/classes:/app/libs/*", "kr.kro.ApplicationKt")
     }
 }
