@@ -19,12 +19,15 @@ jobs:
           java-version: "21"
           distribution: "zulu"
 
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
       - name: Build and push Docker image with Jib
         run: |
           ./gradlew jib
-        env:
-          JIB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          JIB_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: SSH and Pull & Restart Docker Service
         uses: appleboy/ssh-action@master
