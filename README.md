@@ -37,20 +37,19 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
   - Image Processing
 
 ## 🛠 Architecture Diagram
-![image](https://github.com/trip-sketch/tripsketch/assets/51044545/2afaef17-da70-47a4-9ae3-a6fe8ac73659)
+![image](https://github.com/trip-sketch/tripsketch/assets/51044545/72b67441-6652-45cd-9af7-0847a13027d7)
+
 
 ## 📦 Installation Guide
 
 ### Prerequisites
 
-- JVM 17
-- Kotlin 1.9.10
+- JVM 21
+- Kotlin 1.9.22
 - MongoDB (NoSQL)
 
 ```bash
-# Step 1: Install JVM 17
-sudo apt-get update
-sudo apt-get install openjdk-17-jdk
+# Step 1: Install JVM 21 and Kotlin
 
 # Step 2: Install Kotlin 1.9.10
 curl -s https://get.sdkman.io | bash
