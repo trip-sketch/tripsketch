@@ -13,19 +13,30 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
 
 📅 **Development period:** July 2023 - September 2023
 
+
 ## 🛠️ Tech Stack
-[![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white&labelColor=FF4081)](https://kotlinlang.org/)
+
+![Frameworks](https://img.shields.io/badge/-Frameworks-8A2BE2?style=for-the-badge&logo=appveyor&logoColor=white)<br>
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Spring Data MongoDB](https://img.shields.io/badge/Spring_Data_MongoDB-47A248?style=for-the-badge&logo=spring&logoColor=white)](https://spring.io/projects/spring-data-mongodb)
+[![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white&labelColor=FF4081)](https://kotlinlang.org/)
+
+![Database](https://img.shields.io/badge/-Database-FF4500?style=for-the-badge&logo=redis&logoColor=white)<br>
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+![Deployment and Infrastructure](https://img.shields.io/badge/-Deployment%20and%20Infrastructure-1E90FF?style=for-the-badge&logo=azure-devops&logoColor=white)<br>
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![Jib](https://img.shields.io/badge/Jib-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://github.com/GoogleContainerTools/jib)
-[![Caddy](https://img.shields.io/badge/Caddy-00ADD8?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com/)
-[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)
 [![Oracle Cloud Infrastructure](https://img.shields.io/badge/Oracle_Cloud_Infrastructure-F80000?style=for-the-badge&logo=oracle&logoColor=white)](https://www.oracle.com/cloud/)
+[![Caddy](https://img.shields.io/badge/Caddy-00ADD8?style=for-the-badge&logo=caddy&logoColor=white)](https://caddyserver.com/)
+
+![Other Tools](https://img.shields.io/badge/-Other%20Tools-32CD32?style=for-the-badge&logo=nuget&logoColor=white)<br>
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)
 [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
 [![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
+
+
 
 
 ## 🤝 Team Members & Responsibilities
@@ -52,7 +63,8 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
   - Image Processing
 
 ## 🛠 Architecture Diagram
-![image](https://github.com/trip-sketch/tripsketch/assets/51044545/799eccc7-6aa1-46fc-9fc1-e41cfe20cc24)
+![image](https://github.com/trip-sketch/tripsketch/assets/51044545/d07dba50-9b25-424e-adce-7a64a4ae64f1)
+
 
 
 
