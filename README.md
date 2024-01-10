@@ -37,7 +37,8 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
   - Image Processing
 
 ## 🛠 Architecture Diagram
-![image](https://github.com/trip-sketch/tripsketch/assets/51044545/72b67441-6652-45cd-9af7-0847a13027d7)
+![image](https://github.com/trip-sketch/tripsketch/assets/51044545/458fc7c5-42d6-4e94-a331-d435383d7a1a)
+
 
 
 ## 📦 Installation Guide
