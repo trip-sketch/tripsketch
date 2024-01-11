@@ -1,8 +1,11 @@
 package kr.kro.tripsketch.auth.services
 
+import kr.kro.tripsketch.auth.OauthController
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.dtos.TokenResponse
 import kr.kro.tripsketch.user.services.UserService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 /**
@@ -18,6 +21,7 @@ class AuthService(
     private val userService: UserService,
     private val jwtService: JwtService,
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(AuthService::class.java)
     /**
      * 카카오를 통해 인증 후 JWT 토큰 반환
      * @param code Kakao OAuth 인증 코드
@@ -52,22 +56,34 @@ class AuthService(
      */
 
     fun refreshUserToken(request: KakaoRefreshRequest): TokenResponse? {
-        val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null
+        val timestamp = System.currentTimeMillis()
+        logger.warn("[$timestamp] 2.1 리프레시 토큰으로 유저 찾기 시도: ${request.ourRefreshToken}")
+        val user = userService.findByOurRefreshToken(request.ourRefreshToken) ?: return null.also {
+            logger.warn("[$timestamp] 2.2 유저 찾기 실패: 해당 리프레시 토큰 ${request.ourRefreshToken}")
+        }
 
-        val (newAccessToken, newKakaoRefreshToken) = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) ?: return null
-        if (newAccessToken == null) return null
+        logger.warn("[$timestamp] 3.1 카카오 토큰 갱신 시도: KakaoRefreshToken=${user.kakaoRefreshToken}")
+        val (newAccessToken, newKakaoRefreshToken) = kakaoOAuthService.refreshAccessToken(user.kakaoRefreshToken!!) ?: return null.also {
+            logger.warn("[$timestamp] 3.2 카카오 토큰 갱신 실패: KakaoRefreshToken=${user.kakaoRefreshToken}")
+        }
 
         if (newKakaoRefreshToken != null) {
+            logger.warn("[$timestamp] 4.1 카카오 리프레시 토큰 업데이트")
             userService.updateKakaoRefreshToken(user.memberId, newKakaoRefreshToken)
         }
 
+        logger.warn("[$timestamp] 5.1 유저 마지막 로그인 업데이트")
         user.updateLastLogin()
 
+        logger.warn("[$timestamp] 6.1 JWT 토큰 생성 중")
         val tokenResponse = jwtService.createTokens(user)
 
         user.ourRefreshToken = tokenResponse.refreshToken
         userService.saveOrUpdate(user)
+        logger.warn("[$timestamp] 7.1 유저 정보 업데이트 완료: memberId=${user.memberId}")
 
         return tokenResponse
     }
+
+
 }

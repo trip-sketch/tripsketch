@@ -9,6 +9,8 @@ import kr.kro.tripsketch.commons.utils.EnvLoader
 import kr.kro.tripsketch.follow.FollowRepository
 import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.trip.dtos.*
+import kr.kro.tripsketch.trip.model.HashtagInfo
+import kr.kro.tripsketch.trip.model.Trip
 import kr.kro.tripsketch.user.UserRepository
 import kr.kro.tripsketch.user.dtos.*
 import kr.kro.tripsketch.user.services.UserService

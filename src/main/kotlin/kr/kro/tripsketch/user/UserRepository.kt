@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.user
 
+import kr.kro.tripsketch.user.model.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime

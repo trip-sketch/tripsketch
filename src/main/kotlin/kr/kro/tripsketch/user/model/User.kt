@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.user
+package kr.kro.tripsketch.user.model
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size

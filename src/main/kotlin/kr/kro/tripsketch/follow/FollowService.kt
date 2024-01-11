@@ -2,6 +2,7 @@
 
 package kr.kro.tripsketch.follow
 
+import kr.kro.tripsketch.follow.model.Follow
 import kr.kro.tripsketch.notification.NotificationService
 import kr.kro.tripsketch.user.UserRepository
 import kr.kro.tripsketch.user.dtos.ProfileDto

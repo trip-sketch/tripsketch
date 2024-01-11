@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.comment
+package kr.kro.tripsketch.comment.model
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size

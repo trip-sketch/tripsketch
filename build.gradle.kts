@@ -95,8 +95,8 @@ dependencies {
     // Nominatim 사용을 위한 HTTP 클라이언트
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // 핫리로딩 사용
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    // 로깅을 위한 Hightlight.io 의존성 추가
+    implementation("io.highlight:highlight-sdk:0.1.2")
 }
 
 tasks.withType<KotlinCompile> {
@@ -106,9 +106,15 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.bootRun {
+    jvmArgs("-Xmx256m", "-Xms128m")
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs = listOf("-Xmx256m")
 }
+
 
 ktlint {
     disabledRules.set(setOf("no-wildcard-imports"))
