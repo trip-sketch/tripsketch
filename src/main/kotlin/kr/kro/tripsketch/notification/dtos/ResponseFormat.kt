@@ -1,4 +1,6 @@
-package kr.kro.tripsketch.notification
+package kr.kro.tripsketch.notification.dtos
+
+import kr.kro.tripsketch.notification.model.Notification
 
 /**
  * @author Hojun Song

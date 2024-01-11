@@ -106,9 +106,15 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.bootRun {
+    jvmArgs("-Xmx256m", "-Xms128m")
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs = listOf("-Xmx256m")
 }
+
 
 ktlint {
     disabledRules.set(setOf("no-wildcard-imports"))
