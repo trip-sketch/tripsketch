@@ -55,11 +55,11 @@ class OauthController(
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
         val timestamp = System.currentTimeMillis()
-        logger.warn("[$timestamp] 1. 프론트엔드에서 받은 RefreshToken: ${request.ourRefreshToken}")
+        logger.error("[$timestamp] 1. 프론트엔드에서 받은 RefreshToken: ${request.ourRefreshToken}")
 
         val tokenResponse = authService.refreshUserToken(request)
 
-        logger.warn("[$timestamp] 8. 토큰 갱신 후 RefreshToken: ${tokenResponse?.refreshToken}")
+        logger.error("[$timestamp] 8. 토큰 갱신 후 RefreshToken: ${tokenResponse?.refreshToken}")
 
         return if (tokenResponse != null) {
             val headers = HttpHeaders().apply {
