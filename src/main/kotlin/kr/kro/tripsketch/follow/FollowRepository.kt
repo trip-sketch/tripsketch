@@ -1,5 +1,6 @@
 package kr.kro.tripsketch.follow
 
+import kr.kro.tripsketch.follow.model.Follow
 import org.springframework.data.mongodb.repository.MongoRepository
 
 /**

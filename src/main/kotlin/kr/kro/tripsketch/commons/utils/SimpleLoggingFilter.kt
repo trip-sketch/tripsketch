@@ -1,10 +1,11 @@
-package kr.kro.tripsketch.commons.utils
+package kr.kro.tripsketch.commons.utils;
 
-import jakarta.servlet.*
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.apache.logging.log4j.LogManager
-import org.springframework.stereotype.Component
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * `SimpleLoggingFilter`는 요청과 응답에 대한 기본적인 로깅을 수행하는 필터입니다.
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component
 @Component
 class SimpleLoggingFilter : Filter {
 
-    private val logger = LogManager.getLogger(SimpleLoggingFilter::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(SimpleLoggingFilter::class.java)
 
     /**
      * 실제 필터링 로직을 수행하는 메서드입니다.

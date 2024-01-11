@@ -1,6 +1,7 @@
 package kr.kro.tripsketch.notification
 
 import kr.kro.tripsketch.commons.exceptions.UnauthorizedException
+import kr.kro.tripsketch.notification.model.Notification
 import kr.kro.tripsketch.user.services.UserService
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient

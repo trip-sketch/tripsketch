@@ -4,6 +4,7 @@ import kr.kro.tripsketch.comment.dtos.CommentChildrenCreateDto
 import kr.kro.tripsketch.comment.dtos.CommentCreateDto
 import kr.kro.tripsketch.comment.dtos.CommentDto
 import kr.kro.tripsketch.comment.dtos.CommentUpdateDto
+import kr.kro.tripsketch.comment.model.Comment
 import kr.kro.tripsketch.commons.exceptions.ForbiddenException
 import kr.kro.tripsketch.commons.utils.EnvLoader
 import kr.kro.tripsketch.notification.NotificationService

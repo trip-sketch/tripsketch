@@ -3,6 +3,7 @@ package kr.kro.tripsketch.follow
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import kr.kro.tripsketch.commons.exceptions.UnauthorizedException
+import kr.kro.tripsketch.follow.dtos.FollowDto
 import kr.kro.tripsketch.user.dtos.ProfileDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

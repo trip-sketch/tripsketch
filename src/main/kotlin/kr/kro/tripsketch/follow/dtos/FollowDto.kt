@@ -1,4 +1,4 @@
-package kr.kro.tripsketch.follow
+package kr.kro.tripsketch.follow.dtos
 
 import jakarta.validation.constraints.NotBlank
 
