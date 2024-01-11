@@ -5,7 +5,6 @@ import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
 import kr.kro.tripsketch.user.services.UserService
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpHeaders
@@ -26,7 +25,7 @@ class OauthController(
 
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(OauthController::class.java)
+    private val logger = LoggerFactory.getLogger(OauthController::class.java)
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
