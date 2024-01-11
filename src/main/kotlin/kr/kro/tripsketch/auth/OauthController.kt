@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.kro.tripsketch.auth.dtos.KakaoRefreshRequest
 import kr.kro.tripsketch.auth.services.AuthService
 import kr.kro.tripsketch.commons.configs.KakaoOAuthConfig
-import kr.kro.tripsketch.commons.utils.HighlightLoggerWrapper
 import kr.kro.tripsketch.user.services.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
@@ -26,7 +25,7 @@ class OauthController(
 
 ) {
 
-    private val logger = HighlightLoggerWrapper(LoggerFactory.getLogger(OauthController::class.java))
+    private val logger = LoggerFactory.getLogger(OauthController::class.java)
     /**
      * Kakao OAuth 콜백을 처리하는 메서드입니다.
      */
@@ -55,11 +54,11 @@ class OauthController(
     @ApiResponse(responseCode = "400", description = "카카오 토큰을 갱신할 수 없습니다. 제공된 REFRESH 토큰을 확인하세요.")
     fun refreshKakaoToken(@RequestBody request: KakaoRefreshRequest): ResponseEntity<Void> {
         val timestamp = System.currentTimeMillis()
-        logger.warn("[$timestamp] 1. 프론트엔드에서 받은 RefreshToken: ${request.ourRefreshToken}")
+        logger.error("[$timestamp] 1. 프론트엔드에서 받은 RefreshToken: ${request.ourRefreshToken}")
 
         val tokenResponse = authService.refreshUserToken(request)
 
-        logger.warn("[$timestamp] 8. 토큰 갱신 후 RefreshToken: ${tokenResponse?.refreshToken}")
+        logger.error("[$timestamp] 8. 토큰 갱신 후 RefreshToken: ${tokenResponse?.refreshToken}")
 
         return if (tokenResponse != null) {
             val headers = HttpHeaders().apply {
