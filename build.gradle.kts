@@ -79,7 +79,8 @@ dependencies {
     implementation("io.github.cdimascio:java-dotenv:5.2.2")
 
     // Amazon SDK
-    implementation("software.amazon.awssdk:s3:2.20.138")
+    implementation("software.amazon.awssdk:apache-client:2.20.138") {
+    exclude(group = "commons-logging", module = "commons-logging")  }
 
     // 테스트 프레임워크
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
