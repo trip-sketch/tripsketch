@@ -1,17 +1,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread]
-                %replace(%-5level) {
-                'ERROR', '❌ ERROR'
-                'WARN', '⚠️ WARN'
-                'INFO', 'ℹ️ INFO'
-                'DEBUG', '🐛 DEBUG'
-                'TRACE', '🔍 TRACE'
-                }
-                %logger{36} - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
 
