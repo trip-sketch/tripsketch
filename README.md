@@ -115,96 +115,45 @@ cd tripsketch
 ```
 
 ## 📂 Project File Structure
+<details>
+<summary><b>View File Structure</b></summary>
 
 ```
 ├── HELP.md
+├── LICENSE
+├── README.md
 ├── build.gradle.kts
+├── docker
+│   └── local.dockerfile
+├── docker-compose.yml
+├── gradle
+│   └── wrapper
 ├── gradlew
 ├── gradlew.bat
 ├── output.txt
 ├── settings.gradle.kts
 └── src
-    ├── main
-    │   ├── kotlin
-    │   │   └── kr
-    │   │       └── kro
-    │   │           ├── Application.kt
-    │   │           └── tripsketch
-    │   │               ├── config
-    │   │               │   ├── KakaoOAuthConfig.kt
-    │   │               │   ├── S3Config.kt
-    │   │               │   ├── ServletFilterConfig.kt
-    │   │               │   └── WebMvcConfig.kt
-    │   │               ├── controllers
-    │   │               │   ├── CommentController.kt
-    │   │               │   ├── FollowController.kt
-    │   │               │   ├── NotificationController.kt
-    │   │               │   ├── OauthController.kt
-    │   │               │   ├── TripController.kt
-    │   │               │   └── UserController.kt
-    │   │               ├── domain
-    │   │               │   ├── Comment.kt
-    │   │               │   ├── Follow.kt
-    │   │               │   ├── Notification.kt
-    │   │               │   ├── Trip.kt
-    │   │               │   └── User.kt
-    │   │               ├── dto
-    │   │               │   ├── CommentChildrenCreateDto.kt
-    │   │               │   ├── CommentCreateDto.kt
-    │   │               │   ├── CommentDto.kt
-    │   │               │   ├── CommentUpdateDto.kt
-    │   │               │   ├── FollowDto.kt
-    │   │               │   ├── KakaoRefreshRequest.kt
-    │   │               │   ├── ProfileDto.kt
-    │   │               │   ├── ResponseFormat.kt
-    │   │               │   ├── TokenResponse.kt
-    │   │               │   ├── TripAndCommentResponseDto.kt
-    │   │               │   ├── TripCardDto.kt
-    │   │               │   ├── TripCountryFrequencyDto.kt
-    │   │               │   ├── TripCreateDto.kt
-    │   │               │   ├── TripDto.kt
-    │   │               │   ├── TripIdDto.kt
-    │   │               │   ├── TripUpdateDto.kt
-    │   │               │   ├── TripUpdateResponseDto.kt
-    │   │               │   ├── UserDto.kt
-    │   │               │   ├── UserProfileDto.kt
-    │   │               │   └── UserUpdateDto.kt
-    │   │               ├── exceptions
-    │   │               │   ├── CustomException.kt
-    │   │               │   └── GlobalExceptionHandler.kt
-    │   │               ├── repositories
-    │   │               │   ├── CommentRepository.kt
-    │   │               │   ├── FollowRepository.kt
-    │   │               │   ├── NotificationRepository.kt
-    │   │               │   ├── TripRepository.kt
-    │   │               │   └── UserRepository.kt
-    │   │               ├── services
-    │   │               │   ├── AuthService.kt
-    │   │               │   ├── CommentService.kt
-    │   │               │   ├── FollowService.kt
-    │   │               │   ├── ImageService.kt
-    │   │               │   ├── JwtService.kt
-    │   │               │   ├── KakaoOAuthService.kt
-    │   │               │   ├── NickNameService.kt
-    │   │               │   ├── NotificationService.kt
-    │   │               │   ├── S3Service.kt
-    │   │               │   ├── TripService.kt
-    │   │               │   └── UserService.kt
-    │   │               └── utils
-    │   │                   ├── Dotenv.kt
-    │   │                   ├── JwtTokenInterceptor.kt
-    │   │                   ├── PagenationUtil.kt
-    │   │                   └── SimpleLoggingFilter.kt
-    │   └── resources
-    │       ├── META-INF
-    │       ├── application.properties
-    │       ├── banner.txt
-    │       ├── log4j2.xml
-    │       └── static
-    │           └── index.html
-    └── test
-        └── kotlin
+    └── main
+        ├── kotlin
+        │   └── kr
+        │       └── kro
+        │           ├── Application.kt
+        │           └── tripsketch
+        │               ├── auth
+        │               ├── comment
+        │               ├── commons
+        │               ├── follow
+        │               ├── notification
+        │               ├── trip
+        │               └── user
+        └── resources
+            ├── application.properties
+            ├── banner.txt
+            ├── logback.xml
+            └── static
 ```
+
+</details>
 
 ## 🎨 Project Description
 
