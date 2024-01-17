@@ -155,21 +155,17 @@ cd tripsketch
 
 </details>
 
-## 🎨 Project Description
+## 🌟 Key Features
 
-### Key Features
+- 📚 **User Authentication**: User authentication using Kakao OAuth.
+- ✏️ **Travel Diary CRUD**: Create, Read, Update, Delete functionality for travel diaries.
+- 🔍 **Diary Exploration/Search**: Exploration and search feature for travel diaries.
+- ❤️ **Diary 'Like' Feature**: 'Like' feature for travel diaries.
+- 💬 **Comment CRUD**: Comment Create, Read, Update, Delete functionality.
+- 👍 **Comment 'Like' Feature**: 'Like' feature for comments.
+- 📝 **Reply CRUD**: Reply Create, Read, Update, Delete functionality.
+- 💖 **Reply 'Like' Feature**: 'Like' feature for replies.
+- 📥 **User Subscription**: User subscription feature.
+- 🔔 **Push Notifications**: Push notification and notification management feature.
+- 🖊️ **Profile Editing**: Profile editing feature.
 
-- User authentication using Kakao OAuth
-- Travel diary CRUD (Create, Read, Update, Delete) functionality
-- Exploration and search feature for travel diaries
-- 'Like' feature for travel diaries
-- Comment CRUD functionality
-- 'Like' feature for comments
-- Reply CRUD functionality
-- 'Like' feature for replies
-- User subscription feature
-- Push notification and notification management feature
-- Profile editing feature
-- User subscription feature
-- Push notification and notification management feature
-- Profile editing feature
