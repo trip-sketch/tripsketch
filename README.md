@@ -70,7 +70,8 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
 
 ```bash
 # Step 1: Install JVM 21 and Kotlin
-# If you are a Linux user, it is highly recommended to install via the Azul zulu deb or rpm package manager
+# If you are a Linux user
+# It is highly recommended to install via the Azul zulu deb or rpm package manager
 
 # Step 2: Clone the repository
 git clone github.com/trip-sketch/tripsketch
