@@ -168,4 +168,8 @@ cd tripsketch
 - 📥 **User Subscription**: User subscription feature.
 - 🔔 **Push Notifications**: Push notification and notification management feature.
 - 🖊️ **Profile Editing**: Profile editing feature.
+  
 
+## :eyes:  Did you know? 
+
+-  [Using JIB to speed up the build time! by Hojun Song](https://velog.io/@who_doctor/Spring-Boot-Using-JIB-to-speed-up-the-build-time)
