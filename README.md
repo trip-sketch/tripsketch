@@ -60,35 +60,6 @@ We power the "TRIPSKETCH" mobile app with our robust web server application.
 
 📅 **Development period:** July 2023 - September 2023
 
-## 🤝 Team Members & Responsibilities
-
-- **Hojun Song**
-
-  - Team Leadership
-  - User management
-  - Image Processing
-  - User Authentication
-  - Managing Notifications
-
-- **Saejin Park**
-
-  - Implementing Search Features
-  - Posts/Articles Management
-
-- **ByeonUk Ko**
-
-  - Category Management
-  - Threaded Comments Oversight and Management
-
-- **Hyejin Youn**
-  - Image Processing
-
-## 🛠 Architecture Diagram
-![image](https://github.com/trip-sketch/tripsketch/assets/51044545/799eccc7-6aa1-46fc-9fc1-e41cfe20cc24)
-
-
-
-
 ## 📦 Installation Guide
 
 ### Prerequisites
@@ -113,6 +84,24 @@ cd tripsketch
 # Step 6: Run the project
 ./gradlew run
 ```
+
+## 🛠 Architecture Diagram
+![image](https://github.com/trip-sketch/tripsketch/assets/51044545/799eccc7-6aa1-46fc-9fc1-e41cfe20cc24)
+
+## 🌟 Key Features
+
+- 📚 **User Authentication**: User authentication using Kakao OAuth.
+- ✏️ **Travel Diary CRUD**: Create, Read, Update, Delete functionality for travel diaries.
+- 🔍 **Diary Exploration/Search**: Exploration and search feature for travel diaries.
+- ❤️ **Diary 'Like' Feature**: 'Like' feature for travel diaries.
+- 💬 **Comment CRUD**: Comment Create, Read, Update, Delete functionality.
+- 👍 **Comment 'Like' Feature**: 'Like' feature for comments.
+- 📝 **Reply CRUD**: Reply Create, Read, Update, Delete functionality.
+- 💖 **Reply 'Like' Feature**: 'Like' feature for replies.
+- 📥 **User Subscription**: User subscription feature.
+- 🔔 **Push Notifications**: Push notification and notification management feature.
+- 🖊️ **Profile Editing**: Profile editing feature.
+
 
 ## 📂 Project File Structure
 <details>
@@ -155,21 +144,29 @@ cd tripsketch
 
 </details>
 
-## 🌟 Key Features
+## 🤝 Team Members & Responsibilities
 
-- 📚 **User Authentication**: User authentication using Kakao OAuth.
-- ✏️ **Travel Diary CRUD**: Create, Read, Update, Delete functionality for travel diaries.
-- 🔍 **Diary Exploration/Search**: Exploration and search feature for travel diaries.
-- ❤️ **Diary 'Like' Feature**: 'Like' feature for travel diaries.
-- 💬 **Comment CRUD**: Comment Create, Read, Update, Delete functionality.
-- 👍 **Comment 'Like' Feature**: 'Like' feature for comments.
-- 📝 **Reply CRUD**: Reply Create, Read, Update, Delete functionality.
-- 💖 **Reply 'Like' Feature**: 'Like' feature for replies.
-- 📥 **User Subscription**: User subscription feature.
-- 🔔 **Push Notifications**: Push notification and notification management feature.
-- 🖊️ **Profile Editing**: Profile editing feature.
+- **Hojun Song**
+
+  - Team Leadership
+  - User management
+  - Image Processing
+  - User Authentication
+  - Managing Notifications
+
+- **Saejin Park**
+
+  - Implementing Search Features
+  - Posts/Articles Management
+
+- **ByeonUk Ko**
+
+  - Category Management
+  - Threaded Comments Oversight and Management
+
+- **Hyejin Youn**
+  - Image Processing
   
-
 ## :eyes:  Did you know? 
 
 -  [Using JIB to speed up the build time! by Hojun Song](https://velog.io/@who_doctor/Spring-Boot-Using-JIB-to-speed-up-the-build-time)
